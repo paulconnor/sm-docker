@@ -1,0 +1,575 @@
+
+schema set oid-prefix managementUiAttributeType = (1.3.6.1.4.1.3327.300.1);
+schema set oid-prefix managementUiObjectClass = (1.3.6.1.4.1.3327.300.2);
+schema set oid-prefix managementUiNameBinding = (1.3.6.1.4.1.3327.300.3);
+
+#
+# Attribute Definitions.
+#
+schema set attribute managementUiAttributeType:1 = {
+        name   = host
+        syntax = caseIgnoreString
+	single-valued
+	description = "Host name of the dxagent"
+};
+
+schema set attribute managementUiAttributeType:2 = {
+        name   = port
+        syntax = integer
+	single-valued
+	description = "Port number of the dxagent"
+};
+
+schema set attribute managementUiAttributeType:3 = {
+        name   = clientCertPem
+        syntax = caseExactString
+	single-valued
+	description = "Client certificate in PEM format used to access the REST API of the dxagent"
+};
+
+schema set attribute managementUiAttributeType:4 = {
+        name   = clientKeyPem
+        syntax = caseExactString
+	single-valued
+	description = "Client private key in PEM format used to access the REST API of the dxagent"
+};
+
+schema set attribute managementUiAttributeType:5 = {
+        name   = caCertPem
+        syntax = caseExactString
+	description = "CA certificates in PEM format used to verify dxagent server certificate"
+};
+
+schema set attribute managementUiAttributeType:6 = {
+        name   = dsaJsonSchema
+        syntax = caseIgnoreString
+	single-valued
+	description = "DSA JSON schema of the dxagent"
+};
+
+schema set attribute managementUiAttributeType:7 = {
+        name   = installationInfo
+        syntax = caseIgnoreString
+	single-valued
+	description = "Directory installation information of the dxagent"
+};
+
+schema set attribute managementUiAttributeType:8 = {
+        name   = config
+        syntax = caseIgnoreString
+	single-valued
+	description = "DSA configuration"
+};
+
+schema set attribute managementUiAttributeType:9 = {
+        name   = status
+        syntax = caseIgnoreString
+	single-valued
+	description = "DSA status"
+};
+
+schema set attribute managementUiAttributeType:10 = {
+  name = globalKnowledge
+  syntax = boolean
+  single-valued
+};
+
+schema set attribute managementUiAttributeType:11 = {
+        name   = error
+        syntax = caseIgnoreString
+	single-valued
+	description = "DSA reconciliation error"
+};
+
+schema set attribute managementUiAttributeType:12 = {
+    name   = dsaPeers
+    syntax = caseIgnoreString
+    single-valued
+    description = "DSA peers"
+};
+
+schema set attribute managementUiAttributeType:13 = {
+    name   = unmanagedDsaType
+    syntax = caseIgnoreString
+    single-valued
+    description = "Unmanaged DSA type"
+};
+
+schema set attribute managementUiAttributeType:14 = {
+    name   = unmanagedDsaCreatedBy
+    syntax = caseIgnoreString
+    single-valued
+    description = "Who created the unmanaged DSA"
+};
+
+schema set attribute managementUiAttributeType:15 = {
+    name   = time
+    syntax = generalizedTime
+    single-valued
+    description = "Timestamp"
+};
+
+schema set attribute managementUiAttributeType:16 = {
+    name   = messageId
+    syntax = integer
+    single-valued
+    description = "DSA monitoring message ID"
+};
+
+schema set attribute managementUiAttributeType:17 = {
+    name   = id
+    syntax = caseIgnoreString
+    single-valued
+    description = "DSA monitoring alarm ID"
+};
+
+schema set attribute managementUiAttributeType:18 = {
+    name   = type
+    syntax = caseIgnoreString
+    single-valued
+    description = "DSA monitoring alarm type"
+};
+
+schema set attribute managementUiAttributeType:19 = {
+    name   = message
+    syntax = caseIgnoreString
+    single-valued
+    description = "DSA monitoring message"
+};
+
+schema set attribute managementUiAttributeType:20 = {
+    name   = stats
+    syntax = caseIgnoreString
+    single-valued
+    description = "DSA monitoring stats"
+};
+
+schema set attribute managementUiAttributeType:21 = {
+    name   = monitoringLabel
+    syntax = caseIgnoreString
+    single-valued
+    description = "DSA monitoring label for the configuration block"
+};
+
+schema set attribute managementUiAttributeType:22 = {
+    name   = serverCaCertPem
+    syntax = caseExactString
+    description = "CA certificates in PEM format for the management UI server"
+
+};
+
+schema set attribute managementUiAttributeType:23 = {
+    name   = emailSmtpConfig
+    syntax = caseIgnoreString
+    single-valued
+    description = "Email SMTP configuration for sending email notifications"
+};
+
+schema set attribute managementUiAttributeType:24 = {
+    name   = emailGroups
+    syntax = caseIgnoreString
+    single-valued
+    description = "Email addresses of email recipients to whom notification emails will be sent"
+};
+
+schema set attribute managementUiAttributeType:25 = {
+    name   = emailNotificationEnabled
+    syntax = boolean
+    single-valued
+    description = "whether email notification is enabled or not"
+};
+
+schema set attribute managementUiAttributeType:26 = {
+    name   = scimResourceTypes
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim instance resource types"
+};
+
+schema set attribute managementUiAttributeType:27 = {
+    name   = scimDsas
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim instance dsa name list"
+};
+
+schema set attribute managementUiAttributeType:28 = {
+    name   = scimRelationships
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim instance relationships"
+};
+
+schema set attribute managementUiAttributeType:29 = {
+    name   = scimEnabled
+    syntax = boolean
+    single-valued
+    description = "whether the scim instance is enabled or not"
+};
+
+schema set attribute managementUiAttributeType:30 = {
+    name   = scimEndpoint
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type endpoint"
+};
+
+schema set attribute managementUiAttributeType:31 = {
+    name   = scimReadOnly
+    syntax = boolean
+    single-valued
+    description = "Scim resource type read only or not"
+};
+
+schema set attribute managementUiAttributeType:32 = {
+    name   = scimDefaultParentDN
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type default parent DN"
+};
+
+schema set attribute managementUiAttributeType:33 = {
+    name   = scimNamingAttribute
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type naming attribute"
+};
+
+schema set attribute managementUiAttributeType:34 = {
+    name   = scimSchemaExtensions
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type schema extensions"
+};
+
+schema set attribute managementUiAttributeType:35 = {
+    name   = scimObjectClassMappings
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type object class mappings"
+};
+
+schema set attribute managementUiAttributeType:36 = {
+    name   = scimAttributeMappings
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type attribute mappings"
+};
+
+schema set attribute managementUiAttributeType:37 = {
+    name   = scimDescription
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim object description"
+};
+
+schema set attribute managementUiAttributeType:38 = {
+    name   = scimSchemaId
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim schema id"
+};
+
+schema set attribute managementUiAttributeType:39 = {
+    name   = scimSchemaAttributes
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim schema attributes"
+};
+
+schema set attribute managementUiAttributeType:40 = {
+    name   = scimSchema
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type schema"
+};
+
+schema set attribute managementUiAttributeType:41 = {
+    name   = scimSchemaSourceDsa
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type schema source DSA"
+};
+
+schema set attribute managementUiAttributeType:42 = {
+    name   = scimLdapSchema
+    syntax = caseIgnoreString
+    single-valued
+    description = "Scim resource type cached Ldap schema"
+};
+
+schema set attribute managementUiAttributeType:43 = {
+    name   = scimServerUrl
+    syntax = caseIgnoreString
+    single-valued
+    description = "SCIM server URl with the scheme, hostname and port number, e.g. https://testhost:3100"
+};
+
+schema set attribute managementUiAttributeType:44 = {
+    name   = scimServerSecret
+    syntax = caseExactString
+    single-valued
+    description = "The shared secret with the SCIM server"
+};
+
+schema set attribute managementUiAttributeType:45 = {
+    name   = email
+    syntax = caseIgnoreString
+    single-valued
+    description = "Email address for sending OTP to the user"
+};
+
+schema set attribute managementUiAttributeType:46 = {
+    name   = otp
+    syntax = integer
+    single-valued
+    description = "OTP sent to the user when the user initiates forgot password"
+};
+
+schema set attribute managementUiAttributeType:47 = {
+    name   = otpCreationTime
+    syntax = generalizedTime
+    single-valued
+    description = "OTP sent timestamp"
+};
+
+schema set attribute managementUiAttributeType:48 = {
+    name   = otherSettings
+    syntax = caseIgnoreString
+    single-valued
+    description = "Future settings related to Management UI"
+};
+
+#
+# ObjectClass Definitions.
+#
+schema set object-class managementUiObjectClass:1 = {
+        name = managementUiEnvironment
+        subclass-of top
+        kind = structural
+	must-contain
+		name
+	may-contain
+		description,
+		config,
+		emailSmtpConfig,
+		emailGroups,
+		emailNotificationEnabled
+};
+
+schema set object-class managementUiObjectClass:2 = {
+	name = managementUiDxagent
+        subclass-of top
+	kind = structural
+	must-contain
+		name,
+		host,
+		port,
+		clientCertPem,
+		clientKeyPem,
+		caCertPem
+	may-contain
+		description,
+		dsaJsonSchema,
+		installationInfo,
+		serverCaCertPem
+};
+
+schema set object-class managementUiObjectClass:3 = {
+	name = managementUiDSA
+        subclass-of top
+	kind = structural
+	must-contain
+		name,
+		config
+	may-contain
+		status,
+		globalKnowledge,
+		error,
+		dsaPeers,
+		monitoringLabel
+};
+
+schema set object-class managementUiObjectClass:4 = {
+	name = managementUiUnmanagedDSA
+        subclass-of top
+	kind = structural
+	must-contain
+		name,
+		config
+	may-contain
+		globalKnowledge,
+		unmanagedDsaType,
+		unmanagedDsaCreatedBy
+};
+
+schema set object-class managementUiObjectClass:5 = {
+  name = managementUiAlarm
+        subclass-of top
+  kind = structural
+  must-contain
+    name,
+    host,
+    time,
+    messageId,
+    id,
+    type
+  may-contain
+    message
+};
+
+schema set object-class managementUiObjectClass:6 = {
+  name = managementUiStats
+        subclass-of top
+  kind = structural
+  must-contain
+    name,
+    host,
+    time,
+    messageId
+  may-contain
+    stats
+};
+
+schema set object-class managementUiObjectClass:7 = {
+	name = managementUiScimInstance
+        subclass-of top
+	kind = structural
+	must-contain
+		name,
+		scimEnabled,
+		scimResourceTypes,
+		scimDsas
+	may-contain
+		scimRelationships
+};
+
+schema set object-class managementUiObjectClass:8 = {
+	name = managementUiScimResourceType
+        subclass-of top
+	kind = structural
+	must-contain
+		"name", 
+		"scimEndpoint",
+		"scimDescription",
+		"scimDefaultParentDN",
+		"scimNamingAttribute",
+		"scimReadOnly",
+		"scimSchema",
+    "scimObjectClassMappings",
+		"scimAttributeMappings",
+    "scimSchemaSourceDsa"
+	may-contain
+		"scimSchemaExtensions",
+		scimLdapSchema
+};
+
+schema set object-class managementUiObjectClass:9 = {
+	name = managementUiScimSchema
+        subclass-of top
+	kind = structural
+	must-contain
+		"name",
+		"scimSchemaId",
+		"scimDescription",
+		"scimSchemaAttributes"
+};
+
+schema set object-class managementUiObjectClass:10 = {
+  name = managementUiScimServer
+        subclass-of top
+  kind = structural
+  must-contain
+    scimServerUrl,
+    scimServerSecret
+};
+
+schema set object-class managementUiObjectClass:11 = {
+        name = managementUiUserSettings
+        subclass-of top
+        kind = structural
+	must-contain
+		name,
+        email,
+		emailSmtpConfig
+	may-contain
+		otp,
+		otpCreationTime,
+		otherSettings
+};
+
+#
+# Name Binding Definitions.
+#
+schema set name-binding managementUiNameBinding:1 = {
+        name = managementUiEnvironment-ou
+        managementUiEnvironment allowable-parent organizationalUnit
+        named-by name
+        };
+
+schema set name-binding managementUiNameBinding:2 = {
+        name = managementUiDxagent-managementUiEnvironment
+        managementUiDxagent allowable-parent managementUiEnvironment
+        named-by name
+        };
+
+schema set name-binding managementUiNameBinding:3 = {
+        name = managementUiDSA-managementUiDxagent
+        managementUiDSA allowable-parent managementUiDxagent
+        named-by name
+        };
+
+schema set name-binding managementUiNameBinding:4 = {
+        name = ou-managementUiEnvironment
+        organizationalUnit allowable-parent managementUiEnvironment
+        named-by ou
+        };
+
+schema set name-binding managementUiNameBinding:5 = {
+        name = managementUiUnmanagedDSA-ou
+        managementUiUnmanagedDSA allowable-parent organizationalUnit
+        named-by name
+        };
+
+schema set name-binding managementUiNameBinding:6 = {
+        name = managementUiAlarm-ou
+        managementUiAlarm allowable-parent organizationalUnit
+        named-by name
+        };
+
+schema set name-binding managementUiNameBinding:7 = {
+        name = managementUiStats-ou
+        managementUiStats allowable-parent organizationalUnit
+        named-by name
+        };
+		
+schema set name-binding managementUiNameBinding:8 = {
+        name = managementUiScimInstance-ou
+        managementUiScimInstance allowable-parent organizationalUnit
+        named-by name
+        };
+		
+schema set name-binding managementUiNameBinding:9 = {
+        name = managementUiScimResourceType-ou
+        managementUiScimResourceType allowable-parent organizationalUnit
+        named-by name
+        };
+
+schema set name-binding managementUiNameBinding:10 = {
+        name = managementUiScimSchema-ou
+        managementUiScimSchema allowable-parent organizationalUnit
+        named-by scimSchemaId
+        };
+
+schema set name-binding managementUiNameBinding:11 = {
+        name = managementUiScimServer-ou
+        managementUiScimServer allowable-parent organizationalUnit
+        named-by scimServerUrl
+        };
+
+schema set name-binding managementUiNameBinding:12 = {
+        name = managementUiUserSettings-ou
+        managementUiUserSettings allowable-parent organizationalUnit
+        named-by name
+        };
+

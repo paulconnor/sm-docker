@@ -1,0 +1,9 @@
+#
+# Versioning file for Unix install. Note: version must be descending.
+#
+# Program Name, Operating system, version, glibc minor version 2.n (Linux), archictecture, location of tars, Shared Lib
+#
+DXsetup, Linux, 2,6,16,  11, x86_64, linux_x86_64, dxsetuplinux.shlib
+DxMgmtUIsetup, Linux, 2,6,16,  17, x86_64, linux_x86_64, dxsetuplinux.shlib
+DXagentSetup, Linux, 2,6,16,  11, x86_64, linux_x86_64, dxsetuplinux.shlib
+DXwebsetup, Linux, 2,6,16,  11, x86_64, linux_x86_64, dxsetuplinux.shlib

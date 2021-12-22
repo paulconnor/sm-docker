@@ -1,0 +1,13 @@
+# size limits
+set max-users = 255;
+set max-op-size = 1000;
+set multi-write-queue = 20000;
+
+# time limits
+set max-bind-time = none;
+set bind-idle-time = 3600;
+set max-op-time = 600;
+
+set max-ops = 1000;
+set multi-write-queue = 300000;
+set multi-write-outstanding-ops = 1000;

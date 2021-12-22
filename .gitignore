@@ -1,0 +1,8 @@
+base/dockerfiles/siteminder/12.8/ps/install/*.tar.gz
+base/dockerfiles/siteminder/12.8/ps/install/*.zip
+base/dockerfiles/siteminder/12.8/ag/install/*.tar.gz
+base/dockerfiles/siteminder/12.8/ag/install/*.zip
+base/dockerfiles/cadir/14.1.00/install/*.tar.gz
+base/dockerfiles/cadir/14.1.00/install/*.zip
+*.tar
+**/.DS_Store

@@ -1,0 +1,2432 @@
+#!/bin/sh
+# Computer Associates DXserver Setup Script 
+# $Id: dxprepare.shlib,v 1.173 2015/05/12 06:36:07 justin Exp $
+
+COPYCAPKI=0
+NONROOTUSER=0
+#################
+# Product names #
+#################
+PRODNAME="Symantec Directory"
+DXPROD=DXserver
+JREPROD=JRE
+JXPPROD=JXplorer
+DXWEBSERVERPROD="DXwebserver"
+DXMGMTUIPROD="Directory Management UI"
+DXAGENTPROD="Directory DXagent"
+UDDIPROD=UDDI
+EIAMPROD="CA Embedded Entitlements Manager"
+DXMGRPROD=DXmanager
+
+############
+# DXagent  #
+############
+CADIR_MIN_VERSION=12.0.10205
+DXAGENT_FIRST_VERSION=12.5.12858
+DXAGENT_DEFAULT_PORT=9443
+DXAGENT_DEFAULT_CLIENT_NAME=dxaclient
+
+
+##############
+# User names #
+##############
+GECOS_PATTERN="DXserver Administrator*"
+if [ -z "$DXUSER" ]; then DXUSER=dsa; fi
+DXGROUP=etrdir
+
+############
+# Versions #
+############
+MAJOR=14
+MINOR=1
+SP=02
+BLDNUM=16555
+DXVERSION="${MAJOR}.${MINOR}.${SP} build $BLDNUM" 
+DXVERSIONEX="${MAJOR}.${MINOR}.${SP}.${BLDNUM}"
+
+INGVERSION="3.0.3"
+case `uname` in
+    'AIX') INGBUILD=211 ;;
+
+  'SunOS') if [ `uname -m` = "sun4u" ]; then
+               INGBUILD=211
+           else # i86pc
+               INGBUILD=211
+           fi ;;
+
+  'Linux') if [ `uname -m` = "i686" ]; then
+               INGBUILD=103
+           elif [ `uname -m` = "x86_64" ]; then
+               INGBUILD=211
+           else # ia64
+               INGBUILD=211
+           fi ;;
+
+  'HP-UX') if [ `uname -m | awk -F/ '{print $1}'` = "9000" ]; then
+               INGBUILD=211
+           else # ia64
+               INGBUILD=211
+           fi ;;
+esac
+
+JREVERSION=1.7.0
+
+DXSRCSH=". $HOME/.profile"
+
+############################################
+# load library routines from dxsetup.shlib #
+############################################
+source_shared_file()
+{
+    if [ -r $SOURCEDIR/$SHARED_LIBRARY ]; then
+        . $SOURCEDIR/$SHARED_LIBRARY
+    else
+        echo | $LOG
+        echo "  Can't find library of Operating system specific script functions" | $LOG
+        echo | $LOG
+        echo "  Installation terminated." | $LOG
+        exit 1
+    fi
+    
+    if [ -r $SOURCEDIR/dxsetup.shlib ]; then
+        . $SOURCEDIR/dxsetup.shlib
+    else
+        echo | $LOG
+        echo "  Can't find library of script functions" | $LOG
+        echo | $LOG
+        echo "  Installation terminated." | $LOG
+        exit 1
+    fi
+}
+
+dxpasswdtool()
+{
+    # $1 = command:
+	# getuseruid	    get user id
+	# getusergid	    get user group id
+	# getgroupgid   	get group id
+	# getgroupname      get group name providing gid
+	# getuserhomedir	get home directory
+	# getusershell  	get shell
+	# getusergecos  	get shell
+	# searchcomment	return the name of the user that have provided comment field;
+	#		if there's more than one user return '::';
+	#		if there're no users with such comment return ':';
+
+    # $2 = entry: username, groupname or comment string
+    $SOURCEDIR/passwdtool $1 "$2"
+	return $?
+}
+
+############################################
+# Verify that the user is $INSTUSER (root) #
+############################################
+user_verify()
+{
+#    if [ -n "$WRITE_RESPONSE_FILE" ]; then 
+#        # don't check if we're writing a response file 
+#        return 
+#    fi 
+
+    # Try /usr/ucb for Solaris
+    if [ -r /usr/ucb/whoami ] ; then
+        if [ -x /usr/ucb/whoami ]; then
+            WHOAMI=`/usr/ucb/whoami`
+        fi
+    fi
+    # Try /usr/bin for all other platforms
+    if [ -r /usr/bin/whoami ]; then
+        if [ -x /usr/bin/whoami ]; then
+            WHOAMI=`/usr/bin/whoami`
+        fi
+    fi
+    if [ "$WHOAMI"  = "" ]; then
+        echo
+        echo "Your system does not contain the 'whoami' executable, install cannot continue"
+        echo
+        echo "  Installation terminated."
+        exit 1
+    fi
+    TEST=`dxpasswdtool` > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "Cannot run passwdtool. Please check that you are installing on a compatible Unix system"
+        echo
+        echo "  Installation terminated."
+        exit 1
+    fi
+
+	if [ "$WHOAMI" = "$INSTUSER" ]; then
+	    #Root installation
+	    # Firstly try to find 'dsa' user (or other username specified by -dxuser)
+	    if [ "x$DXUSER_PARAM" = "xy" ]; then
+	        # -dxuser parameter specified.
+	        # Does DXUSER exist?
+    	    DSA_UID=`dxpasswdtool getuseruid $DXUSER`
+    	    if [ "x$DSA_UID" != "x" ]; then
+    	        #DXUSER exists
+    	        DXUSER_EXIST=y
+    	        # Does it have "DXserver Administrator" description?
+                GECOS=`dxpasswdtool getusergecos $WHOAMI`
+                case "$GECOS" in
+                    $GECOS_PATTERN)
+                            :
+                        ;;
+                    *)
+                        # No "DXserver Administrator" in the description field. Embedded CAPKI to be installed.
+                        CA_SH_COMP=` if [ -f /etc/profile.CA ]; then . /etc/profile.CA; echo $CASHCOMP; fi`
+                        if [ "x$CA_SH_COMP" = "x" ]; then
+                            COPYCAPKI=1
+                        fi
+                        ;;
+                esac
+    	    fi
+    	else
+    	    # No -dxuser parameter specified, looking for "dsa" account first
+    	    DSA_UID=`dxpasswdtool getuseruid dsa`
+	        if [ "x$DSA_UID" != "x" ]; then
+                DXUSER_EXIST=y
+    	        # Does dsa user have "DXserver Administrator" description?
+                GECOS=`dxpasswdtool getusergecos dsa`
+                case "$GECOS" in
+                    $GECOS_PATTERN)
+                            :
+                        ;;
+                    *)
+                        # No "DXserver Administrator" in the description field. Embedded CAPKI to be installed.
+                        DXUSER=dsa
+                        CA_SH_COMP=` if [ -f /etc/profile.CA ]; then . /etc/profile.CA; echo $CASHCOMP; fi`
+                        if [ "x$CA_SH_COMP" = "x" ]; then
+                            COPYCAPKI=1
+                        fi
+                        ;;
+                esac
+	        else
+	            # 'dsa' user not found, now look for gecos field starting with "DXserver Administrator"
+                USR=`dxpasswdtool searchcomment "DXserver Administrator"`
+                CNT=$?
+	            if [ $CNT -eq 0 ]; then
+                    DXUSER=$USR
+                elif [ $CNT -gt 1 ]; then
+                    echo "More than one \"DXserver Administrator\" exists. Exiting this operation."
+                    exit 1
+                else
+                    # No "dsa" user or any user with "DXserver Administrator"
+                    # New "dsa" user to be created
+                    DXUSER=dsa
+                fi
+            fi
+        fi
+	else
+		#Non-root install, no special requirements for an ordinary user any more
+		DXUSER=$WHOAMI
+        echo
+        echo "  Your user is not \`$INSTUSER'. Please make sure it has sufficient privileges to run $PROGNAME"
+        echo
+
+        DXUSER_EXIST=y
+        NONROOTUSER=1
+        COPYCAPKI=1
+    fi
+
+    if [ "x$DXUSER_EXIST" = "xy" ]; then
+        GID=`dxpasswdtool getusergid $DXUSER`
+        CURDXGROUP=`dxpasswdtool getgroupname "$GID"`
+        export DXUSER CURDXGROUP
+    fi
+    export NONROOTUSER COPYCAPKI
+}
+
+###################
+# check sourcedir #
+###################
+check_sourcedir()
+{
+    TMPSOURCEDIR=""
+    ORIGSOURCEDIR=$SOURCEDIR
+    check_readable $SOURCEDIR
+    if [ $READABLE = "n" ]; then
+        # if SOURCEDIR or its parent directory has permission issues then copy installation source files to
+        # a temporary directory under /tmp Attempt to use this temporary directory as SOURCEDIR.
+        TMPSOURCEDIR=/tmp/cadir_rnd$$
+        echo | $LOG
+        echo "  $SOURCEDIR " |  $LOG
+        echo "  or one of its parent directories is not readable/executable" |  $LOG
+        echo "  Trying $TMPSOURCEDIR" | $LOG
+        echo |  $LOG
+	CURRDR=`pwd`
+        rm -rf $TMPSOURCEDIR && mkdir -p $TMPSOURCEDIR && cd $SOURCEDIR/../../ && cp -rp * $TMPSOURCEDIR && cd $CURRDR
+        if [ $? -ne 0 ]; then
+            exit 1
+        fi
+        ORIGSOURCEDIR=$SOURCEDIR
+        chmod a+rx $TMPSOURCEDIR
+        if [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+            SOURCEDIR=$TMPSOURCEDIR/management-ui/install
+            chmod a+rx $TMPSOURCEDIR/management-ui
+            chmod a+rx $TMPSOURCEDIR/management-ui/install
+        elif [ "$PROGNAME" = "DXagentSetup" ]; then
+            SOURCEDIR=$TMPSOURCEDIR/dxagent/install
+            chmod a+rx $TMPSOURCEDIR/dxagent
+            chmod a+rx $TMPSOURCEDIR/dxagent/install
+        else
+            SOURCEDIR=$TMPSOURCEDIR/dxserver/install
+            chmod a+rx $TMPSOURCEDIR/dxserver
+            chmod a+rx $TMPSOURCEDIR/dxserver/install
+        fi
+        check_readable $SOURCEDIR
+    fi
+    if [ $READABLE = "n" ]; then
+        echo | $LOG
+        echo "  $SOURCEDIR " |  $LOG
+        echo "  or one of its parent directories is not readable/executable" |  $LOG
+        if [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+            echo "  The install cannot execute dxmgmtuisetup.sh" | $LOG
+        else
+            echo "  The install cannot execute dxsetup.sh" | $LOG
+        fi
+        echo |  $LOG
+        echo "  Installation terminated." | $LOG
+        rm -fr $TMPSOURCEDIR
+        exit 1
+    fi
+    if [ ! -d $SOURCEDIR ]; then
+        echo | $LOG
+        echo "$SOURCEDIR is not a directory" |  $LOG
+        echo |  $LOG
+        echo "  Installation terminated." | $LOG
+        exit 1
+    fi
+
+    # use backslashes with linux (-e support)
+    if [ -z `echo -e` ]; then
+        LINUX_USE_BACKSLASHES=-e
+    fi
+}
+
+#########################################################
+# Check if the directory that the user is installing to #
+# has read and execute permission (recursive)           #
+#########################################################
+check_readable()
+{
+    UPONE=`dirname $1`
+    if [ x"$UPONE" = x"/" ]; then
+        READABLE="y"
+        return 0
+    fi
+    if [ -d "$UPONE" ]; then 
+        if [ "r" = `ls -ld $UPONE | awk '{ print $1 }' | cut -c 8` ] && \
+        [ "x" = `ls -ld $UPONE | awk '{ print $1 }' | cut -c 10` -o \
+          "t" = `ls -ld $UPONE | awk '{ print $1 }' | cut -c 10` ]; then
+        # Solaris 9 has the /tmp directory as rwxrwxrwt which causes this
+        # check to fail if SOURCEDIR is in /tmp
+            # Only loop if has more than one slash "/"
+            check_readable $UPONE
+        else
+            READABLE="n"
+        fi
+    fi
+}
+
+#########################################################
+# Check if the directory that the user is installing to #
+# has read and execute permission (recursive)           #
+#########################################################
+check_writeable()
+{
+    UPONE=$1
+    
+    if [ -d $UPONE ]; then 
+    	su - $DXUSER -c "touch $UPONE/ca_dir_install_test.txt" > /dev/null 2>&1 
+    	if [ $? = 0 ]; then
+    		WRITEABLE="y"
+    		rm -rf $UPONE/ca_dir_install_test.txt > /dev/null 2>&1
+    		return 0
+    	else
+    		WRITEABLE="n"
+    		return 1
+    	fi
+	else
+		UPONE=`dirname $UPONE`
+		check_writeable $UPONE
+	fi
+	 
+}
+
+##################################################################
+# if particular file can be located then this must be an upgrade #
+##################################################################
+set_upgrade_variables()
+{
+# DXserver
+
+    UPGRADEDX=0
+    HAVEDX="n"
+    if [ -n "$DXHOME" ] && [ -x $DXHOME/bin/dxserver ]; then
+        HAVEDX="y"
+        if [ -f "$DXTAR" ]; then
+            UPGRADEDX=1
+            NOSAMPLES=1 # Do not run samples at end of upgrade.
+
+            if [ $DEFANS -eq 0 ]; then
+                DXMASTERKEYPASS="defaultpass"
+            elif [ -z "$DXMASTERKEYPASS" ]; then
+                echo                                                                        | $LOG
+                echo "  A default install requires that the DXServer master key certificate password be passed on"  | $LOG
+                echo "  the commandline via the -dxmasterkeypass parameter, or be defined"  | $LOG
+                echo "  in the responsefile by DXMASTERKEYPASS=<value>.  "                  | $LOG
+                echo                                                                        | $LOG
+                echo "  Installation terminated."                                           | $LOG
+                exit 1
+            fi
+
+            if [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+                DXMASTERKEYPASS="randomPass"
+            fi
+        fi
+
+        # add DXHOME/bin to root's LIB_NAME to run OpenSSL libs
+        get_library_name  # OS specific: sets Ingres LIB_NAME
+        case $LIB_NAME in
+            "LD_LIBRARY_PATH" ) LD_LIBRARY_PATH=$DXHOME/bin
+                                export LD_LIBRARY_PATH
+                                ;;
+            "LIBPATH" )         LIBPATH=$DXHOME/bin
+                                export LIBPATH
+                                ;;
+            "SHLIB_PATH" )      SHLIB_PATH=$DXHOME/bin
+                                export SHLIB_PATH
+                                ;;
+        esac
+    fi
+
+# DXwebserver
+
+    UPGRADEDXWEBSERVER=0
+    HAVEDXW="n"
+    if [ -n "$DXWEBHOME" ] && [ -f $DXWEBHOME/bin/dxwebserver.sh ]; then
+        HAVEDXW="y"
+        # Check if we have files to upgrade DXwebserver
+        if [ -f "$DXWTAR" ]; then
+            UPGRADEDXWEBSERVER=1
+            NOWEBSAMPLES=1 # Do not run samples at end of upgrade.
+        fi
+    fi
+
+# Management UI
+
+    UPGRADEUI=0
+    HAVEUI="n"
+    if [ -n "$DXUIHOME" ] && [ -f $DXUIHOME/config.js ]; then
+        HAVEUI="y"
+        # Check if we have files to upgrade DXwebserver
+        if [ -f "$DXUITAR" ]; then
+            UPGRADEUI=1
+        fi
+    fi
+
+# DXmanager
+
+    UPGRADEDXMANAGER=0
+    HAVEDXM="n"
+    if [ "$HAVEDXW" = "y" ]; then
+         if [ -d $DXWEBHOME/webapps/dxmanager ]; then
+            HAVEDXM="y"
+            # Check if we have files to upgrade DXmanager (contained in DXWTAR)
+            if [ -f "$DXWTAR" ]; then 
+                UPGRADEDXMANAGER=1
+            fi
+        fi
+    fi
+
+# DXagent
+
+    UPGRADEDXAGENT=0
+    HAVEDXA="n"
+     if [ -d $DXHOME/dxagent ]; then
+        HAVEDXA="y"
+        # Check if we have files to upgrade DXagent (contained in DXATAR)
+        if [ -f "$DXATAR" ]; then 
+            UPGRADEDXAGENT=1
+        fi
+    fi
+
+# JRE 
+    HAVEJRE="n"
+    if [ -n "$JREHOME" ] && [ -f $JREHOME/bin/java ]; then
+        HAVEJRE="y"
+    fi
+}
+
+######################################################
+# Ask the user what type of install they would like. #
+######################################################
+install_type()
+{
+    echo | $LOG
+    echo "----- OPTIONS --------------------------------" | $LOG
+    echo "  1. Express Install"                           | $LOG
+    echo "  2. Custom Install"                            | $LOG
+    echo "  3. Information on Express Install"            | $LOG
+    echo "  4. Information on Upgrading $PRODNAME"        | $LOG
+    echo "  5. EXIT the Install"                          | $LOG
+    echo "----------------------------------------------" | $LOG
+
+    QUESTION="  Please select an option (1,2,3,4,5)"
+    DEFAULT="1"
+    get_response 12345
+
+    clear
+
+    if [ $RETURN -eq 1 ]; then
+        DEFANS=1
+        SHOW_LICENCE=1
+        EXPRESS=1
+	if [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+	    DXMASTERKEYPASS="randomPass"
+	fi
+    else
+        DEFANS=0
+    fi
+}
+
+check_defans()
+{
+    if [ $DEFANS -eq 0 ]; then
+        return
+    fi
+
+    if [ "$PROGNAME" = "DXsetup" ]; then
+        if [ "$INSTALLDX" = "y" -a -z "$DXMASTERKEYPASS" ]; then
+            echo                                                                        | $LOG
+            echo "  A default install requires that the DXServer master key certificate password be passed on"  | $LOG
+            echo "  the commandline via the -dxmasterkeypass parameter, or be defined"  | $LOG
+            echo "  in the responsefile by DXMASTERKEYPASS=<value>.  "                  | $LOG
+            echo                                                                        | $LOG
+            echo "  Installation terminated."                                           | $LOG
+            exit 1
+        fi
+        if [ "$INSTALLDXAGENT" = "y" -a -z "$DXAGENTPASS" ]; then
+            echo                                                                        | $LOG
+            echo "  A default install requires that the DXagent password be passed on"  | $LOG
+            echo "  the commandline via the -dxagentpass parameter, or be defined"      | $LOG
+            echo "  in the responsefile by DXAGENTPASS=<value>.  "                      | $LOG
+            echo                                                                        | $LOG
+            echo "  Installation terminated."                                           | $LOG
+            exit 1
+        fi
+
+    elif [ "$PROGNAME" = "DXagentSetup" ]; then
+        if [ -z "$DXAGENTPASS" ]; then
+            echo                                                                        | $LOG
+            echo "  A default install requires that the DXagent password be passed on"  | $LOG
+            echo "  the commandline via the -dxagentpass parameter, or be defined"      | $LOG
+            echo "  in the responsefile by DXAGENTPASS=<value>."                        | $LOG
+            echo                                                                        | $LOG
+            echo "  Installation terminated."                                           | $LOG
+            exit 1
+        fi
+
+    elif [ "$PROGNAME" = "DXwebsetup" ]; then
+        if [ "$INSTALLDXMANAGER" = "y" -a -z "$DXMANAGERPASS" ]; then
+            echo                                                                         | $LOG
+            echo "  A default install requires that the DXmanager password be passed on" | $LOG
+            echo "  the commandline via the -dxmanagerpass parameter, or be defined"     | $LOG
+            echo "  in the responsefile by DXMANAGERPASS=<value>."                       | $LOG
+            echo                                                                         | $LOG
+            echo "  Installation terminated."                                            | $LOG
+            exit 1
+        fi
+    fi
+}
+
+####################################################
+# Output the Express Information onto the Terminal #
+####################################################
+express_information()
+{
+    clear
+    echo | $LOG
+
+    # where am I being called from?
+    if [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+	cat <<EOF | $LOG
+####################################################################
+                        -------------------
+                        EXPRESS INFORMATION
+                        -------------------
+                                                                   
+   The express setup will install the following components 
+   into their default directories.
+
+   COMPONENTS                     DIRECTORY 
+
+   1. $DXPROD                    $ETDIRHOME/dxserver
+   2. $DXAGENTPROD        $ETDIRHOME/dxserver/dxagent
+   3. $DXMGMTUIPROD  $ETDIRHOME/management-ui
+                                                                   
+  NOTE: If you want to modify any of these settings                
+        then please choose the CUSTOM install.
+
+####################################################################
+EOF
+    elif [ "$PROGNAME" = "DXsetup" ]; then
+        cat <<EOF | $LOG
+####################################################################
+                        -------------------
+                        EXPRESS INFORMATION
+                        -------------------
+                                                                   
+   The express setup will install the following components 
+   into their default directories.  
+                                                                   
+  COMPONENTS             DIRECTORY 
+                                                                   
+  1. $DXPROD            $ETDIRHOME/dxserver
+                                                                   
+  NOTE: If you want to modify any of these settings                
+        then please choose the CUSTOM install.
+
+####################################################################
+EOF
+#  2. Samples             $ETDIRHOME/dxserver/samples
+
+    elif [ "$PROGNAME" = "DXwebsetup" ]; then
+        cat <<EOF | $LOG
+####################################################################
+                        -------------------
+                        EXPRESS INFORMATION
+                        -------------------
+                                                                   
+   The express setup will install the following components 
+   into their default directories.  
+                                                                   
+  COMPONENTS                   DIRECTORY 
+
+  1. $DXWEBSERVERPROD      $ETDIRHOME/dxwebserver
+                                                                   
+  NOTE: If you want to modify any of these settings                
+        then please choose the CUSTOM install.
+
+####################################################################
+EOF
+    fi
+
+    get_response cont
+    sleep 1
+    install_type
+}
+
+upgrade_information()
+{
+    clear
+    echo | $LOG
+
+    if [ "$PROGNAME" = "DXsetup" -o "$PROGNAME" = "DxMgmtUIsetup" ]; then
+        cat <<EOF | $LOG
+############################################################
+                  -------------------
+                  UPGRADE INFORMATION
+                  -------------------
+
+   The $PRODNAME Upgrade allows the user to upgrade
+   any existing $PRODNAME components as well as
+   install any new components they have never installed
+   before. There are a few things you should know before
+   upgrading any $PRODNAME Components, these are:
+
+  1. An upgrade creates backups of the existing version
+     within the existing directory and owned by the
+     existing owner.
+
+  2. The upgrade will always install into the existing
+     directory. If another location is required then we
+     recommend that you uninstall the components and then
+     re-install choosing a new directory.
+
+  3. Any changes to standard files will be moved into the
+     backup directory and will have to be merged back into
+     the new install if required.
+
+  --------------------------------------------------------
+                       !!WARNING!!
+  --------------------------------------------------------
+  Please read the notes above carefully before continuing
+  on with the install. For more information please read
+  the release notes located on the installation cd.
+
+############################################################
+EOF
+
+    elif [ "$PROGNAME" = "DXwebsetup" ]; then
+        cat <<EOF | $LOG
+############################################################
+                  -------------------
+                  UPGRADE INFORMATION
+                  -------------------
+
+   The $DXWEBSERVERPROD Upgrade allows the user to upgrade
+   any existing $DXWEBSERVERPROD components as well as
+   install any new components they have never installed
+   before. There are a few things you should know before
+   upgrading any $DXWEBSERVERPROD Components, these are:
+
+  1. An upgrade creates backups of the existing version
+     within the existing directory and owned by the
+     existing owner.
+
+  2. The upgrade will always install into the existing
+     directory. If another location is required then we
+     recommend that you uninstall the components and then
+     re-install choosing a new directory.
+
+  --------------------------------------------------------
+                       !!WARNING!!
+  --------------------------------------------------------
+  Please read the notes above carefully before continuing
+  on with the install. For more information please read
+  the release notes located on the installation cd.
+
+############################################################
+EOF
+
+    fi
+
+    get_response cont
+    sleep 1
+    install_type
+}
+
+####################################################
+# Initial handles the welcome screens for dxsetup. #
+####################################################
+initial_screens()
+{
+	PRG="$PRODNAME"
+	if [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+		PRG="$DXMGMTUIPROD"
+	fi
+	if [ "$PROGNAME" = "DXagentSetup" ]; then
+		PRG="$DXAGENTPROD"
+	fi
+	if [ "$PROGNAME" = "DXsetup" ] && [ $SKIPDX -eq 1 ]; then  # we already have this version
+		echo                                                                   | $LOG
+		echo "  A newer/identical version of $PRG has been detected."     | $LOG
+		echo                                                                   | $LOG
+		echo "  Existing Version: $CUR_VERSION"   | $LOG
+		echo "  Install Version : $DXVERSION"               | $LOG
+		echo                                                                   | $LOG
+		exit 1
+	fi
+	if [ "$PROGNAME" = "DxMgmtUIsetup" ] && [ $SKIPUI -eq 1 ]; then  # we already have this version
+		echo                                                                   | $LOG
+		echo "  A newer/identical version of $PRG has been detected."     | $LOG
+		echo                                                                   | $LOG
+		echo "  Existing Version: $UICUR_VERSION"   | $LOG
+		echo "  Install Version : $DXVERSION"               | $LOG
+		echo                                                                   | $LOG
+		exit 1
+	fi
+	if [ "$PROGNAME" = "DXagentSetup" ] && [ $SKIPDXAGENT -eq 1 ]; then  # we already have this version
+		echo                                                                   | $LOG
+		echo "  A newer/identical version of $PRG has been detected."     | $LOG
+		echo                                                                   | $LOG
+		echo "  Existing Version: $DXAGENT_CUR_VERSION"   | $LOG
+		echo "  Install Version : $DXVERSION"               | $LOG
+		echo                                                                   | $LOG
+		exit 1
+	fi
+	if [ "$PROGNAME" = "DXwebsetup" ] && [ $SKIPDXW -eq 1 ]; then
+		echo                                                                   | $LOG
+		echo "  A newer/identical version of $PRG has been detected."     | $LOG
+		echo                                                                   | $LOG
+		echo "  Existing Version: $WXCUR_VERSION"   | $LOG
+		echo "  Install Version : $DXVERSION"               | $LOG
+		echo                                                                   | $LOG
+		exit 1
+	fi
+    if [ "$RSP" = "1" ]; then
+        return
+    fi
+
+    clear
+    if [ $UPGRADEDX -eq 1 ] || [ $UPGRADEUI -eq 1 ] || [ $UPGRADEDXAGENT -eq 1 ] || [ $UPGRADEDXWEBSERVER -eq 1 ]; then
+
+cat <<EOF | $LOG
+---------------------------------------------------------------------------
+  This is an upgrade of $PRG to version $DXVERSION. For further
+  details please review the release notes accompanying this software.
+
+  This upgrade will replace all files from previous releases with new
+  versions. All files will be backed up before being overwritten.
+
+  Any updates or amendments to the standard files WILL BE LOST!
+  Any changes still required will have to be merged back into the new
+  install.
+EOF
+        sleep 2
+    fi
+
+cat <<EOF | $LOG
+---------------------------------------------------------------------------
+              $PRG $DXVERSION Installation/Upgrade
+
+              Copyright 2020 CA. All rights reserved.
+
+$PROGNAME will do the following (if required):
+EOF
+
+    if [ "$PROGNAME" = "DXsetup" ]; then
+cat <<EOF | $LOG
+   * Create and configure a $DXPROD Administrator account
+   * Allow you to choose the installation directory for $DXPROD
+   * Install or Upgrade selected components
+   * Install system startup/shutdown control scripts
+
+EOF
+
+    elif [ "$PROGNAME" = "DXwebsetup" ]; then
+cat <<EOF | $LOG
+   * Create and configure a $DXWEBSERVERPROD Administrator account
+   * Allow you to choose the installation directory for $DXWEBSERVERPROD
+   * Install or Upgrade selected components
+EOF
+    elif [ "$PROGNAME" = "DXagentSetup" ]; then
+cat <<EOF | $LOG
+   * Ensure Directory is already installed
+   * Install and configure or upgrade DXagent
+EOF
+    elif [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+cat <<EOF | $LOG
+   * Install Directory
+   * Install DXagent
+   * Configure embedded Management UI DSAs
+   * Install and configure Management UI node.js server
+   * Install and configure SCIM server
+EOF
+
+    fi
+echo "---------------------------------------------------------------------------" | $LOG
+
+    if [ $DEFANS -eq 0 ]; then
+        install_type
+    fi
+
+    echo "============================= GENERAL INFORMATION =============================" | $LOG
+    echo | $LOG
+    echo "  At y/n/q questions you may type: 'q' then <return>  to quit." | $LOG
+    echo | $LOG
+    echo "  At y/n/i/q questions you may type: 'i' then <return>" | $LOG
+    echo "  to display information on the specific product." | $LOG
+    echo | $LOG
+
+    license_agree
+}
+
+
+#############################################################
+# Check if installing user ok for a major DXmanager upgrade #
+#############################################################
+check_major_upgrade()
+{
+    if [ "$PROGNAME" != "DXwebsetup" ]; then
+        return
+    fi
+
+    if [ $UPGRADEDXWEBSERVER -ne 1 ]; then
+	return
+    fi
+
+    # An upgrade of r12 SP9 onwards is not considered a major upgrade
+    if [ "$WXCUR_MAJOR" -ge "12" -a "$WXCUR_MINOR" -ge "0" -a "$WXCUR_BLDNUM" -ge "6600" ]; then
+        return
+    fi
+
+cat <<EOF | $LOG
+
+---------------------------------------------------------------------------
+               WARNING: This is a major DXmanager upgrade
+
+  In this upgrade, the DXmanager configuration has been extended to
+  support most limits, settings, logging and tracing configuration items.
+
+  Before continuing this upgrade, it is important to be aware that:
+
+  * All DXmanager monitored nodes need to be upgraded to at least 
+    CA Directory r12 SP9, otherwise, newly deployed configuration
+    will be rejected.
+
+  * The DXmanager default configuration has been migrated from the
+    dxmanager.dxc files to DXmanager itself. Any custom configuration or
+    changes to these files may need to be removed and manually applied via
+    DXmanager. If this does not occur, DXmanager defaults may override
+    custom settings. CA Directory will provide details in the alarm and
+    warn logs when an override is detected.
+---------------------------------------------------------------------------
+EOF
+
+    QUESTION="  Do you wish to continue with the upgrade (y/n)"
+    DEFAULT="y"
+    get_response ynq
+
+    if [ "$RETURN" = "n" ]; then
+	checkpoint
+    fi
+}
+
+
+############################################################
+#                        GETOWNER                          #
+############################################################
+# a ls -ld (list the directory and it's properties) on the #
+# directory that is passed in from outside the subroutine. #
+# EXAMPLE: getowner $DXHOME                                #
+############################################################
+getowner()
+{
+    RETURN=`ls -ldL $1 | awk '{print $3; exit}'`
+
+    if [ -z "$RETURN" ]; then
+        echo | $LOG
+        echo "  Internal Error - Can't find any owner for file $1" | $LOG
+        checkpoint
+    fi
+
+    # if user is a number we have a problem ...
+    if expr $RETURN : '[0-9]' >/dev/null ; then
+        echo  | $LOG
+        #echo "  Error - Owner of file $1 is not a known user" | $LOG ## see 9017
+        echo "  The specified folder $1 cannot be used as it is owned by another user." | $LOG
+        checkpoint
+    fi
+}
+
+#####################
+# License Agreement #
+#####################
+license_agree()
+{
+    # skip if license text file not available
+    if [ ! -f $SOURCEDIR/$LICENSE_FILE ]; then
+        return
+    fi
+
+    RETURN="v"
+
+    while [ "$RETURN" != "y" ]; do
+        cat <<EOF | $LOG
+
+=============================  LICENSE AGREEMENT  =============================
+
+  You must agree to the terms of the license agreement before you may
+  install and use this product.
+  ___________________________________________________________________________
+
+  Please refer to the file $ORIGSOURCEDIR/$LICENSE_FILE 
+  for the license agreements governing the use of $PRODNAME, and if you 
+  agree to the terms and conditions, enter the command required to proceed 
+  with this installation. 
+  
+  The command is located within the license file provided.
+  ___________________________________________________________________________
+EOF
+
+        QUESTION="  Enter the command required, or [Return] to quit."
+        DEFAULT=""
+        get_response license
+
+        if [ "$RETURN" = "n" ]; then
+            checkpoint
+        fi
+    done
+}
+
+######################################
+# task 7505: ask for a UID and a GID #
+######################################
+get_uid()
+{
+    if [ $DEFANS -eq 1 ]; then
+        RETURN=0
+    elif [ `uname` = "AIX" ]; then
+        RETURN=0
+    else
+        QUESTION="  Enter a UID for $1, or leave blank to accept the system default"
+        DEFAULT=""
+        get_response port
+
+        if [ -z "$RETURN" ]; then
+            RETURN=0
+        fi
+    fi
+}
+get_gid()
+{
+    if [ $DEFANS -eq 1 ]; then
+        RETURN=0
+    elif [ `uname` = "AIX" ]; then
+        RETURN=0
+    else
+        echo | $LOG
+        echo "  The $1 group needs to be created."
+        QUESTION="  Enter a GID for $1, or leave blank to accept the system default"
+        DEFAULT=""
+        get_response port
+
+        if [ -z "$RETURN" ]; then
+            RETURN=0
+        fi
+    fi
+}
+
+
+########################################
+# request DXserver administration user #
+########################################
+user_dxserver()
+{
+    echo | $LOG
+    echo "  Checking for existing $DXUSER account..." | $LOG
+    # check if DXGROUP exists
+	dxpasswdtool getgroupgid $DXGROUP  > /dev/null 2>&1
+    if [ $? != 0 ]; then
+
+        if [ -z "$DXGID" ]; then
+            get_gid $DXGROUP
+            DXGID=$RETURN
+        fi
+        # if a value for DXGID exists, then this has been set in the responsefile
+
+        dxgroupadd $DXGID $DXGROUP
+        if [ $? != 0 ]; then
+            echo | $LOG
+            echo "  Could not create the $DXGROUP group" | $LOG
+            checkpoint
+        fi
+    fi
+
+    # check if DXUSER exists 
+    id $DXUSER >/dev/null 2>&1
+    if [ $? != 0 ]; then
+
+        get_user_shell $DXUSER $DXSHELL
+        DXSHELL=$RETURN
+
+        if [ -z "$DXUID" ]; then
+            get_uid $DXUSER 
+            DXUID=$RETURN
+        fi
+        # if a value for DXUID exists, then this has been set in the responsefile
+
+        dxuseradd $DXUID $DXGROUP "DXserver Administrator" $ETDIRHOME/dxserver $DXSHELL $DXUSER 
+
+        # note: ETDIRHOME is the _default_ home directory. Once DXHOME 
+        # is defined, then we dxusermod to change this.
+
+        if [ $? = 0 ]; then
+                
+            # Flag that we've just created DXUSER
+            DXUSER_CREATED=1
+            echo | $LOG
+            echo "  $DXUSER account successfully created." | $LOG
+
+            if [ $DEFANS -eq 0 -o -n "$EXPRESS" ] && [ -z "$WRITE_RESPONSE_FILE" ]; then
+                while [ 1 ]; do
+                    echo | $LOG
+                    echo "  The $DXUSER account requires a password" | $LOG
+                    passwd $DXUSER 2>&1
+                    [ $? = 0 ] && break
+                done
+            fi 
+
+        else
+            echo | $LOG
+            echo "  Could not create the $DXUSER account" | $LOG
+            checkpoint
+        fi
+    else
+        # check if DXUSER is logged in; only modify groups if necessary
+
+        echo | $LOG
+        echo "  The $DXUSER account exists. " | $LOG
+        echo "  Its home directory and group membership will be modified if necessary." |$LOG
+
+        if [ `who | grep $DXUSER | wc -l` -gt 0 ]; then
+            echo | $LOG
+            echo "  WARNING: the $DXUSER account is currently logged in. This may cause " | $LOG
+            echo "  group membership modifications to fail. Please add these manually "   | $LOG
+            echo "  after the upgrade is complete."                                       | $LOG
+        fi
+
+        # handle the difference in OS's reporting of groups
+        GROUPLIST=`groups $DXUSER | awk -F: '{print$2}'`
+        if [ -z "$GROUPLIST" ]; then
+            GROUPLIST=`groups $DXUSER`
+        fi
+
+        if [ "`echo $GROUPLIST | awk '{print $1}'`" != "$DXGROUP" ]; then
+            # task 8715: DXGROUP must be(come) DXUSER's primary group
+            echo | $LOG
+            echo "  Adding $DXUSER to group $DXGROUP" | $LOG
+            dxusermodgroup $DXGROUP $DXUSER primary
+        fi
+
+        # now add any others 
+        for group in $GROUPLIST; do 
+            # is it there already?
+            groups $DXUSER | grep $group > /dev/null 2>&1
+            if [ $? -ne 0 ]; then
+                echo "  Adding $DXUSER to group $group" | $LOG
+                dxusermodgroup $group $DXUSER
+            fi
+        done;
+    fi
+
+    # call ~/.profile when su'ing to user with bash shell (see 11343, 11344, 11345)
+    if [ "$DXSHELL" = "" ]; then
+        DXSHELL=`dxpasswdtool getusershell $DXUSER`
+    fi
+    if [ "`basename $DXSHELL`" = "bash" ]; then
+    	DXUSERDIR=`dxpasswdtool getuserhomedir $DXUSER`
+    	if [ `uname` = "SunOS" ] || [ `uname` = "HP-UX" ]; then
+	       	DXSRCBASH="source ~/.profile;"
+	    fi
+    	
+    fi
+
+}
+
+############################################
+# check dsa' environment during dxingsetup #
+# (AFTER DXserver is installed)            #
+############################################
+user_dxuser_check()
+{
+    id $DXUSER >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        return
+    fi
+}
+
+###########################
+# used to identify DXUSER #
+# default is dsa          #
+###########################
+get_dxuser()
+{
+    # may be called with a parameter indicating where it has been called from.
+    # $1="" dxuninst or dxwebuninst (DXUSER should always exist)
+    # $1="dxsetup" (also applies to dxwebsetup)
+
+    # find the DXserver Administrator (dsa)
+    id $DXUSER > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        # have one guess, then give up and ask user
+		USR=`dxpasswdtool searchcomment "DXserver Administrator"`
+		if [ $? = 0 ]; then
+            DXUSER=$USR
+        else
+            if [ "$1" = "dxsetup" ]; then
+                : # fine, we don't care
+            else
+                id $DXUSER > /dev/null 2>&1
+                while [ $? -gt 0 ]; do
+                    echo
+                    echo "  Unable to identify DXserver Administrator (dsa)"
+                    echo "  Please enter the DXserver Administrator username: "
+                    echo
+                    read DXUSER
+                    if [ -z "$DXUSER" ]; then
+                        exit 1
+                    fi
+                    id $DXUSER > /dev/null 2>&1
+                done
+            fi
+        fi
+     else
+	#13651: need to check the DSA user and its environment to make sure it is ok 
+	# to install or upgrade
+               if [ $NONROOTUSER -eq 1 ]; then
+                        "$DXSRCBASH env | grep DXHOME" > /dev/null 2>&1
+                        if [ $? -gt 0 ]; then
+                                return 
+                        fi
+               else
+		    su - $DXUSER -c "$DXSRCBASH env | grep DXHOME" > /dev/null 2>&1
+               fi
+		if [ $? = 0 ]; then
+			DXHOMEDIR=`su - $DXUSER -c "env | grep DXHOME" | awk -F= '{print $2}'` > /dev/null 2>&1
+             	fi	
+		if [ -n "$DXHOMEDIR" ]; then 
+			if [ -x $DXHOMEDIR/bin/dxserver ]; then
+				su - $DXUSER -c "$DXSRCBASH dxserver status" > /dev/null 2>&1
+				if [ $? -ne 0 ]; then
+					echo | $LOG
+					echo " There appears to be something wrong with your current" | $LOG
+					echo " install of $DXPROD. You may have an incorrect DXHOME" | $LOG
+					echo " or your current install may be corrupt. " | $LOG
+					echo " Please check before proceeding. " | $LOG
+					echo
+					exit 1
+				else
+					continue
+				fi
+			else
+				echo 
+				echo " Your DXHOME is pointing to a location with no dxserver installed." | $LOG
+				echo " Please check your installation before proceeding. " | $LOG
+				echo 
+				exit 1
+			fi 
+		fi
+		if [ "$PROGNAME" != "DXserver Uninstall" ]; then 
+			HOMEDIR=`dxpasswdtool getuserhomedir $DXUSER`
+			if [ "$HOMEDIR" != "$DXHOMEDIR" ]; then 		
+				mkdir -p $HOMEDIR 
+				if [ $? -ne 0 ]; then
+					echo 
+					echo " cannot create home directory $HOMEDIR for $DXUSER" | $LOG
+					echo
+					exit 1
+				fi
+						
+				chown $DXUSER:$DXGROUP $HOMEDIR
+				if [ $? -ne 0 ]; then
+					echo | $LOG
+					echo " Cannot set the correct ownership on $HOMEDIR for $DXUSER" | $LOG
+					echo " Please check that the $DXUSER user is a part of the appropriate $DXGROUP group." | $LOG
+					echo
+					exit 1
+				fi
+			fi
+		fi
+    fi
+}
+
+###############################
+# Works out what is installed #
+###############################
+whats_installed()
+{
+    # DXserver
+
+    if [ -n "$DXHOME" ] && [ -x $DXHOME/bin/dxserver ]; then
+        DXINST=1
+    fi
+
+    # DXagent
+
+    if [ -n "$DXHOME" ] && [ -x $DXHOME/dxagent/start_dxagent.sh ]; then
+        DXAINST=1
+    fi
+
+    # DXwebserver
+
+    if [ -n "$DXWEBHOME" ] && [ -f $DXWEBHOME/start ]; then
+        DXWEBSERVERINST=1
+    fi
+
+    # Management UI
+
+    if [ -n "$DXUIHOME" ] && [ -f $DXUIHOME/config.js ]; then
+        DXUIINST=1
+    fi
+
+    # JXplorer
+
+    if [ -n "$JXPHOME" ] && [ -d $JXPHOME/jars ]; then
+        if [ -f $JXPHOME/.reference_count ]; then
+            # only if we installed it
+            JXPINST=1
+        fi
+    fi
+
+    # DXwebserver
+
+    if [ -f $DXWEBHOME/bin/dxwebserver.sh ]; then
+        DXWEBSERVERINST=1
+    fi
+}
+
+
+#######################################
+# Sets the home directories           #
+# used for both install and uninstall #
+#######################################
+set_home_dirs()
+{
+    if [ -n "$DXHOME" ]; then
+    #13549: if dxhome is set in the responsefile we need to check to see if there is an existing 
+    #install. If yes then we need to upgrade it regardless of the responsefile. 
+    if [ $NONROOTUSER -eq 0 ]; then
+          DXHOME2=`su - $DXUSER -c "$DXSRCBASH env | grep '^DXHOME=' " | grep DXHOME | awk -F= '{print $2}' `
+    else
+          DXHOME2=env | grep "^DXHOME=" | grep DXHOME | awk -F= '{print $2}'
+    fi
+    if [ -n "$DXHOME2" ]; then
+    	if [ "$DXHOME" = "$DXHOME2" ]; then
+    		: 
+    	else
+   			DXHOME=$DXHOME2
+    	fi
+    fi
+    	
+    
+        # this has been set in the responsefile
+    else
+        # if this is an upgrade, then we will have a DXUSER and a DXHOME
+        id $DXUSER >/dev/null 2>&1
+        if [ $? -eq 0 ] && [ $NONROOTUSER -eq 0 ]; then
+
+            # call ~/.profile when su'ing to user with bash shell (see 11343, 11344, 11345)
+            DXSHELL=`dxpasswdtool getusershell $DXUSER`
+        	DXUSERDIR=`dxpasswdtool getuserhomedir $DXUSER`
+	        if [ "`basename $DXSHELL`" = "bash" ]; then
+	           	if [ `uname` = "HP-UX" ] || [ `uname` = "SunOS" ]; then
+	               	DXSRCBASH="source ~/.profile;"
+	           	fi
+	        fi
+            DXHOME=`su - $DXUSER -c "$DXSRCBASH env | grep '^DXHOME=' " >/dev/null`
+            if [ $? -eq 0 ]; then
+                DXHOME=`su - $DXUSER -c "$DXSRCBASH env | grep '^DXHOME=' " | grep DXHOME | awk -F= '{print $2}' `
+            else
+                DXHOME=""
+            fi
+        fi
+        if [ $NONROOTUSER -eq 0 ]; then
+              DXHOME=env | grep "^DXHOME=" | grep DXHOME | awk -F= '{print $2}'
+        fi
+        if [ -z "$DXHOME" ] && [ -n "$ETDIRHOME" ]; then
+            DXHOME=$ETDIRHOME/dxserver
+        fi
+    fi
+
+# non-dxserver installs will not have DXHOME defined, 
+# so need to check dsa's HOME directory
+
+    DIROK=0
+    if [ -n "$DXHOME" ] && [ -d $DXHOME ] ; then
+        DIROK=1
+    elif [ $NONROOTUSER -eq 0 ]; then
+        id $DXUSER > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            # user exists, test for home
+            DSAHOME=`dxpasswdtool getuserhomedir $DXUSER`
+        fi
+        if [ -n "$DSAHOME" ] && [ -d $DSAHOME ]; then
+            DIROK=1
+        fi
+    fi
+
+# JXplorer
+# used for uninstalls of JXplorer installed by pre-r12 DXsetup
+    id $DXUSER >/dev/null 2>&1
+    if [ $? = 0 ]; then
+        if [ $DIROK -eq 1 ]; then
+        if [ $NONROOTUSER -eq 0 ]; then
+            for path in `su - $DXUSER -c "$DXSRCBASH env | grep '^PATH=' " |grep PATH | awk -F= '{print $2}'  | sed 's/^:/.:/;s/:$/./;s/:/ /g' `
+            do
+                if [ -n "`echo $path | grep jxplorer`" ]; then
+                    JXPHOME=$path
+                    break
+                fi
+            done
+        else
+            for path in `env | grep "^PATH=" |grep PATH | awk -F= '{print $2}'  | sed 's/^:/.:/;s/:$/./;s/:/ /g' `
+            do
+                if [ -n "`echo $path | grep jxplorer`" ]; then
+                    JXPHOME=$path
+                    break
+                fi
+            done
+        fi
+        fi
+    fi
+
+# DX MGMT UI
+
+    if [ -z "$DXUIHOME" ]; then
+	id $DXUSER >/dev/null 2>&1
+	if [ $? = 0 ]; then
+	    if [ $DIROK -eq 1 ]; then
+        if [ $NONROOTUSER  -eq 0 ]; then
+		for path in `su - $DXUSER -c "$DXSRCBASH env | grep '^PATH=' " | grep PATH | awk -F= '{print $2}' | sed 's/^:/.:/;s/:$/./;s/:/ /g'`
+		do
+		    if [ -n "`echo $path | grep management-ui`" ]; then
+			DXUIHOME=$path
+			break
+		    fi
+		done
+         else
+              for path in `env | grep "^PATH=" | grep PATH | awk -F= '{print $2}' | sed 's/^:/.:/;s/:$/./;s/:/ /g'`
+                do
+                    if [ -n "`echo $path | grep management-ui`" ]; then
+                        DXUIHOME=$path
+                        break
+                    fi
+                done
+         fi
+	    fi
+	fi
+    fi
+
+# DXwebserver
+
+    if [ -z "$DXWEBHOME" ]; then
+	id $DXUSER >/dev/null 2>&1
+	if [ $? = 0 ]; then
+	    if [ $DIROK -eq 1 ]; then
+        if [ $NONROOTUSER  -eq 0 ]; then
+		for path in `su - $DXUSER -c "$DXSRCBASH env | grep '^PATH=' " | grep PATH | awk -F= '{print $2}' | sed 's/^:/.:/;s/:$/./;s/:/ /g'`
+		do
+		    if [ -n "`echo $path | grep dxwebserver`" ]; then
+			DXWEBHOME=`dirname $path`
+			break
+		    fi
+		done
+         else
+              for path in `env | grep "^PATH=" | grep PATH | awk -F= '{print $2}' | sed 's/^:/.:/;s/:$/./;s/:/ /g'`
+                do
+                    if [ -n "`echo $path | grep dxwebserver`" ]; then
+                        DXWEBHOME=`dirname $path`
+                        break
+                    fi
+                done
+         fi
+	    fi
+	fi
+    fi
+    if [ -z "$DXWEBHOME" ] || [ ! -d $DXWEBHOME ]; then
+        # new installation
+        # If dxserver exists then use this as the base
+        if [ -n "$DXHOME" ] && [ -d $DXHOME ]; then
+            DXWEBHOME=`dirname $DXHOME`/dxwebserver
+        elif [ -n "$ETDIRHOME" ]; then
+            DXWEBHOME=$ETDIRHOME/dxwebserver
+        fi
+    fi
+# JRE 
+
+    if [ -n "$JAVA_LOC" ]; then
+        # this has been set in the responsefile
+        JAVA_OK="y"
+    elif [ -n "$DXHOME" ] && [ -d $DXHOME ]; then
+        if [ $NONROOTUSER -eq 0 ];then
+        # must run su's as /bin/sh to counter truely ugly C shell possibility for DXUSER
+        JAVA_LOC=`su - $DXUSER -c "sh -c 'which java 2>/dev/null'" | grep java | grep -v "no java in" | grep -v "not found"`
+        else
+        JAVA_LOC=`sh -c 'which java 2>/dev/null' | grep java | grep -v "no java in" | grep -v "not found"`
+        fi
+    elif [ -n "$DXWEBHOME" ] && [ -d $DXWEBHOME ]; then
+        JAVA_LOC=`su - $DXUSER -c "sh -c 'which java 2>/dev/null'" | grep java | grep -v "no java in" | grep -v "not found"`
+    else
+        # find the system java
+        JAVA_LOC=`which java 2>/dev/null | grep -v "no java in" | grep -v "not found"`
+    fi
+
+    # if Java location is a symbolic link then try and locate target
+    if [ -h "$JAVA_LOC" ]; then
+        SYMLINKTARGET=`ls -l $JAVA_LOC | awk '{print $11}'`
+    fi
+    if [ -z "$SYMLINKTARGET" ]; then # check alternate ls format
+        SYMLINKTARGET=`ls -l $JAVA_LOC | awk '{print $10}'`
+    fi
+    if [ -f "$SYMLINKTARGET" -a "/" = "`echo $SYMLINKTARGET | cut -c 1-1`" ]; then
+        JAVA_LOC=$SYMLINKTARGET
+    fi
+    if [ "$PROGNAME" = "DXwebsetup" ] && [ -z "$JAVA_OK" ]; then
+        RETURN="n"
+        while [ $RETURN = "n" ]; do
+            QUESTION="  Specify the Java Binary to use"
+            DEFAULT=$JAVA_LOC
+            get_response path
+	    if [ -h "$RETURN" ]; then
+                echo | $LOG
+                echo "Please supply the physical path to the Java Binary and not a symbolic link" | $LOG
+                RETURN=n
+            else
+                GETDIR=$RETURN
+                PROD="jre"
+                PRODSIZE=$DXSIZE
+                check_product_dir
+            fi
+        done
+        JAVA_LOC=$GETDIR
+        # version checked in set_upgrade_variables and find_previous_versions
+    fi
+    if [ -n "$JAVA_LOC" ]; then
+        JREHOME=`dirname $JAVA_LOC`
+        JREHOME=`dirname $JREHOME`
+    fi
+    export ETDIRHOME DXHOME INGHOME II_SYSTEM DXWEBHOME JREHOME JXPHOME DXUIHOME
+}
+
+########################
+# move the install log #
+########################
+relocate_log()
+{
+    # Put on stricter permissions
+    chmod 644 $INSTALL_LOG
+
+    if [ "$PROGNAME" = "DXsetup" ]; then
+        LOGHOME=`dirname $DXHOME`
+    elif [ "$PROGNAME" = "DXwebsetup" ]; then
+        LOGHOME=`dirname $DXWEBHOME`
+    elif [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+        LOGHOME=`dirname $DXUIHOME`
+    else
+        return
+    fi
+
+    if [ -f $LOGHOME/$INSTALL_LOG_NAME ]; then
+        cat $LOGHOME/$INSTALL_LOG_NAME $INSTALL_LOG $RESPONSE_FILE > $LOGHOME/tmp.log
+        mv $LOGHOME/tmp.log $LOGHOME/$INSTALL_LOG_NAME
+    else 
+        cat $INSTALL_LOG $RESPONSE_FILE > $LOGHOME/$INSTALL_LOG_NAME
+    fi
+
+    chgrp $DXGROUP $LOGHOME/$INSTALL_LOG_NAME | $LOG
+    chown $DXUSER $LOGHOME/$INSTALL_LOG_NAME | $LOG  
+
+    echo | $LOG
+    echo "  The installation log has been written to" | $LOG
+    echo "    $LOGHOME/$INSTALL_LOG_NAME "            | $LOG
+}
+
+##############################################
+# determine OS and set variables accordingly #
+##############################################
+set_operating_system()
+{
+    # Determine what operating system the install is running on
+
+    OS=`uname`
+    SOLVER=`uname -r`
+
+    # Determine version and architecture of the detected operating system
+    # Some information may not be relevant include the Linux specifc 3rd version
+    # for the kernel and the Architecture.
+
+    case $OS in
+        "SunOS" )
+            OS_FIRST_VERSION=`uname -r | awk -F. '{print $1}'`
+            OS_SECOND_VERSION=`uname -r | awk -F. '{print $2}'`
+            OS_THIRD_VERSION=0
+            OS_ARCHITECTURE=`uname -p`
+        ;;
+
+        "HP-UX" )
+            OS_FIRST_VERSION=`uname -r | awk -F. '{print $2}'`
+            OS_SECOND_VERSION=`uname -r | awk -F. '{print $3}'`
+            OS_THIRD_VERSION=0
+            OS_ARCHITECTURE=`uname -m | awk -F/ '{print $1}'`
+        ;;
+
+        "AIX"   )
+            OS_FIRST_VERSION=`uname -v` 
+            OS_SECOND_VERSION=`uname -r`
+            OS_THIRD_VERSION=0
+            OS_ARCHITECTURE=all
+        ;;
+
+        "Linux" )
+            OS_FIRST_VERSION=`uname -r | awk -F. '{print $1}'`
+            OS_SECOND_VERSION=`uname -r | awk -F. '{print $2}'`
+            OS_THIRD_VERSION=`uname -r | awk -F- ' {print $1}' | awk -F. '{print $3}'`
+            OS_ARCHITECTURE=`uname -m`
+            if [ -f /usr/bin/ldd ]; then
+                OS_GLIBC_MINOR=`/usr/bin/ldd --version | head -1 | awk -F\) '{printf $2}' | awk -F. '{printf $2}'`
+            elif [ -f /lib/libc.so.6]; then
+                OS_GLIBC_MINOR=`/lib/libc.so.6 | head -1 | awk -F, '{printf $1}' | awk -F. '{printf $2}'`
+            else
+                OS_GLIBC_MINOR=4 # guess
+            fi
+            NONEWLINE=-e
+        ;;
+
+               *)
+            echo | $LOG
+            echo "  Operating system not supported" | $LOG
+            echo | $LOG
+            echo "  Installation terminated." | $LOG
+            exit 1
+        ;;
+    esac
+
+    # Ensure the version file exists
+    if [ ! -f ${SOURCEDIR}/${VERSION_FILE} ]; then
+        echo | $LOG
+        echo "  Unable to locate Version file ${SOURCEDIR}/${VERSION_FILE}" | $LOG
+        echo | $LOG
+        echo "  Installation terminated." | $LOG
+        exit 1
+    fi
+
+    # Ok now determine which row is applicable and configure the install accordingly.
+    # Tricky as while loop is run in sub shell so need to output what we require into a variable
+    OUTPUT=`while read LINE; do
+        # Ignore comments
+        echo "$LINE" | grep "^#" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            continue
+        fi
+
+        # Parse line
+        FILE_PROG=\`echo $LINE | awk -F, '{ print $1 }'\`
+        FILE_OS=\`echo $LINE | awk -F, '{ print $2 }' | tr -d " "\`
+        FILE_OS_FIRST_VERSION=\`echo $LINE | awk -F, '{ print $3 }' | tr -d " "\`
+        FILE_OS_SECOND_VERSION=\`echo $LINE | awk -F, '{ print $4 }' | tr -d " "\`
+        FILE_OS_THIRD_VERSION=\`echo $LINE | awk -F, '{ print $5 }' | tr -d " "\`
+        FILE_GLIBC_MINOR=\`echo $LINE | awk -F, '{ print $6 }' | tr -d " "\`
+        FILE_OS_ARCHITECTURE=\`echo $LINE | awk -F, '{ print $7 }' | tr -d " "\`
+        FILE_TAR_LOCATION=\`echo $LINE | awk -F, '{ print $8 }' | tr -d " "\`
+        FILE_SHARED_LIBRARY=\`echo $LINE | awk -F, '{ print $9 }' | tr -d " "\`
+
+        if [ "$FILE_OS" != "$OS" ] || [ "$FILE_PROG" != "$PROGNAME" ]; then
+            # Try the next line
+            continue
+        fi
+
+        # Now check Operating system version
+        if [ $OS_FIRST_VERSION -lt $FILE_OS_FIRST_VERSION ]; then
+
+            # Won't work. Bad luck dude.
+            continue
+
+        # If equal check minor version
+        elif [ $OS_FIRST_VERSION -eq $FILE_OS_FIRST_VERSION ]; then
+
+            if [ $OS_SECOND_VERSION -lt $FILE_OS_SECOND_VERSION ]; then
+
+                # Won't work. Bad luck dude
+                continue
+
+            elif [ $OS_THIRD_VERSION -eq $FILE_OS_THIRD_VERSION ]; then
+
+                if [ $OS_THIRD_VERSION -lt $FILE_OS_THIRD_VERSION ]; then
+
+                    # Won't work. Bad luck dude
+                    continue
+                fi
+            fi 
+        fi
+
+        # check GLIBC version for Linux
+        if [ "$OS" = "Linux" ]; then
+            if [ $OS_GLIBC_MINOR -lt $FILE_GLIBC_MINOR ]; then
+
+                # Won't work. Bad luck dude
+                continue
+            fi 
+        fi
+
+        # Check architecture
+        if [ "$FILE_OS_ARCHITECTURE" != "all" ]; then
+            if [ "$FILE_OS_ARCHITECTURE" != "$OS_ARCHITECTURE" ]; then
+                continue
+            fi
+        fi
+
+        # Now check if the sub directory exists. If it doesn't then continue
+        if [ ! -d $SOURCEDIR/../$FILE_TAR_LOCATION ]; then
+            continue
+        fi
+
+        # If up to here then good news. Store the relevant items
+        echo "$FILE_TAR_LOCATION,$FILE_SHARED_LIBRARY"
+        break
+
+    done < ${SOURCEDIR}/${VERSION_FILE}`
+
+    # Deconstruct output into local variables. 
+    # Shame variables used during while aren't accessible
+    TAR_LOCATION=`echo $OUTPUT | awk -F, '{print $1}'`
+    SHARED_LIBRARY=`echo $OUTPUT | awk -F, '{print $2}'`
+
+# Check if we are installing 64-bit package on 64-bit machine only for AIX, Solaris i386 platforms
+CHKPKG=0;
+if [ ! -z "$SHARED_LIBRARY" ]; then
+case `uname` in
+    'AIX')
+        CHKPKG=1;
+        ;;
+    'SunOS')
+        CHKPKG=1;
+        ;;
+esac
+fi
+
+if [ $CHKPKG -eq 1 ]; then
+. ${SOURCEDIR}/${SHARED_LIBRARY}
+        # sets IS64BIT if OS is 64-bit
+        get_64_bit
+
+        echo $TAR_LOCATION | grep 64 > /dev/null
+        if [ $? -eq 0 -a  $IS64BIT -ne 1 ]; then
+            TAR_LOCATION='';
+        fi
+fi
+
+    # These must be set otherwise install will fail.
+    if [ -z "$TAR_LOCATION" -o -z "$SHARED_LIBRARY" ]; then
+        echo  | $LOG
+        echo "  Your current operating system is not supported by this installation." | $LOG
+        echo "  Either the version of your operating system is not supported or you" | $LOG
+        echo "  are trying to install the wrong package for your operating system." | $LOG
+        echo | $LOG
+        echo "  Please contact CA Support if you have any questions." | $LOG
+        echo | $LOG
+        echo "  Installation terminated." | $LOG
+        exit 1
+    fi
+    export TAR_LOCATION  # mostly for untar'd linux RPMs
+}
+
+###############################################
+# test for presence of the relevant tar files #
+###############################################
+test_for_tar_files()
+{
+    if [ "$PROGNAME" = "DXsetup" ]; then
+        DXTAR=`ls $SOURCEDIR/../$TAR_LOCATION/cadir*.tar.Z $SOURCEDIR/../$TAR_LOCATION/cadir*.tar.gz $SOURCEDIR/../$TAR_LOCATION/cadir*.tar 2>/dev/null`
+ 
+        if [ -z "$DXTAR" ]; then
+            echo "Cannot find the required install/upgrade files in $SOURCEDIR/../$TAR_LOCATION"
+            checkpoint
+        fi
+        export DXTAR TAR_LOCATION
+
+        # DXagent tar only available on Linux
+        if [ "$OS" = "Linux" ]; then
+            DXATAR=`ls $SOURCEDIR/../$TAR_LOCATION/cadxagent*.tar.Z $SOURCEDIR/../$TAR_LOCATION/cadxagent*.tar.gz 2>/dev/null`
+
+            if [ -z "$DXATAR" ]; then
+                echo "Cannot find the required install/upgrade files in $SOURCEDIR/../$TAR_LOCATION"
+                checkpoint
+            fi
+            export DXATAR TAR_LOCATION
+        fi
+
+    elif [ "$PROGNAME" = "DxMgmtUIsetup" ]; then
+
+        DXTAR=`ls $SOURCEDIR/../$TAR_LOCATION/cadir*.tar.Z $SOURCEDIR/../$TAR_LOCATION/cadir*.tar.gz $SOURCEDIR/../$TAR_LOCATION/cadir*.tar 2>/dev/null`
+        DXUITAR=`ls $SOURCEDIR/../$TAR_LOCATION/camgmtui*.tar.Z $SOURCEDIR/../$TAR_LOCATION/camgmtui*.tar.gz $SOURCEDIR/../$TAR_LOCATION/camgmtui*.tar 2>/dev/null`
+        DXATAR=`ls $SOURCEDIR/../$TAR_LOCATION/cadxagent*.tar.Z $SOURCEDIR/../$TAR_LOCATION/cadxagent*.tar.gz 2>/dev/null`
+ 
+        if [ -z "$DXTAR" ] || [ -z "$DXUITAR" ] || [ -z "$DXATAR" ]; then
+            echo "Cannot find the required install/upgrade files in $SOURCEDIR/../$TAR_LOCATION"
+            checkpoint
+        fi
+        export DXTAR DXATAR DXUITAR TAR_LOCATION
+
+    elif [ "$PROGNAME" = "DXwebsetup" ]; then
+
+        DXWTAR=`ls $SOURCEDIR/../$TAR_LOCATION/dxwebserver*.tar.Z $SOURCEDIR/../$TAR_LOCATION/dxwebserver*.tar 2>/dev/null`
+
+        if [ -z "$DXWTAR" ]; then
+            echo "Cannot find the required install/upgrade files in $SOURCEDIR/../$TAR_LOCATION"
+            checkpoint
+        fi
+        export DXWTAR TAR_LOCATION
+
+    elif [ "$PROGNAME" = "DXagentSetup" ]; then
+
+        DXATAR=`ls $SOURCEDIR/../$TAR_LOCATION/cadxagent*.tar.Z $SOURCEDIR/../$TAR_LOCATION/cadxagent*.tar.gz 2>/dev/null`
+
+        if [ -z "$DXATAR" ]; then
+            echo "Cannot find the required install/upgrade files in $SOURCEDIR/../$TAR_LOCATION"
+            checkpoint
+        fi
+        export DXATAR TAR_LOCATION
+    fi
+}
+
+#####################################################
+# Display a file forcing the user to see every part #
+#####################################################
+#12926 - no longer used
+file_display()
+{
+    FILE=$1
+    FIRST_PAGE=$2
+	LENGTH=`cat $FILE | wc -l | tr -d " "`
+	HEIGHT=22
+	CURRENT_ROW=$HEIGHT
+
+	until [ `expr $CURRENT_ROW - $HEIGHT` -ge "$LENGTH" ]; do
+
+        if [ $FIRST_PAGE -gt 0 ]; then
+            HEIGHT=$FIRST_PAGE
+	        CURRENT_ROW=$HEIGHT
+        fi
+
+		if [ `expr $LENGTH - $CURRENT_ROW + $HEIGHT` -lt $HEIGHT ]; then
+			HEIGHT=`expr $LENGTH - $CURRENT_ROW + $HEIGHT`
+			CURRENT_ROW=$LENGTH
+		fi
+		head -$CURRENT_ROW $FILE | tail -$HEIGHT
+
+        if [ $FIRST_PAGE -gt 0 ]; then
+            HEIGHT=22
+            FIRST_PAGE=0
+        fi
+
+		CURRENT_ROW=`expr $CURRENT_ROW + $HEIGHT`
+
+		if [ `expr $CURRENT_ROW - $HEIGHT` -lt "$LENGTH" ]; then
+			echo "________________________________________________________________________________"
+			echo $LINUX_USE_BACKSLASHES "Next page [Enter] \c"
+			read DUMMY
+			if [ "$DUMMY" = "fy" ]; then
+				break
+			fi
+		fi
+
+	done
+}
+
+#############################################
+# get the owner of the file/directory in $1 #
+#############################################
+dxowner()
+{
+    # return the owner of the file/directory in $1 - follow links first
+    DIR=$1
+
+    while [ -h $DIR ]; do
+        DIR=`ls -l $DIR | awk '{print $NF; exit}' `
+    done
+    ls -lod $DIR | awk '{print $3; exit}'
+}
+
+################################################
+# create a response file to use during install #
+################################################
+setup_write_response_file()
+{
+    if [ -z "$WRITE_RESPONSE_FILE" ]; then
+        return
+    fi
+    if [ "$WRITE_RESPONSE_FILE" = "DEFAULT" ]; then
+        case "$PROGNAME" in
+            DXsetup) 
+                WRITE_RESPONSE_FILE="/tmp/cadir${MAJOR}${MINOR}.rsp" 
+                if [ $MINOR -eq 0 ]; then
+                    WRITE_RESPONSE_FILE="/tmp/cadir${MAJOR}.rsp"
+                fi
+                ;;
+
+            DXwebsetup)
+                WRITE_RESPONSE_FILE="/tmp/cadirmgmt${MAJOR}${MINOR}.rsp" 
+                if [ $MINOR -eq 0 ]; then
+                    WRITE_RESPONSE_FILE="/tmp/cadirmgmt${MAJOR}.rsp"
+                fi
+                ;;
+            DXagentSetup)
+                WRITE_RESPONSE_FILE="/tmp/cadir_dxagent_${MAJOR}_${MINOR}_${SP}.rsp" 
+                ;;
+        esac
+    fi
+
+    echo | $LOG
+    echo "============================  WRITE RESPONSE FILE  ============================" | $LOG
+    echo | $LOG
+    echo "  You have chosen to build a Response File at $WRITE_RESPONSE_FILE" | $LOG
+    echo "  for unattended installation. " | $LOG
+
+    while [ 1 ]; do
+
+        # check the filename is not a directory
+        if [ -d $WRITE_RESPONSE_FILE ]; then
+            echo | $LOG
+            echo "  ERROR: invalid filename `basename $WRITE_RESPONSE_FILE` " | $LOG
+
+        # check the path exists
+        elif [ ! -d `dirname $WRITE_RESPONSE_FILE` ]; then
+            echo | $LOG
+            echo "  INFO: pathname `dirname $WRITE_RESPONSE_FILE` does not exist." | $LOG
+            echo "  INFO: creating pathname `dirname $WRITE_RESPONSE_FILE`." | $LOG
+            mkdir -p `dirname $WRITE_RESPONSE_FILE`
+            continue
+
+        # check if the filename already exists
+        elif [ -f $WRITE_RESPONSE_FILE ]; then
+            echo | $LOG
+            echo "  WARNING: file already exists "   | $LOG
+            QUESTION="  Do you want to overwrite it? (y/n)"
+            DEFAULT=n
+            get_response ynq
+            if  [ $RETURN = "y" ]; then
+                break
+            fi
+
+        elif [ -n "$WRITE_RESPONSE_FILE_OK" ]; then
+            break
+
+        # confirm filename
+        else
+            QUESTION="  Do you want to change the filename or location? (y/n)"
+            DEFAULT="n"
+            get_response ynq
+            if  [ $RETURN = "n" ]; then
+                break
+            fi
+        fi
+
+        echo | $LOG
+        echo "  Please specify the full pathname and filename of the Response File" | $LOG
+        echo "  or press [RETURN] to accept the default. "  | $LOG
+        QUESTION=""
+        DEFAULT=$WRITE_RESPONSE_FILE
+        get_response path
+        WRITE_RESPONSE_FILE=$RETURN
+
+    done
+
+    echo | $LOG
+    echo "  Response File will be written to $WRITE_RESPONSE_FILE " | $LOG
+    sleep 1
+}
+
+
+#############################################################################
+# Find any previous installed versions
+# DXserver install checks for DXserver, JRE
+# DXwebserver install checks for DXwebserver, JRE
+#############################################################################
+find_previous_versions()
+{
+# DXagent
+
+    SKIPDXAGENT=0
+	DXAGENT_PREVIEW=0
+    if [ "$HAVEDXA" = "y" ]; then
+        if [ -d $DXHOME/dxagent/lib -a -f $DXHOME/dxagent/start_dxagent.sh ]; then
+            grep VERSION_STRING ${DXHOME}/dxagent/start_dxagent.sh > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+                # version' is valid.
+                DXAGENT_CUR_VERSION=`cat ${DXHOME}/dxagent/start_dxagent.sh | grep VERSION_STRING | awk -F\' '{print $2}'| awk '{print $4}'`
+            else
+                # No VERSION_STRING in start_dxagent.sh means it is 12.5.0GA
+                DXAGENT_CUR_VERSION=12.5.0.12858
+				# Has DXagent been configured?
+				# As in 12.5GA there is no VERSION_STRING in start_dxagent.sh, our best guess is based on the presence of DXagent certificates:
+				ls ${DXHOME}/dxagent/openssl-ca/CA/private/ca.key > /dev/null 2>&1
+				if [ $? -ne 0 ]; then
+					DXAGENT_125_NOT_CONFIGURED=y
+				fi
+            fi
+            DXAGENT_CUR_MAJOR=`echo $DXAGENT_CUR_VERSION | awk -F. '{print $1}'`
+            DXAGENT_CUR_MINOR=`echo $DXAGENT_CUR_VERSION | awk -F. '{print $2}'`
+            DXAGENT_CUR_SP=`echo $DXAGENT_CUR_VERSION | awk -F. '{print $3}'`
+            DXAGENT_CUR_BLDNUM=`echo $DXAGENT_CUR_VERSION | awk -F. '{print $4}'`
+            # Compare current version with install version
+            if [ $MAJOR -lt $DXAGENT_CUR_MAJOR ]; then
+                SKIPDXAGENT=1
+            elif [ $MAJOR -eq $DXAGENT_CUR_MAJOR ]; then
+                if [ $MINOR -lt $DXAGENT_CUR_MINOR ]; then
+                    SKIPDXAGENT=1
+                elif [ $MINOR -eq $DXAGENT_CUR_MINOR ]; then
+                    if [ $SP -lt $DXAGENT_CUR_SP ]; then
+                        SKIPDXAGENT=1
+    	            elif [ $SP -eq $DXAGENT_CUR_SP ]; then
+                        if [ $BLDNUM -le $DXAGENT_CUR_BLDNUM ]; then
+                            SKIPDXAGENT=1
+                        fi
+                    fi
+                fi
+            fi
+        else
+			DXAGENT_PREVIEW=1
+        fi
+    fi
+
+# Management UI
+
+    SKIPUI=0
+    if [ "$HAVEUI" = "y" ]; then
+	# Try 12.5 style
+	grep VERSION_STRING ${DXUIHOME}/start_dxmgmtui > /dev/null 2>&1
+	if [ $? -eq 0 ]; then
+		UICUR_VER=`cat ${DXUIHOME}/start_dxmgmtui | grep VERSION_STRING | awk -F\' '{print $2}'`
+	fi
+	# Try 14.0 style
+        if [ -z "$UICUR_VER" ]; then
+		$DXUIHOME/dxmgmtuiserver version > /dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			UICUR_VER=`$DXUIHOME/dxmgmtuiserver version 2>/dev/null`
+		fi
+	fi
+        if [ ! -z "$UICUR_VER" ]; then
+            # version is valid.
+            UICUR_VERSION=`echo $UICUR_VER | awk '{print $5}'`
+            UICUR_MAJOR=`echo $UICUR_VERSION | awk -F. '{print $1}'`
+            UICUR_MINOR=`echo $UICUR_VERSION | awk -F. '{print $2}'`
+            UICUR_SP=`echo $UICUR_VERSION | awk -F. '{print $3}'`
+            UICUR_BLDNUM=`echo $UICUR_VERSION | awk -F. '{print $4}'`
+	        # Compare current version with install version
+	        if [ $MAJOR -lt $UICUR_MAJOR ]; then
+                SKIPUI=1
+            elif [ $MAJOR -eq $UICUR_MAJOR ]; then
+	            if [ $MINOR -lt $UICUR_MINOR ]; then
+	                SKIPUI=1
+	            elif [ $MINOR -eq $UICUR_MINOR ]; then
+                    if [ $SP -lt $UICUR_SP ]; then
+                        SKIPUI=1
+    	            elif [ $SP -eq $UICUR_SP ]; then
+	                    if [ $BLDNUM -le $UICUR_BLDNUM ]; then
+	                        SKIPUI=1
+	                    fi
+	                fi
+	            fi
+            fi
+        fi
+    fi
+
+# DXserver
+
+    SKIPDX=0
+	ISDXGRID="n"
+    if [ "$HAVEDX" = "y" ]; then
+        export DXHOME
+        OUTPUT=`$DXHOME/bin/dxserver version 2>/dev/null`
+
+        # build number can either be V8.0 or r8 or r8.1 or 12.0
+	# try V8.0 style
+        CUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                    awk -FV '{print $2}' |  \
+                                    awk -F. '{print $1}'`
+        CUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                    awk -FV '{print $2}' |  \
+                                    awk -F. '{print $2}'`
+
+	# try r8.1 style
+        if [ -z "$CUR_MAJOR" ]; then
+            CUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                        awk -Fr '{print $2}' |  \
+                                        awk -F. '{print $1}'`
+            CUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                        awk -Fr '{print $2}' |  \
+                                        awk -F. '{print $2}'`
+        fi
+
+	# must be 12.0 style
+        if [ -z "$CUR_MAJOR" ]; then
+            CUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                        awk -F. '{print $1}'`
+            CUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                        awk -F. '{print $2}'`
+	    # 12.5 style
+            CUR_SP=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                     awk -F. '{print $3}'`
+        fi
+
+	if [ -z "$CUR_MINOR" ]; then
+	    CUR_MINOR=0
+	fi
+
+        # extract nn from "xxxx (build nn) xxxx"
+        CUR_BLDNUM=`echo "$OUTPUT" | awk -F'(' '{print $2}' | awk -F')' '{print $1}' | awk '{print $2}'`
+
+        # used for archive name
+        CUR_VERSION=$CUR_MAJOR.$CUR_MINOR.$CUR_BLDNUM
+        if [ ! "x$CUR_SP" = "x" ]; then
+	        CUR_VERSION=$CUR_MAJOR.$CUR_MINOR.$CUR_SP.$CUR_BLDNUM
+        fi
+
+        # Compare current version with install version
+        if [ $MAJOR -lt $CUR_MAJOR ]; then
+            SKIPDX=1
+        elif [ $MAJOR -eq $CUR_MAJOR ]; then
+            if [ $MINOR -lt $CUR_MINOR ]; then
+                SKIPDX=1
+            elif [ $MINOR -eq $CUR_MINOR ]; then
+                if [ $BLDNUM -le $CUR_BLDNUM ]; then
+                    SKIPDX=1
+                fi
+            fi
+        fi
+
+        # test for 64-bit install
+        UPGRADE64BIT="n"
+        if [ $NONROOTUSER -eq 0 ]; then
+              TEST64BIT=`su - $DXUSER -c "$DXSRCBASH dxserver version" | grep "64-Bit"`
+        else
+              TEST64BIT=`dxserver version | grep "64-Bit"`
+        fi
+        if [ -n "$TEST64BIT" ]; then
+            UPGRADE64BIT="y"
+        fi
+
+		#need to test to see if the current install version is a dxgrid install or not. 
+                if [ $NONROOTUSER -eq 0 ]; then
+		      TESTOUTPUT=`su - $DXUSER -c "$DXSRCBASH dxserver version" `
+                else
+		      TESTOUTPUT=`$DXSRCBASH dxserver version `
+                fi  
+		echo $TESTOUTPUT | grep "DXgrid" > /dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			ISDXGRID="y"
+        fi
+    fi
+
+# DXwebserver
+
+    SKIPDXW=0
+    SKIPDXM=0
+    if [ "$HAVEDXW" = "y" ]; then
+
+        # we need to identify whether dxwebserver knows about the version parameter.
+        # If it does not, then the dxwebserver command will attempt to start dxwebserver.
+        grep VERSION_STRING $DXWEBHOME/bin/dxwebserver.sh > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            # 'dxwebserver version' is valid.
+            OUTPUT=`su - $DXUSER -c "$DXSRCBASH dxwebserver version" | tail -1 `
+
+            # build number can either be V8.0 or r8 or r8.1
+            #13329: may not be able to determine the version
+            echo "$OUTPUT" | grep "(build"  >/dev/null 2>&1
+            if [ $? -eq 0 ]; then
+	            echo "$OUTPUT" | grep V  >/dev/null 2>&1
+	            if [ $? -eq 0 ]; then
+	                WXCUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+	                                              awk -FV '{print $2}' |  \
+	                                              awk -F. '{print $1}'`
+	                WXCUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+	                                              awk -FV '{print $2}' |  \
+	                                              awk -F. '{print $2}'`
+	            else
+			WXCUR_MAJOR_MINOR=`echo "$OUTPUT" | awk     '{print $2}'`
+			echo "$WXCUR_MAJOR_MINOR" | grep r  >/dev/null 2>&1
+			if [ $? -eq 0 ]; then
+		                WXCUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+		                                              awk -Fr '{print $2}' |  \
+	        	                                      awk -F. '{print $1}'`
+		                WXCUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+		                                              awk -Fr '{print $2}' |  \
+		                                              awk -F. '{print $2}'`
+			else
+                                WXCUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                                              awk -F. '{print $1}'`
+                                WXCUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                                              awk -F. '{print $2}'`
+			fi
+	                if [ -z "$WXCUR_MINOR" ]; then
+	                    WXCUR_MINOR=0
+	                fi
+	            fi
+	            WXCUR_BLDNUM=`echo "$OUTPUT" | awk -F')' '{print $1}' | awk '{print $4}'`
+	            WXCUR_VERSION=$WXCUR_MAJOR.$WXCUR_MINOR.$WXCUR_BLDNUM
+	
+	            # 12485: special case for 8.1 build 1161
+	            if [ -n "`echo $OUTPUT | grep __VERSION__`" ]; then
+	                WXCUR_MAJOR=8
+	                WXCUR_MINOR=1
+	                WXCUR_BLDNUM=1161
+	                WXCUR_VERSION=$WXCUR_MAJOR.$WXCUR_MINOR.$WXCUR_BLDNUM
+	            fi
+	
+	            # Compare current version with install version
+	            if [ $MAJOR -lt $WXCUR_MAJOR ]; then
+	                SKIPDXW=1
+	            elif [ $MAJOR -eq $WXCUR_MAJOR ]; then
+	                if [ $MINOR -lt $WXCUR_MINOR ]; then
+	                    SKIPDXW=1
+	                elif [ $MINOR -eq $WXCUR_MINOR ]; then
+	                    if [ $BLDNUM -le $WXCUR_BLDNUM ]; then
+	                        SKIPDXW=1
+	                    fi
+	                fi
+	            fi
+	            if  [ -f $DXWEBHOME/webapps/dxmanager/WEB-INF/dxmanager.properties ]; then
+	                EIAMSERVER=`awk -F= '/eiamServer/ {print $2}' $DXWEBHOME/webapps/dxmanager/WEB-INF/dxmanager.properties`
+	                if [ $SKIPDXW -eq 1 -a $UPGRADEDXMANAGER -eq 1 ]; then
+	                    SKIPDXM=1
+	                fi
+	            fi
+	    	fi
+        else 
+            # old version, cannot determine version
+            WXCUR_VERSION="unknown"
+        fi
+    fi
+
+# JRE
+
+  if [ "x$JRECHECK" = "x1" ]; then
+    SKIPJRE=0
+    if [ "$HAVEJRE" = "y" ]; then
+        echo $LINUX_USE_BACKSLASHES "  Checking current install of $JREPROD... \c" | $LOG
+
+        $JREHOME/bin/java -version > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            JV=0
+            # broken JRE. This problem was identified by QA doing upgrade testing
+            # using JRE 1.4.0 (from etDir 4.1 GA) on Linux RHAS3 which is not supported.
+        else
+            JV=`$JREHOME/bin/java -version 2>&1 `
+            JV=`echo $JV | awk '{ print substr($3,2,length($3)-2) }' `
+
+            # current JRE
+            JV1=`echo $JV | awk -F. '{print $1}'`
+            JV2=`echo $JV | awk -F. '{print $2}'`
+
+            echo $JV1 | grep "-" > /dev/null
+            if [ $? -eq 0 ] ; then
+               # New version string format for java 9+
+               # and the value is something like "9-internal" or "9-ea"
+               JV1=`echo $JV1 | awk -F- '{print $1}'`
+            fi
+
+            # allow for different 'java -version' formats, grrr.
+            echo $JV | grep "_" > /dev/null
+            if [ $? -eq 0 ] ; then
+                # JRE format n.n.n_nn
+                JV3=`echo $JV | awk -F. '{print $3}' | awk -F_ '{print $1}' `
+                JV4=`echo $JV | awk -F. '{print $3}' | awk -F_ '{print $2}' `
+            else
+                echo $JV | grep "-" > /dev/null
+                if [ $? -eq 0 ] ; then
+                    # JRE format n.n.n-nn
+                    JV3=`echo $JV | awk -F. '{print $3}' | awk -F- '{print $1}' `
+                    JV4=`echo $JV | awk -F. '{print $3}' | awk -F- '{print $2}' `
+                else
+                    # task 9027: older JREs format n.n.n
+ 					# OR new format for java version 9+
+                   JV3=`echo $JV | awk -F. '{print $3}' `
+                    JV4=0
+                fi
+            fi
+
+            if [ $JV1 -gt 1 ]; then
+            # New version string format for java 9+
+                JV4=$JV3
+                JV3=$JV2
+                JV2=$JV1
+                JV1=1
+                if [ "x$JV2" = "x" ]; then
+                    JV2=0
+                fi
+                if [ "x$JV3" = "x" ]; then
+                    JV3=0
+                fi
+                if [ "x$JV4" = "x" ]; then
+                    JV4=0
+                fi
+            fi
+
+            # this is used by dxwebsetup to determine whether JRE is a high enough version
+            # install JRE
+            JRE1=`echo $JREVERSION | awk -F. '{print $1}'`
+            JRE2=`echo $JREVERSION | awk -F. '{print $2}'`
+            JRE3=`echo $JREVERSION | awk -F. '{print $3}' | awk -F_ '{print $1}' `
+            JRE4=`echo $JREVERSION | awk -F. '{print $3}' | awk -F_ '{print $2}' `
+            if [ $JRE1 -lt $JV1 ]; then
+                SKIPJRE=1
+            elif [ $JRE1 -eq $JV1 ]; then
+                if [ $JRE2 -lt $JV2 ]; then
+                    SKIPJRE=1
+                elif [ $JRE2 -eq $JV2 ]; then
+                    if [ -z "$JRE3" ]; then
+                        SKIPJRE=1
+                    elif [ -n "$JV3" ] && [ $JRE3 -lt $JV3 ]; then
+                        SKIPJRE=1
+                    elif [ $JRE3 -eq $JV3 ]; then
+                        if [ -z "$JRE4" ]; then
+                            SKIPJRE=1
+                        elif [ -n "$JV4" ] && [ $JRE4 -le $JV4 ]; then
+                            SKIPJRE=1
+                        fi
+                    fi
+                fi
+            fi
+        fi
+    fi
+  else
+    SKIPJRE=1
+  fi
+
+  export DXAGENT_CUR_VERSION DXAGENT_PREVIEW SKIPDXAGENT SKIPUI UICUR_VERSION UPGRADE64BIT ISDXGRID CUR_VERSION SKIPDX WXCUR_VERSION SKIPDXW SKIPDXM SKIPJRE JV
+
+}
+
+#############################################################################
+# Display info for any previous installed versions
+#############################################################################
+display_previous_versions()
+{
+    echo | $LOG
+    echo "============================= CURRENT INSTALLATION ============================" | $LOG
+    echo | $LOG
+
+# DXagent
+    if [ "$HAVEDXA" = "y" ]; then
+        echo $LINUX_USE_BACKSLASHES "  Checking current install of $DXAGENTPROD... \c" | $LOG
+		echo "$DXAGENT_CUR_VERSION" | $LOG
+		if [ $DXAGENT_PREVIEW -eq 1 ]; then
+            echo "  Preview version detected (earlier than $DXAGENT_FIRST_VERSION)" | $LOG
+            echo "  All files from the DXagent preview will be kept under $DXHOME/dxagent.preview" | $LOG
+        fi
+    else
+        echo "  No $DXAGENTPROD detected" | $LOG
+    fi
+
+# Management UI
+    if [ "$HAVEUI" = "y" ]; then
+        echo $LINUX_USE_BACKSLASHES "  Checking current install of $DXMGMTUIPROD... \c" | $LOG
+		echo "$UICUR_VERSION" | $LOG
+    else
+        echo "  No $DXMGMTUIPROD detected" | $LOG
+    fi
+
+# DXserver
+    if [ "$HAVEDX" = "y" ]; then
+        echo $LINUX_USE_BACKSLASHES "  Checking current install of $DXPROD... \c" | $LOG
+		echo "$CUR_VERSION" | $LOG
+    else
+        echo "  No $DXPROD detected" | $LOG
+    fi
+	export ISDXGRID
+
+# DXwebserver
+    if [ "$HAVEDXW" = "y" ]; then
+        echo $LINUX_USE_BACKSLASHES "  Checking current install of $DXWEBSERVERPROD... \c" | $LOG
+		echo "$WXCUR_VERSION" | $LOG
+    else
+        echo "  No $DXWEBSERVERPROD detected" | $LOG
+    fi
+
+# JRE
+
+  if [ "x$JRECHECK" = "x1" ]; then
+    if [ "$HAVEJRE" = "y" ]; then
+        echo $LINUX_USE_BACKSLASHES "  Checking current install of $JREPROD... \c" | $LOG
+		echo "$JV" | $LOG
+    else
+        echo "  No $JREPROD detected" | $LOG
+    fi
+  fi
+
+}
+
+#################
+# Delete DXuser #
+#################
+delete_user_dxserver()
+{
+    # Remove any temporary files owned by DSA user
+    find /tmp -type f -user $DXUSER -exec rm {} \; 2>/dev/null
+
+    id $DXUSER >/dev/null 2>&1
+    if [ $? = 0 ]; then
+        echo
+        dxuserdel $DXUSER
+        if [ $? = 0 ]; then
+            echo "Successfully deleted the $DXUSER account"
+            RETURN="n"
+        else
+            echo "Could not delete the $DXUSER account"
+        fi
+    fi
+}
+
+####################
+#  Advanced Info   #
+####################
+dxserver_advanced_info()
+{
+    if [ "$DXINST" -eq 1 ]; then
+        # add DXHOME/bin to root's LIB_NAME to run OpenSSL libs
+        get_library_name  # OS specific: sets Ingres LIB_NAME
+        case $LIB_NAME in
+            "LD_LIBRARY_PATH" ) LD_LIBRARY_PATH=$DXHOME/bin
+                                export LD_LIBRARY_PATH
+                                ;;
+            "LIBPATH" )         LIBPATH=$DXHOME/bin
+                                export LIBPATH
+                                ;;
+            "SHLIB_PATH" )      SHLIB_PATH=$DXHOME/bin
+                                export SHLIB_PATH
+                                ;;
+        esac
+
+        DXVERSION=`$DXHOME/bin/dxserver version`
+
+        echo "--------------  $DXPROD Information Screen  ----------------"
+        echo
+        echo "     $DXVERSION"
+        echo "     Installed into: $DXHOME"
+        echo
+        echo "-------------------------------------------------------------"
+        get_response cont
+    fi
+}
+dxagent_advanced_info()
+{
+    if [ "$DXAINST" -eq 1 ]; then
+        echo "--------------  $DXAGENTPROD Information Screen  ----------------"
+        echo
+        echo "     $DXAGENTPROD"
+        echo "     Installed into: $DXHOME/dxagent"
+        echo
+        echo "-------------------------------------------------------------"
+        get_response cont
+    fi
+}
+dxmgmtui_advanced_info()
+{
+    if [ "$DXUIINST" -eq 1 ]; then
+        echo "--------------  $DXMGMTUIPROD Information Screen  ----------------"
+        echo
+        echo "     $DXMGMTUIPROD"
+        echo "     Installed into: $DXUIHOME"
+        echo
+        echo "-------------------------------------------------------------"
+        get_response cont
+    fi
+}
+dxuser_advanced_info()
+{
+    if [ -n "$DXUSER" ]; then
+        echo "----------  $DXPROD account Information Screen  ------------"
+        echo
+        echo "     $DXPROD account: $DXUSER"
+        echo "     Home directory: $DXHOME"
+        echo
+        echo "-------------------------------------------------------------"
+        get_response cont
+    fi
+}
+
+dxwebserver_advanced_info()
+{
+    if [ "$DXWEBSERVERINST" -eq 1 ]; then
+
+        JV=`$JREHOME/bin/java -version 2>&1 `
+        JV=`echo $JV | awk '{ print substr($3,2,length($3)-2) }' `
+
+        echo "-------------  DXwebserver Information Screen  --------------"
+        echo
+        echo "     You are using JRE version $JV"
+        echo "     Installed Into: $DXWEBHOME"
+        echo
+        echo "-------------------------------------------------------------"
+        get_response cont
+    fi
+}
+
+start_dxwebserver()
+{
+    echo | $LOG
+    echo "  Starting $DXWEBSERVERPROD" | $LOG
+    # Will run in batch mode (no tty). This overcomes the problem when exiting
+    # the installation shell causing DXwebserver to stop.
+batch <<EOF >/dev/null 2>&1
+su - $DXUSER -c "$DXSRCBASH $DXWEBHOME/bin/dxwebserver.sh start" >/dev/null 2>&1
+EOF
+    echo "  $DXWEBSERVERPROD started as batch job" | $LOG
+}
+
+
+

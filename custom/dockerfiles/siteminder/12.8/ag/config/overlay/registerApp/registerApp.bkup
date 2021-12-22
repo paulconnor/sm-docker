@@ -1,0 +1,21 @@
+#!/bin/bash
+cd /opt/CA/sm-config/registerApp
+export SM_SMREGHOST_CLASSPATH=./:./sdk/java/smagentapi.jar:./sdk/java/smcrypto.jar:./sdk/java/bc-fips-1.0.1.jar
+
+# Override some settings from helm setup
+export RAPIDSSO_HOST_CONFIG=DefaultHostSettings
+export RAPIDSSO_SMHOST_CONF=SmHost.conf
+export RAPIDSSO_ADMIN_USER=siteminder
+export RAPIDSSO_ADMIN_PASSWORD=CAdemo123
+export RAPIDSSO_TRUSTED_HOST_NAME=rapidsso
+export RAPIDSSO_PS_ADDR=$(kubectl get svc -n siteminder | grep casso | awk '{ print $4 }')
+export RAPIDSSO_NAMESPACE=siteminder
+export DEBUG=false
+export JAVA=/opt/CA/secure-proxy/install_config_info/jre/bin/java
+
+
+RAPIDSSO_SECRET=$(${JAVA} -Dcom.ca.siteminder.sdk.agentapi.enableDebug=${DEBUG}  -Daddress=${RAPIDSSO_PS_ADDR}  -DfileName=${RAPIDSSO_SMHOST_CONF}  -DhostName=${RAPIDSSO_TRUSTED_HOST_NAME}  -DhostConfig=${RAPIDSSO_HOST_CONFIG}  -DuserName=${RAPIDSSO_ADMIN_USER}  -Dpassword=${RAPIDSSO_ADMIN_PASSWORD}  -cp $SM_SMREGHOST_CLASSPATH  RegisterApp)
+
+B64_SECRET=$(echo ${RAPIDSSO_SECRET} | base64 -w 0)
+echo "${B64_SECRET}"
+

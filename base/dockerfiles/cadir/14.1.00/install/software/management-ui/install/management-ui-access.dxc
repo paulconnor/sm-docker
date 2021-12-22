@@ -1,0 +1,12 @@
+set access-controls = true;
+
+set super-user management-ui-superuser = {
+        user = <o management-ui><ou users><cn superuser>
+};
+
+set reg-user management-ui-users = {
+        own-entry
+        subtree = <o management-ui><ou users>
+        perms = modify
+};
+

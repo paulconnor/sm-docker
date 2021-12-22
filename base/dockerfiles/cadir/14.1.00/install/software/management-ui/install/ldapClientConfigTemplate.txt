@@ -1,0 +1,1 @@
+{ reconnect: __RECONNECT__,url: '__URL__',timeout: __TIMEOUT__,connectTimeout: __CONNECT_TIMEOUT__,bindDN: '__BINDDN__',bindCredentials: '__BINDPWD__',tlsOptions: ldapTlsOptions }

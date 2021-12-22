@@ -1,0 +1,57 @@
+version: "3"
+services:
+  cadir:
+    build:
+      context: ./dockerfiles/cadir/14.1.00
+    image: pconnor/dx:custom
+    hostname: cadir
+    privileged: true
+    networks:
+      - sm
+    ports:
+      - "15389:15389"
+      - "5022:22"
+    stdin_open: true
+    tty: true
+  casso:
+    build:
+      context: ./dockerfiles/siteminder/12.8/ps
+    image: pconnor/ps:custom
+    hostname: casso
+    privileged: true
+    environment:
+      - SM_POLICY_ADMIN_PASSWORD
+    networks:
+      - sm
+    ports:
+      - "2022:22"
+      - "8443:8443"
+      - "44441:44441"
+      - "44442:44442"
+      - "44443:44443"
+      - "44444:44444"
+    depends_on:
+      - cadir
+    stdin_open: true
+    tty: true
+  caag:
+    build:
+      context: ./dockerfiles/siteminder/12.8/ag
+    image: pconnor/ag:custom
+    hostname: caag
+    privileged: true
+    ports:
+      - "3022:22"
+      - "9090:8080"
+      - "9191:8181"
+    depends_on:
+        - casso
+    stdin_open: true
+    tty: true
+    networks:
+      sm:
+        aliases:
+          - extapp
+networks:
+  sm:
+    name: sm-net

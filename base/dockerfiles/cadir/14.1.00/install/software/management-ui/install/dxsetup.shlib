@@ -1,0 +1,2053 @@
+#!/bin/sh
+# Computer Associates DXserver Library File
+# $Id: dxsetup.shlib,v 1.31 2011/01/19 05:11:39 justin Exp $
+
+#######################################
+#  Library routines for dxsetup suite #
+#######################################
+
+# If log not set then set to cat to ignore
+if [ -z "$LOG" ]; then
+    LOG="cat"
+fi
+
+#####################################
+#  allow access to ports below 1024 #
+#####################################
+setuid()
+{
+    if [ -f $1 ]; then
+        if [ "x$LEGACY_SETUID" = "xy" ]; then
+	    # use old style setuid approach for any Unix
+            chown $INSTUSER $1 | $LOG
+            chmod 4750 $1 | $LOG
+        elif [ `uname` = "Linux" ]; then
+	    # use POSIX capabilities on Linux
+            setcap cap_net_bind_service=+ep $1 | $LOG
+        elif [ `uname` = "SunOS" ]; then
+        # use rights profiles on Solaris
+            APP_NAME=`basename $1`
+            PROFILE_NAME=CADirectory${APP_NAME}Profile
+            profiles -p $PROFILE_NAME info > /dev/null 2>&1
+            if [ $? -ne 0 ]; then
+                profiles -p $PROFILE_NAME << EOF
+set desc="Rights profile that allows Directory $APP_NAME application to listen on ports 1 through 1024"
+add cmd="$1"
+add privs="basic,net_privaddr"
+end
+exit
+EOF
+            fi
+            usermod -K profiles+=$PROFILE_NAME $DXUSER
+        else
+	    # otherwise binaries need to be owned by root and the setuid flag needs to be set
+            chown $INSTUSER $1 | $LOG
+            chmod 4750 $1 | $LOG
+        fi
+    fi
+}
+
+#####################################################################################
+# task 7895: check that the owner of a directory has write access to that directory #
+#####################################################################################
+test_for_write_permissions()
+{
+    echo | $LOG
+    echo "============================ DIRECTORY PERMISSIONS ============================" | $LOG
+    echo | $LOG
+    echo "  Checking directory permissions" | $LOG
+
+    # DXserver
+    if [ $SKIPDX -eq 1 ] || [ "$INSTALLDX" = "n" ] || [ $UPGRADEDX -eq 0 ]; then
+        : # do nothing
+    else
+        echo | $LOG
+        echo "  $DXPROD..." | $LOG
+        DIRLIST=`ls -lR $DXHOME | grep "^dr" | grep -v "^drw"`  2>/dev/null
+        if [ -n "$DIRLIST" ]; then
+            echo | $LOG
+            echo "  The following directories do not have write access." | $LOG
+            echo "  The upgrade cannot continue. " | $LOG
+            echo | $LOG
+            ls -lR $DXHOME | grep "^dr" | grep -v "^drw"  
+            checkpoint
+        fi
+    fi
+
+    echo | $LOG
+    echo "  Directory permissions verified" | $LOG
+}
+
+################
+# quit_program #
+################
+quit_program()
+{
+    echo
+    echo "  Uninstall terminated."
+    exit 1
+}
+
+install_caopenssl()
+{
+    echo | $LOG
+    echo "=========================== CA OpenSSL INSTALLATION ===========================" | $LOG
+    echo | $LOG
+    CAPKIDIR=`dirname $SOURCEDIR`
+    CAPKIDIR=`dirname $CAPKIDIR`
+    if [ -d $CAPKIDIR ]; then
+    	cd $CAPKIDIR/capki 
+    else
+    	echo "  Could not find CAPKI install directory " | $LOG
+    	checkpoint
+	fi
+
+    if [ -n "$CAPKILOC" ]; then
+        if [ -n "$CASHCOMP" ]; then
+	    echo "WARNING: Cannot install CA OpenSSL to $CAPKILOC as " | $LOG
+	    echo "         CA Shared Components already installed: $CASHCOMP" | $LOG
+        fi
+        CAPKILOCATION="instdir=$CAPKILOC"
+    fi
+
+	if [ -f setup ]; then
+    	su - root -c "$CAPKIDIR/capki/setup install caller=ETRDIR $CAPKILOCATION env=all verbose" | $LOG
+	    if [ $? != 0 ]; then
+	        echo | $LOG
+	        echo "  Install of CA OpenSSL failed." | $LOG
+	        echo "  Install cannot continue unless CA OpenSSL is installed." | $LOG
+	        echo | $LOG
+	        checkpoint
+	    fi
+	fi
+
+	# 13362: need to check if it is a 64 bit system. if it is then install the 64bit CAPKI
+	if [ $IS64BIT -eq 1 ]; then
+	    if [ -f setup64 ]; then
+	    	su - root -c "$CAPKIDIR/capki/setup64 install caller=ETRDIR $CAPKILOCATION env=all verbose" | $LOG
+		    if [ $? != 0 ]; then
+		        echo | $LOG
+		        echo "  Install of CA OpenSSL 64-bit failed." | $LOG
+		        echo "  Install cannot continue unless CA OpenSSL is installed." | $LOG
+		        echo | $LOG
+		        checkpoint
+		    fi
+	 	fi 
+    fi
+}
+
+copy_caopenssl()
+{
+    echo | $LOG
+    echo "=========================== CA OpenSSL INSTALLATION ===========================" | $LOG
+    echo | $LOG
+    CAPKIDIR=`dirname $SOURCEDIR`
+    CAPKIDIR=`dirname $CAPKIDIR`
+    if [ -d $CAPKIDIR ]; then
+       if [ -n "$CAPKILOC" ]; then
+         if [ -n "$CASHCOMP" ]; then
+             echo "WARNING: Cannot install CA OpenSSL to $CAPKILOC as " | $LOG
+             echo "         CA Shared Components already installed: $CASHCOMP" | $LOG
+         fi
+       else
+            echo "Copying CAPKI libs " | $LOG
+            mkdir $DXHOME/lib
+            cp -rp $CAPKIDIR/capki $DXHOME/lib
+       fi
+    else
+        echo "  Could not find CAPKI install directory " | $LOG
+        checkpoint
+    fi
+}
+##################
+# Display Readme #
+##################
+show_readme()
+{
+    if [ $DEFANS -eq 1 ]; then
+	    if [ $RESTOREERROR -eq 0 ]; then
+	    	return 0
+		else
+			return 1
+		fi
+    fi
+
+    echo "================================= VIEW README =================================" | $LOG
+
+    QUESTION="  Do you want to view the Readme file for this release? (y/n)"
+    DEFAULT="y"
+    get_response ynq
+    if [ $RETURN = "y" ]; then
+        if [ -f $DXHOME/../readme ]; then
+            more $DXHOME/../readme
+        fi
+  	fi
+  	
+	if [ $RESTOREERROR -eq 0 ]; then
+    	return 0
+	else
+		return 1
+	fi
+}
+
+#########################################
+# Displays a quick summary of Directory #
+# components and what they do.          #
+#########################################
+dxserver_info()
+{
+echo "" | $LOG
+cat <<EOF | $LOG
+---------------------------------------------------------------------
+  $PRODNAME is an advanced X.500 and LDAP directory system
+  solution. $DXPROD is the directory server and its support files,
+  including the tools.
+---------------------------------------------------------------------
+EOF
+}
+
+###################################################
+# Before UPGRADE a list of DSAs that were running #
+# was stored. These can now be started            #
+###################################################
+start_dxservers()
+{
+    # Check if we need to do anything.
+    if [ $UPGRADEDX -eq 0 -o "$RESTARTDSAS" = "n" ]; then
+        return 0
+    fi
+
+    echo | $LOG
+    echo "============================== STARTING DXSERVERS =============================" | $LOG
+
+	for DSA in $RESTARTLIST; do
+        echo | $LOG
+        echo "  Starting DSA $DSA" | $LOG
+            if [ $NONROOTUSER -eq 0 ]; then
+		su - $DXUSER -c "$DXSRCBASH dxserver start $DSA" | $LOG
+	    else
+		/bin/sh -c "$DXSRCSH;dxserver start $DSA" | $LOG
+            fi
+		
+    done
+
+    return 0
+}
+
+##################################################
+# Before UPGRADE a list of SSLDs was stored      #
+# The ssld configuration can be migrated and     #
+# the ssld services (incl binary) can be removed #
+##################################################
+migrate_ssld()
+{
+    # Check if we need to do anything.
+    if [ $UPGRADEDX -eq 0 -o -z "$REMOVESSLDS" ]; then
+        return 0
+    fi
+
+    echo | $LOG
+    echo "======================== MIGRATING SSLD CONFIGURATION =========================" | $LOG
+
+    $SOURCEDIR/dxupgradecheck -migratessl 2>>/$INSTALL_LOG
+    if [ $? -ne 0 ]; then
+		echo | $LOG
+		echo "  The upgrade failed to migrate SSLD configuration" | $LOG
+		echo "  This will need to be performed manually for Directory to function normally" | $LOG
+    fi
+
+    echo | $LOG
+    echo "=========================== REMOVING SSLD SERVICES ============================" | $LOG
+
+    for SSLD in $REMOVESSLDS; do
+        echo | $LOG
+        echo "  Removing SSL Daemon $SSLD" | $LOG
+        su - $DXUSER -c "$DXSRCBASH ssld remove $SSLD | $LOG" 
+    done
+
+    echo | $LOG
+    echo "========================== REMOVING SSLD COMPONENT  ===========================" | $LOG
+    rm $DXHOME/bin/ssld | $LOG
+    echo | $LOG
+
+    return 0
+}
+
+########################################################
+# Before UPGRADE a list of dxadminds that were running #
+# was stored. These can now be started                 #
+########################################################
+start_dxadminds()
+{
+    # Check if we need to do anything.
+    if [ $UPGRADEDX -eq 0 -o -z "$RESTARTDXADMINDS" ]; then
+        return 
+    fi
+    if [ "$INSTALLDXAGENT" = "y" ] || [ "$KEEPDXADMIN" = "n" ]; then
+        return 
+    fi
+
+    echo | $LOG
+    echo "============================== STARTING DXADMINDS =============================" | $LOG
+    if [ $NONROOTUSER -eq 1 ]; then
+         echo "Please provide password for user $DXUSER"
+    fi
+    for DXADMIND in $RESTARTDXADMINDS; do
+        echo | $LOG
+        echo "  Starting $DXADMIND" | $LOG
+        su - $DXUSER -c "$DXSRCBASH dxadmind start $DXADMIND | $LOG" 
+    done
+
+    return 0
+}
+
+##########################################################
+# Before UPGRADE a list of TLSCLIENT's that were running #
+# was stored. These can now be started                   #
+##########################################################
+start_tlsclients()
+{
+    # Check if we need to do anything.
+    if [ $UPGRADEDX -eq 0 -o "$RESTARTTLSCLIENTS" = "" ]; then
+        return 0
+    fi
+
+    echo | $LOG
+    echo "============================= STARTING TLSCLIENTS =============================" | $LOG
+
+    for TLSCLIENT in $RESTARTTLSCLIENTS; do
+        echo | $LOG
+        echo "  Starting $TLSCLIENT" | $LOG
+        su - $DXUSER -c "$DXSRCBASH tlsclient start $TLSCLIENT -ca config/ssld/trusted.pem | $LOG" 
+    done
+
+    return 0
+}
+
+###################
+# CAPKI questions #
+###################
+capki_questions()
+{
+    CA_SH_COMP=` if [ -f /etc/profile.CA ]; then . /etc/profile.CA; echo $CASHCOMP; fi`
+    if [ "x$CA_SH_COMP" = "x" -a "$INSTALLDX" = "y" -a $COPYCAPKI -ne 1 -a -z "$CAPKILOC" ]; then
+        echo | $LOG
+        echo "=============================== CAPKI QUESTIONS ===============================" | $LOG
+
+        RETURN="n"
+        LOC=/opt/CA/SharedComponents
+        if [ $DEFANS -eq 0 ]; then
+            while [ $RETURN = "n" ]; do
+                echo
+                echo "  Specify the location for the CAPKI installation new data store files: "
+                QUESTION=""
+                DEFAULT=/opt/CA/SharedComponents
+                get_response path
+                GETDIR=$RETURN
+                PROD="CAPKI"
+                PRODSIZE=17
+                check_product_dir
+            done
+            CAPKILOC=$GETDIR
+        fi
+    fi
+}
+
+######################
+# DXserver questions #
+######################
+dxserver_questions()                                                          
+{
+    echo | $LOG
+    echo "============================= DXSERVER QUESTIONS ==============================" | $LOG
+
+    RETURN="n"
+    touch $DXHOME/.hushlogin > /dev/null 2>&1
+    # V4.0 on HPUX cannot upgradedb
+    if [ $UPGRADEDX -eq 1 ] && [ -n "$II_SYSTEM" ] && \
+       [ "$CUR_MAJOR.$CUR_MINOR" = "4.0" ] && \
+       [ `uname` = "HP-UX" -a `uname -m | awk -F/ '{print $1}'` = "9000" ]; then
+        su - $DXUSER -c "$DXSRCBASH dxlistdb > /tmp/dblist" > /dev/null
+        DBLIST=`cat /tmp/dblist`
+        if [ -n "$DBLIST" ]; then
+            echo | $LOG
+            echo "  Upgrades from 4.0 are not supported. To move to $PRODNAME $MAJOR.$MINOR" | $LOG
+            echo "  you must dump your databases, upgrade, then reload. See the detailed "   | $LOG
+            echo "  instructions in the README, under Known Issues for HP-UX."               | $LOG
+            checkpoint
+        fi
+    fi
+    # cannot upgrade r12 XML config to 12.0 SP1 (see 13119)
+    # 13874 - need to allow upgrades from r12.0 SP1 but not r12.0GA
+    if [ $UPGRADEDX -eq 1 ] && [ $CUR_MAJOR = 12 -a $CUR_MINOR = 0 -a $CUR_BLDNUM -le 1546 ]; then
+        $SOURCEDIR/dxupgradecheck -xmldsas 2>/dev/null
+        if [ $? -ne 0 ]; then
+            echo | $LOG
+            echo "  The upgrade has detected a $DXMGRPROD configuration and cannot continue." | $LOG
+            echo "  You must upgrade manually. Please contact CA Support for assistance."    | $LOG
+            checkpoint
+        fi
+    fi
+
+    # cannot upgrade if using  XML config to 14.1 SP1 
+    if [ $UPGRADEDX -eq 1 ] && [ "$PROGNAME" = "DXsetup" ]; then
+        $SOURCEDIR/dxupgradecheck -hasxmlconfig 2>/dev/null
+        if [ $? -ne 0 ]; then
+            echo | $LOG
+            echo "  The upgrade has detected a $DXMGRPROD (XML) configuration and cannot continue." | $LOG
+            echo "  You must upgrade manually. Please contact CA Support for assistance."    | $LOG
+            checkpoint
+        fi
+    fi
+
+
+    if [ $SKIPDX -eq 1 ]; then  # we already have this version
+        echo                                                                   | $LOG
+        echo "  A newer/identical version of $PRODNAME has been detected."     | $LOG
+        echo                                                                   | $LOG
+        echo "  Existing Version: $CUR_VERSION"   | $LOG
+        echo "  Install Version : $DXVERSIONEX"               | $LOG
+        echo                                                                   | $LOG
+        # RETURN="n"
+    elif [ $UPGRADEDX -eq 1 ] && [ "$ISDXGRID" = "y" ] && [ $CUR_BLDNUM -lt $NOUPGRADEBLD ]; then
+    	echo 
+    	echo "  Your current installed version of $PRODNAME is:"
+    	echo "  Version $CUR_MAJOR.$CUR_MINOR SP2 (Build $CUR_BLDNUM)"
+    	echo
+    	echo "  Setup can not upgrade from builds less then Build $NOUPGRADEBLD. "
+    	echo "  Please remove your current $PRODNAME setup and start again"
+    	echo
+    	checkpoint
+    elif [ $UPGRADEDX -eq 1 ] && [ $CUR_BLDNUM -lt $CADIR_R120SP1 ]; then
+    	echo 
+    	echo "  Your current installed version of $PRODNAME is:"
+    	echo "  Version $CUR_VERSION"
+    	echo
+    	echo "  Setup can not upgrade from builds less then Build $CADIR_R120SP1. "
+    	echo "  Please remove your current $PRODNAME setup and start again"
+    	echo
+    	checkpoint
+    elif [ $UPGRADEDX -eq 1 ]; then
+        echo                                                                   | $LOG
+        echo "  Current installed version of $PRODNAME:"                       | $LOG
+        echo "  Version $CUR_VERSION"             | $LOG
+        echo                                                                   | $LOG
+        echo "  This setup will upgrade it to:"                                | $LOG
+        echo "  Version $DXVERSIONEX"                         | $LOG
+
+        if [ $DEFANS -eq 1 ]; then
+            RETURN="y"
+        else
+            QUESTION="  Do you want to upgrade it? (y/n)"
+            DEFAULT="y"
+            get_response ynq
+            UPGRADING=$RETURN
+        fi
+
+    elif [ $DEFANS -eq 1 ]; then
+        RETURN="y"
+    elif [ "x$1" = "xmgmtui" ]; then # do not ask if it's MgmtUI install, where directory is the must
+        DXMASTERKEYPASS="randomPass"
+        RETURN="y"
+    else
+        QUESTION="  Do you want to install the $DXPROD software? (y/n/i/q)"
+        DEFAULT="y"
+        get_response yniq
+
+        # If the answer is i then run the information subroutine
+        while [ "$RETURN" = "i" ]; do
+            dxserver_info
+            QUESTION="  Do you want to install the $DXPROD software? (y/n/i/q)"
+            DEFAULT="y"
+            get_response yniq
+        done        
+    fi
+        
+    if [ -z "$INSTALLDX" ]; then
+        INSTALLDX=$RETURN
+    fi
+    # if a value for INSTALLDX exists, then this has been set in the responsefile
+
+    if [ "$INSTALLDX" = "y" ]; then
+
+        # set DXUSER to owner of DXHOME if DXUSER is not set in a response file or by -dxuser option
+		if [ ! "x$RSP" = "x1" ] && [ ! "x$DXUSER_PARAM" = "xy" ]; then
+			if [ -d $DXHOME ] || [ -h $DXHOME ]; then
+				getowner $DXHOME
+				DXUSER=$RETURN
+			fi
+		fi
+
+        if [ $UPGRADEDX -eq 0 ]; then
+
+            if [ -z "$WRITE_RESPONSE_FILE" ]; then
+                # don't run if we're writing a response file
+                user_dxserver
+            fi
+
+            get_dx_new_dir
+
+            # suggest defaults relative to DXHOME
+            ETDIRHOME=`dirname $DXHOME`
+
+            get_masterkey_pass
+
+            if [ -z "$WRITE_RESPONSE_FILE" ]; then
+              	#13687, 13688 
+                dxusermod $DXHOME $DXUSER > /dev/null 2>&1
+                if [ $? -ne 0 ]; then
+                    if [ ! -d $DXHOME ]; then
+                    	mkdir -p $DXHOME
+                    	chown $DXUSER:$DXGROUP $DXHOME
+                    fi
+	                
+                    # don't run if we're writing a response file
+    	            USERHOMEDIR=`dxpasswdtool getuserhomedir $DXUSER`
+    			    if [ ! -d $USERHOMEDIR ]; then
+    			    	mkdir -p $USERHOMEDIR
+    			    	chown $DXUSER:$DXGROUP $USERHOMEDIR
+    			    fi
+    			    # end up here because dxusermod somehow failed to change user home directory to DXHOME
+    			    # so need to update .profile in USERHOMEDIR only
+    		    	if [ ! -f $USERHOMEDIR/.profile ]; then
+						echo ". $DXHOME/install/.dxprofile" > $USERHOMEDIR/.profile
+					else
+						# only source .dxprofile if it doesn't exist in .profile
+						CHECK=`grep -l dxprofile $USERHOMEDIR/.profile`
+						if [ ! -n "$CHECK" ]; then
+							echo ". $DXHOME/install/.dxprofile" >> $USERHOMEDIR/.profile
+						fi
+					fi
+					if [ -f $USERHOMEDIR/.bash_profile ]; then
+						CHECK=`grep -l dxprofile $USERHOMEDIR/.bash_profile`
+						if [ ! -n "$CHECK" ]; then
+							echo ". $DXHOME/install/.dxprofile" >> $USERHOMEDIR/.bash_profile
+						fi
+					fi
+    			    if [ ! -f $DXHOME/.cshrc ] || [ ! -f $USERHOMEDIR/.cshrc ]; then
+	    			    if [ "$USERHOMEDIR" != "$DXHOME" ]; then 
+	    			    	echo "source $DXHOME/install/.dxcshrc" >> $USERHOMEDIR/.cshrc
+	    			    	chown $DXUSER:$DXGROUP $USERHOMEDIR/.cshrc
+	    			    else
+				        	echo "source $DXHOME/install/.dxcshrc" >> $DXHOME/.cshrc
+				        	chown $DXUSER:$DXGROUP $DXHOME/.cshrc
+                        fi
+					else
+	    			    if [ "$USERHOMEDIR" != "$DXHOME" ]; then 
+	    			    	echo "source $DXHOME/install/.dxcshrc" >> $USERHOMEDIR/.cshrc
+	    			    	chown $DXUSER:$DXGROUP $USERHOMEDIR/.cshrc
+	    			    else
+				        	echo "source $DXHOME/install/.dxcshrc" >> $DXHOME/.cshrc
+				        	chown $DXUSER:$DXGROUP $DXHOME/.cshrc
+                        fi
+                    fi
+                fi
+            fi
+
+        else
+            if [ -z "$WRITE_RESPONSE_FILE" ]; then
+                # don't run if we're writing a response file
+                user_dxserver
+            fi
+
+            if [ -z "$BACKUPBIN" ]; then
+                BACKUPBIN="y"
+                BACKUPLOC=$DXHOME/backup.$CUR_VERSION
+            fi
+            export BACKUPBIN BACKUPLOC
+ 
+            if [ -z "$RESTARTDSAS" ]; then
+                if [ $DEFANS -eq 0 ]; then
+                    QUESTION="  Do you want to restart DSAs after the upgrade? (y/n)"
+                    DEFAULT="y"
+                    get_response ynq
+                    RESTARTDSAS=$RETURN
+                else
+                    RESTARTDSAS="y"
+                fi
+            fi
+        fi # (end upgrade or install)
+
+        # 64-bit functionality
+  #      if [ "$UPGRADE64BIT" = "y" ]; then
+  #          RUN64BIT="y" # force upgrade of 64-bit DSA
+
+        # sets IS64BIT if OS is 64-bit
+        get_64_bit
+
+        # if the user does not require ports <= 1024 give them the option
+        # to disable the setuid mode on the dxserver binary
+        if [ -n "$SETUID" ]; then
+            : # set from responsefile
+        elif [ $DEFANS -eq 1 ]; then
+            SETUID="n"
+	elif [ $NONROOTUSER -eq 1 ]; then
+            echo "  PLEASE NOTE THAT IN ORDER FOR DXSERVER TO LISTEN ON PORTS <= 1024, " | $LOG
+            echo "  SPECIAL PRIVILEDGE NEEDS TO BE ASSIGNED TO THE BINARIES, OR " | $log
+            echo "  THE OWNER OF THE BINARIES NEED TO BE ROOT AND THE SETUID FLAG NEEDS TO BE SET." | $LOG
+            echo "  THIS MAY POSE A POTENTIAL SECURITY RISK AND WE RECOMMEND NOT USING THIS FEATURE." | $LOG
+            echo "  BUT IF REQUIRED PLEASE ASK YOUR SYSTEM ADMINISTRATOR TO SET IT UP" | $LOG
+            echo "  BECAUSE IT CANNOT BE DONE IN A NON-ROOT INSTALLATION." | $LOG
+            SETUID="n"
+        else
+            echo | $LOG
+            echo "  In order for DXserver to listen on ports <= 1024, " | $LOG
+            echo "  special privilege needs to be assigned to the binaries, or" | $LOG
+            echo "  the binaries need to be root and the setuid flag needs to be set." | $LOG
+            echo "  This may pose a potential security risk and we recommend not using this feature." | $LOG
+            QUESTION="  Do you require $DXPROD to listen on ports <= 1024? (y/n)"
+            DEFAULT="n"
+            get_response ynq
+            SETUID=$RETURN
+            if [ "$SETUID" = "y" ]; then
+                get_legacy_setuid_response
+            fi
+        fi
+    fi
+}
+
+#########################
+# Load Upgrade Defaults #
+#########################
+load_upgrade_defaults()
+{
+    # only applies to upgrades
+    if [ $UPGRADEDX -ne 1 ]; then
+	return
+    fi
+
+    if [ -z "$DXHOME" ]; then
+        echo | $LOG
+        echo "  Failed to set upgrade defaults as DXHOME empty" | $LOG
+        checkpoint
+    elif [ -z "$CUR_VERSION" ]; then
+        echo | $LOG
+        echo "  Failed to set upgrade defaults as current version empty" | $LOG
+        checkpoint
+    fi
+
+    if [ -z "$BACKUPBIN" ]; then
+	BACKUPBIN="y"
+    fi
+
+    if [ -z "$BACKUPLOC" ]; then
+        BACKUPLOC=$DXHOME/backup.$CUR_VERSION
+    fi
+
+    if [ -z "$RESTARTDSAS" ]; then
+        RESTARTDSAS="y"
+    fi
+}
+
+############################
+# Running DXserver Install #
+############################
+run_dxserver_install()
+{
+	#need to check if this is an mdb install. 
+    if [ $SKIPDX -eq 1 ] || [ "$INSTALLDX" = "n" ]; then
+        return
+    fi
+
+    echo | $LOG
+    echo "============================ DXSERVER INSTALLATION ============================" | $LOG
+    if [ $UPGRADEDX -eq 1 ]; then
+        echo | $LOG
+        echo "  Upgrading $DXPROD software (as user $DXUSER)" | $LOG
+    else
+        echo | $LOG
+        echo "  Installing $DXPROD software (as user $DXUSER)" | $LOG
+    fi
+    export SOURCEDIR DXVERSION DXPROD DEFANS UPGRADEDX DXUSER DXMASTERKEYPASS
+
+    # create $DXHOME directory and make $DXUSER its owner
+    if [ ! -d $DXHOME ]; then
+        mkdir -p $DXHOME
+        if [ $? != 0 ]; then
+            echo | $LOG
+            echo "  Failed to create directory $DXHOME" | $LOG
+            checkpoint
+        fi
+    fi
+    chown $DXUSER $DXHOME
+
+    # preserve ownership for customers who insist on DXHOME=/opt/dxserver
+    if [ "`dirname $DXHOME`" != "/opt" ]; then
+        chown $DXUSER `dirname $DXHOME`
+    fi
+
+    if [ $UPGRADEDX -eq 1 ]; then
+        # get list of currently running processes, so we can restart them afterwards
+        if [ $NONROOTUSER -eq 0 ]; then
+              DSAS=`su - $DXUSER -c "$DXSRCBASH dxserver status" | grep started | awk '{print $1}'`
+        else
+              DSAS=`dxserver status | grep started | awk '{print $1}'`
+        fi
+        RESTARTLIST=`echo $DSAS`  # To get rid of newline characters
+
+        if [ -x $DXHOME/bin/dxadmind ]; then
+            if [ $NONROOTUSER -eq 0 ]; then
+                  DXADMINDS=`su - $DXUSER -c "$DXSRCBASH dxadmind status" | grep running | awk '{print $1}'`
+            else
+                  DXADMINDS=`dxadmind status | grep running | awk '{print $1}'`
+            fi
+        fi
+        RESTARTDXADMINDS=`echo $DXADMINDS`
+
+        if [ -d $DXHOME/config/tlsclient ]; then 
+            TLSCLIENTS=`su - $DXUSER -c "$DXSRCBASH tlsclient status" | grep running | awk '{print $1}'`
+            RESTARTTLSCLIENTS=`echo $TLSCLIENTS`
+        fi
+
+        # check if ssl daemon's are installed, these will be remove during the upgrade
+        if [ -f $DXHOME/bin/ssld ]; then
+            if [ $NONROOTUSER -eq 0 ]; then
+                 SSLDS=`su - $DXUSER -c "$DXSRCBASH ssld status" | awk '{print $1}'`
+            else
+                 SSLDS=`ssld status | awk '{print $1}'`
+            fi
+            REMOVESSLDS=`echo $SSLDS`
+        fi
+
+        # reset write permissions 
+        # 13187need to check for default.* files
+    	LIST=`find $DXHOME/config -name "default.*" -print`
+    	if [ -n "$LIST" ]; then
+        	chmod ug+w `find $DXHOME/config -name "default.*" -print`  | $LOG
+    	fi
+    	
+        chmod ug+w $DXHOME/config/*.*   | $LOG
+
+        if expr $DXTAR : '.*\.tar\.Z$' >/dev/null
+        then
+            CMD="zcat $DXTAR |tar tf - | grep config/schema"
+        elif expr $DXTAR : '.*\.tar\.gz$' >/dev/null
+        then
+            CMD="zcat $DXTAR |tar tf - | grep config/schema"
+        else
+            CMD="tar tf $DXTAR | grep config/schema"
+        fi
+        for FILE in `eval $CMD`
+        do
+            if [ -f $DXHOME/$FILE ]; then
+                chmod ug+w $DXHOME/$FILE  | $LOG
+            fi
+        done
+        # reset write permissions on HPUX where the r8.1 GA release reset everything. 
+        if [ `uname` = "HP-UX" ]; then
+            chmod -R u+w $DXHOME
+        fi
+    
+        # remove pre-12 embedded installs
+        if [ -f "$DXHOME/.reference_count" ]; then
+            rm -Rf $DXHOME/.reference_count
+        fi
+
+        # remove obsolete CMIP sample
+        if [ -d "$DXHOME/samples/cmip" ]; then
+            rm -Rf $DXHOME/samples/cmip
+        fi
+
+        export BACKUPBIN BACKUPLOC
+    fi
+    if [ ! -x $SOURCEDIR/dxsetupdsa.sh ]; then
+        echo | $LOG
+        echo "  Can't find dxsetupdsa.sh script" | $LOG
+        checkpoint
+    fi
+    get_library_name  # OS specific: sets Ingres LIB_NAME
+    
+    if [ $NONROOTUSER -eq 0 ]; then
+         su $DXUSER -c "( $SOURCEDIR/dxsetupdsa.sh prep && exit 0 || exit 1 )" 
+    else
+         ( $SOURCEDIR/dxsetupdsa.sh prep && exit 0 || exit 1 )
+    fi
+    if [ $? != 0 ]; then
+        echo | $LOG
+        echo "  The $DXPROD setup prep failed." | $LOG
+        if [ $DEFANS -eq 1 ]; then
+            RETURN="n"
+        else
+            QUESTION="  Do you want to continue? (y/n)"
+            DEFAULT="n"
+            get_response ynq
+        fi
+        if [ "$RETURN" = "n" ]; then
+            checkpoint
+        fi
+    fi
+
+    # backup existing directory
+    if [ "$BACKUPBIN" = "y" ]; then
+
+        echo
+        echo "  Backing up DXserver into $BACKUPLOC"
+   FILES="bin config dxagent install samples uninstall"
+    if [ $COPYCAPKI -eq 1 ] && [ -d $DXHOME/lib ]; then
+        FILES+=" lib"
+    fi
+        for FILE in $FILES
+        do
+            if [ -d $DXHOME/$FILE ]; then
+                echo "    - $FILE"
+                #13690: backup location needs to be cleaned out before attempting a backup
+                if [ ! -d $BACKUPLOC/$FILE ]; then
+                        mkdir -p $BACKUPLOC/$FILE
+                else
+                        rm -rf $BACKUPLOC/$FILE/*
+                fi
+                cp -rp $DXHOME/$FILE/* $BACKUPLOC/$FILE
+
+                if [ $? -ne 0 ]; then
+                    echo "  Backup for $DXHOME/$FILE failed writing to "
+                    echo "  $BACKUPLOC/$FILE"
+                    echo "  Please check, and rerun DXsetup."
+                    exit 1
+                fi
+            fi
+        done
+
+        # backup login scripts generated by install
+        echo "    - login scripts"
+        cp $DXHOME/install/.dxcshrc   $BACKUPLOC/install
+        cp $DXHOME/install/.dxprofile $BACKUPLOC/install
+
+        if [ "$SETUID" = "y" ]; then
+            setuid $BACKUPLOC/bin/dxserver
+        else
+            chmod 750 $BACKUPLOC/bin/dxserver
+        fi
+        echo
+        echo "  Previous DXserver files have been moved to "
+        echo "  $BACKUPLOC"
+        echo
+    fi
+
+    #there was a problem with installing CAOPENSSL before we finished 
+    # with other versions of Directory. Need to install this after we finish with our
+    #old install but before we put on our new install
+    if [ $COPYCAPKI -eq 0 ]; then
+         install_caopenssl					  # need to install CA Open SSL in order to proceed.
+    else
+        copy_caopenssl
+    fi
+
+    # migrate ssld config and remove old services
+    migrate_ssld 
+
+    echo "===================== DXSERVER INSTALLATION (CONTINUED)  ======================" | $LOG
+    echo | $LOG
+
+    # need to find out which dsas use which databases prior to the upgrade 
+    # and any edit of the current config prior to upgrading. 
+    
+    #13326: need to cd to another location as the current location has been removed. 
+    cd $DXHOME
+    if [ $NONROOTUSER -eq 0 ]; then 
+         su $DXUSER -c "( $SOURCEDIR/dxsetupdsa.sh | $LOG && exit 0 || exit 1 )" 
+    else
+         ( $SOURCEDIR/dxsetupdsa.sh | $LOG && exit 0 || exit 1 ) 
+    fi
+    if [ $? != 0 ]; then
+        echo | $LOG
+        echo "  The $DXPROD setup failed." | $LOG
+        if [ $DEFANS -eq 1 ]; then
+            RETURN="n"
+        else
+            QUESTION="  Do you want to continue? (y/n)" 
+            DEFAULT="n"
+            get_response ynq
+        fi
+        if [ "$RETURN" = "n" ]; then
+            checkpoint
+        fi
+    else
+        echo "  $DXPROD has installed successfully" | $LOG
+    fi
+
+    cd $DXHOME
+    # expose profiles to ETDIRHOME level
+    cp -p install/.dxprofile ..
+    cp -p install/.dxcshrc ..
+    # add links to correct ~/bin and samples
+    # 13371, 13372: No longer required to link bin32 and bin64. Only need to link the dxserver binary.
+    if [ -d bin ]; then
+        if [ $NONROOTUSER -eq 0 ]; then
+            su - $DXUSER -c "$DXSRCBASH \
+            cd $DXHOME/bin;"
+        else
+            cd $DXHOME/bin
+        fi
+    fi
+    # remove old-style symbolic link
+    if [ -h $DXHOME/bin/dsa ]; then
+        rm $DXHOME/bin/dsa
+    fi
+    
+    #run the restore after dxserver has upgraded. 
+    
+    #To Do: may need to include questions to ask user for grid size and location
+    #To Do: need steps to work out the gridsize
+    if [ -d $DXHOME ]; then
+        if [ $NONROOTUSER -eq 0 ]; then
+			chgrp -R $DXGROUP $DXHOME | $LOG
+			chmod -R o= $DXHOME | $LOG
+			chown $DXUSER $DXHOME/logs/*.* | $LOG  
+		# perms may have disappeared during SSLD migration
+			for filename in `ls $DXHOME/config/servers/*.dxi 2>/dev/null`; do
+				chown $DXUSER $filename | $LOG  
+			done
+		fi
+
+        if [ "$SETUID" = "y" ]; then
+            # doublecheck SUIDs
+            for filename in bin/dxserver bin/dxadmind 
+            do
+                setuid $DXHOME/$filename
+            done
+        fi
+
+        # make default config and schema files read-only
+        chmod ug-w `find $DXHOME/config -name "default.*" -print`  | $LOG
+        if expr $DXTAR : '.*\.tar\.Z$' >/dev/null
+        then
+            CMD="zcat $DXTAR |tar tf - | grep config/schema" 
+        elif expr $DXTAR : '.*\.tar\.gz$' >/dev/null
+        then
+            CMD="zcat $DXTAR |tar tf - | grep config/schema" 
+        else
+            CMD="tar tf $DXTAR | grep config/schema"
+        fi
+        for FILE in `eval $CMD`
+        do
+            if [ -f $DXHOME/$FILE ]; then
+                chmod ug-w $DXHOME/$FILE  | $LOG
+            fi
+        done
+    fi
+}
+
+get_dxagent_config()
+{
+    if [ -e $DXHOME/dxagent/openssl-ca/CA/index.txt ]; then
+        DXA_CLIENT_NAME=`cat $DXHOME/dxagent/openssl-ca/CA/index.txt |grep "V" |tail -1|awk  -F' ' '{print $5}'|awk  -F'/' '{print $2}'|awk  -F'=' '{print $2}'`
+        if [ ! "x$DXA_CLIENT_NAME" = "x" ]; then
+            DXAGENTCLIENT=$DXA_CLIENT_NAME
+        fi
+    fi
+    if [ -e $DXHOME/dxagent/dxagent_config.py ]; then
+        DXA_PORT=`cat $DXHOME/dxagent/dxagent_config.py|grep "DXAGENT_PORT"|awk -F' ' '{print $3}'`
+        if [ ! "x$DXA_PORT" = "x" ]; then
+            DXAGENTPORT=$DXA_PORT
+        fi
+    fi
+}
+
+############
+# DXagent  #
+############
+dxagent_questions()
+{
+    if [ "$INSTALLDXAGENT" = "n" ]; then
+        return
+    fi
+    INSTALLDXAGENT="y"
+    KEEPDXADMIN="n"
+
+    if [ $SKIPDXAGENT -eq 1 ]; then  # we already have this version
+        echo                                                                                                   | $LOG
+        echo "  A newer/identical version of $DXAGENTPROD has been detected."                                  | $LOG
+        echo                                                                                                   | $LOG
+        echo "  Existing Version: $DXAGENT_CUR_VERSION"   | $LOG
+        echo "  Install Version : $DXVERSIONEX"                                                   | $LOG
+        echo                                                                                                   | $LOG
+        # RETURN="n"
+        get_dxagent_config
+        echo "  Existing DXagent Config: Client Certificate Name : $DXAGENTCLIENT, DXagent Port : $DXAGENTPORT" >> $INSTALL_LOG 2>&1
+    elif [ $UPGRADEDXAGENT -eq 1 -a "x$DXAGENT_CUR_MAJOR" != "x" -a "x$DXAGENT_125_NOT_CONFIGURED" = "x" ]; then
+        echo                                                                                       | $LOG
+        echo "  Current installed version of $DXAGENTPROD:"                                        | $LOG
+        echo "  Version $DXAGENT_CUR_VERSION" | $LOG
+        echo                                                                      	               | $LOG
+        echo "  This setup will upgrade it to:"                                                    | $LOG
+        echo "  Version $DXVERSIONEX"                                                 | $LOG
+        echo                                                                                                   | $LOG
+        get_dxagent_config
+        echo "  Existing DXagent Config: Client Certificate Name : $DXAGENTCLIENT, DXagent Port : $DXAGENTPORT" >> $INSTALL_LOG 2>&1
+        if [ $DEFANS -eq 1 ]; then
+            RETURN="y"
+        else
+            QUESTION="  Do you want to upgrade it? (y/n)"
+            DEFAULT="y"
+            get_response ynq
+            UPGRADING=$RETURN
+        fi
+    else
+        echo | $LOG
+        echo "=============================== DXAGENT QUESTIONS =============================" | $LOG
+
+        echo | $LOG
+        echo "  DXagent service provides REST based API for managing Directory. " | $LOG
+        echo "  This API allows performing a subset of management tasks that could be done  " | $LOG
+        echo "  using the dxtools command line utilities. " | $LOG
+
+        if [ $UPGRADEDXAGENT -eq 1 ]; then
+            if [ "x$DXAGENT_CUR_MAJOR" != "x" -a "x$DXAGENT_125_NOT_CONFIGURED" = "xy" ]; then
+                echo
+                echo "  DXagent $DXAGENT_CUR_MAJOR.$DXAGENT_CUR_MINOR.$DXAGENT_CUR_SP.$DXAGENT_CUR_BLDNUM files are present in $DXHOME/dxagent, " | $LOG
+                echo "  but DXagent server seems not to be properly configured." | $LOG
+                if [ $DEFANS -eq 1 ]; then
+                    RETURN="y"
+                else
+                    QUESTION="  Do you wish to configure DXagent? (y/n)"
+                    DEFAULT="y"
+                    get_response ynq
+                fi
+
+                if [ "$RETURN" != "y" ]; then
+                    echo "  This setup will upgrade DXagent $DXAGENT_CUR_MAJOR.$DXAGENT_CUR_MINOR.$DXAGENT_CUR_SP.$DXAGENT_CUR_BLDNUM files to:" | $LOG
+                    echo "  Version $MAJOR.$MINOR.$SP.$BLDNUM" | $LOG
+
+                    if [ $DEFANS -eq 1 ]; then
+                        RETURN="y"
+                    else
+                        QUESTION="  Do you want to upgrade it? (y/n)"
+                        DEFAULT="y"
+                        get_response ynq
+                        UPGRADING=$RETURN
+                    fi
+                    INSTALLDXAGENT="n"
+                    return
+                fi
+            fi
+            UPGRADEDXAGENT=0
+            REMOVE_OLD_DXAGENT=y
+        fi
+
+        if [ $DEFANS -eq 1 ]; then
+            if [ "$EXPRESS" != "1" ]; then
+                # Silent install: install DXagent if all 3 variables defined in response file
+                if [ -z "$DXAGENTCLIENT" -o -z "$DXAGENTPORT" -o -z "$DXAGENTPASS" ]; then
+                    RETURN="n"
+                fi
+            fi
+            # Else this is Express install: Install DXagent using values from response file.
+            # Prompt if required variables not defined.
+        else
+	    INSTALLDXAGENT="y"
+            #QUESTION="  Do you wish to setup DXagent? (y/n)"
+            #DEFAULT="y"
+            #get_response ynq
+            #if [ "$RETURN" != "y" ]; then
+            #    INSTALLDXAGENT="n"
+            #    return
+            #fi
+        fi
+        
+        # Only prompt to remove dxadmind if using Custom install. In other modes, always remove dxadmind.
+        if [ $DEFANS -eq 0 -a -f $DXHOME/bin/dxadmind ]; then
+            echo "  DXagent functionality replaces the functionality provided by dxadmin service  " | $LOG
+            echo "  in CA Directory 12.0.18 or prior. DXadmin files are detected on this machine.  " | $LOG
+            QUESTION="  Do you wish to remove DXadmin? (y/n)"
+            DEFAULT="y"
+            get_response ynq
+            if [ "$RETURN" = "n" ]; then
+                KEEPDXADMIN="y"
+            fi
+        fi
+
+        # check python and dependencies
+        which python3 > /dev/null 2>&1
+        HAVE_PYTHON3=$?
+        which python > /dev/null 2>&1
+        HAVE_PYTHON=$?
+
+        if [ $HAVE_PYTHON3 -eq 0 ]
+        then
+            PYTHON=python3
+        elif [ $HAVE_PYTHON -eq 0 ]
+        then
+            PYTHON=python
+        else
+            echo "  DXagent requires Python 2.6 or higher, recommended at least 2.7.9 or 3.4" | $LOG
+            exit 1
+        fi
+    
+        PYTHON_VERSION=`$PYTHON --version 2>&1`
+        echo "  Found $PYTHON_VERSION" | $LOG
+        if [ "$PYTHON_VERSION" \< "Python 2.6" ]
+        then
+            echo "  DXagent requires Python 2.6 or higher, recommended at least 2.7.9 or 3.4" | $LOG
+            exit 1
+        fi
+    
+        $PYTHON -c "from ssl import SSLContext" > /dev/null 2>&1
+        if [ $? -ne 0 ]
+        then
+            $PYTHON -c "from OpenSSL import SSL" > /dev/null 2>&1
+            if [ $? -eq 0 ]
+            then
+                echo "  WARNING: ssl.SSLContext not available in this Python version falling back to TLSv1." | $LOG
+                echo "  WARNING: Recommend upgrading to at least Python 2.7.9 or 3.4." | $LOG
+            else
+                echo "  If using Python version less than 2.7.9 or 3.4 must have pyOpenSSL module installed." | $LOG
+                exit 1
+            fi
+        fi
+    
+        # check for FQDN
+        hostname | grep "\." > /dev/null
+        if [ $? -eq 0 ]; then
+            HOSTNAME=`hostname | awk -F. '{print $1}'`
+        else
+            HOSTNAME=`hostname`
+        fi
+        HOSTNAME_FQDN=`hostname -f`
+
+        # Prompt for these 3 variables if:
+        # Custom install, or
+        # Values not set in response file (ok to prompt in Custom/Express mode)
+        # If this is silent install, then its impossible for any 3 variables left unset at this point
+        if [ $DEFANS -eq 0 -o -z "$DXAGENTPORT" ]; then
+            QUESTION="  Enter the port for DXagent to listen"
+            DEFAULT=$DXAGENT_DEFAULT_PORT
+            get_response port
+            DXAGENTPORT=$RETURN
+        fi
+
+        if [ $DEFANS -eq 0 -o -z "$DXAGENTCLIENT" ]; then
+            DXAGENTCLIENT=$HOSTNAME
+            while [ "$DXAGENTCLIENT" = "$HOSTNAME" ] || [ "$DXAGENTCLIENT" = "" ]; do
+                    QUESTION="  Enter name for client certificate - this should be different to this machine's name ($HOSTNAME)"
+                    DEFAULT=
+                    get_response
+                    DXAGENTCLIENT=$RETURN
+            done
+        fi
+
+        if [ $DEFANS -eq 0 -o -z "$DXAGENTPASS" ]; then
+            while [ 1 ]; do
+                echo $LINUX_USE_BACKSLASHES "  Enter DXagent client certificate password (min 5 chars): \c"
+                stty -echo
+                read DXAGENTPASS
+                stty echo
+                echo | $LOG
+
+		if [ -z "$DXAGENTPASS" ]; then
+			echo "  Password cannot be blank. Please try again." | $LOG
+			echo | $LOG
+                elif [ ${#DXAGENTPASS} -lt 5 ]; then
+                    echo "  Password cannot be less than 5 chars. Please try again." | $LOG
+                    echo | $LOG
+		else
+                    echo $LINUX_USE_BACKSLASHES "  Confirm DXagent client certificate password (min 5 chars): \c"
+                    stty -echo
+                    read DXAGENTPASS2
+                    stty echo
+                    echo | $LOG
+
+                    if [ "$DXAGENTPASS" = "$DXAGENTPASS2" ]; then
+			break
+                    else
+			echo "  Passwords do not match, please try again." | $LOG
+			echo | $LOG
+                    fi
+		fi
+            done
+        fi
+    
+        if [ -n "$WRITE_RESPONSE_FILE" ]; then
+            echo
+            echo "  Please note that the DXagent password has been written to the " | $LOG
+            echo "  responsefile at "                                                | $LOG
+            echo "    $WRITE_RESPONSE_FILE. "                                        | $LOG
+            echo "  If this is a security concern, you may edit the file to remove it" | $LOG
+            echo "  and pass the password to dxagentsteup on the commandline: "           | $LOG
+            echo "    ./dxagentsteup.sh -dxagentpass <value>  ... "                      | $LOG
+        fi
+    fi
+}
+
+install_dxagent()
+{
+    umask 027
+    mkdir -p $DXHOME/dxagent
+    cd $DXHOME/dxagent
+
+    if expr $DXATAR : '.*\.tar\.Z$' >/dev/null
+    then
+        zcat $DXATAR | tar xf -
+    elif expr $DXATAR : '.*\.tar\.gz$' >/dev/null
+    then
+        zcat $DXATAR | tar xf -
+    else
+        tar xf $DXATAR
+    fi
+    if [ $? != 0 ]
+    then
+        echo "  ERROR - Load of $DXAGENTPROD product files failed"
+        exit 1
+    fi
+    cp $DXHOME/dxagent/dxagent $DXHOME/bin/
+    chown $DXUSER $DXHOME/bin/dxagent
+}
+
+run_dxagent_install()
+{
+    if [ $SKIPDXAGENT -eq 1 ] || [ "$INSTALLDXAGENT" = "n" ] ; then
+        return
+    fi
+
+    if [ $UPGRADEDXAGENT -eq 1 ] && [ "x$UPGRADING" = "xn" ]; then
+        return
+    fi
+
+    echo | $LOG
+    echo "============================ DXAGENT INSTALLATION =============================" | $LOG
+    echo | $LOG
+
+    if [ "$KEEPDXADMIN" = "n" ] && [ -x $DXHOME/bin/dxadmind ]; then
+        echo "  Stopping dxadmind process if currently running and removing dxadmin service"
+        if [ $NONROOTUSER -eq 0 ]; then
+         su - $DXUSER -c "$DXSRCBASH \
+                     dxadmind stop all; dxadmind remove all"
+        else
+            /bin/sh -c "$DXSRCSH; \
+                     dxadmind stop all; dxadmind remove all"
+        fi
+        rm -rf $DXHOME/bin/dxadmind
+        # remove r8.x configs
+        rm -Rf $DXHOME/config/dxadmind.ldif > /dev/null 2>&1
+        rm -Rf $DXHOME/config/dxadmind_master.args > /dev/null 2>&1
+    fi
+
+    if [ $UPGRADEDXAGENT -eq 1 ]; then
+        if [ $NONROOTUSER -eq 0 ]; then
+         su - $DXUSER -c "$DXSRCBASH \
+                     cd ${DXHOME}/dxagent; ./stop_dxagent.sh&"  >> $INSTALL_LOG 2>&1
+        else
+            /bin/sh -c "$DXSRCSH; \
+                     cd ${DXHOME}/dxagent; ./stop_dxagent.sh&"  >> $INSTALL_LOG 2>&1
+        fi
+        DXAGENT_CONFIG_BAK=`mktemp`
+        cp -pf $DXHOME/dxagent/dxagent_config.py $DXAGENT_CONFIG_BAK
+    fi
+
+    if [ "x$REMOVE_OLD_DXAGENT" = "xy" ]; then
+        mv $DXHOME/dxagent $DXHOME/dxagent.preview
+    fi
+
+    install_dxagent
+
+    #update uninstall scripts
+    if [ "x$UPDATE_UNINSTALL_SCRIPT" = "xy" ]; then
+        cp -rf $DXHOME/dxagent/uninstall/ $DXHOME/uninstall/
+        rm -rf $DXHOME/dxagent/uninstall/
+    fi
+
+    # modify dxagent python file
+    mv $DXHOME/dxagent/dxagent.py $DXHOME/dxagent/dxagent.py.tmp
+    cat $DXHOME/dxagent/dxagent.py.tmp | \
+    sed "s|__DXHOME__|$DXHOME|g" > $DXHOME/dxagent/dxagent.py
+    rm $DXHOME/dxagent/dxagent.py.tmp
+
+    if [ $NONROOTUSER -eq 0 ]; then
+        chown -R $DXUSER ${DXHOME}/dxagent
+    fi
+
+    if [ $UPGRADEDXAGENT -ne 1 ]; then
+    
+        #create password file
+        password_file=`mktemp /tmp/pwd.XXXXXX`
+        echo -n $DXAGENTPASS > $password_file
+
+        if [ $NONROOTUSER -eq 0 ]; then
+            chown $DXUSER $password_file
+         su - $DXUSER -c "$DXSRCBASH cd ${DXHOME}/dxagent; ./setup_dxagent.sh --name $DXAGENTCLIENT --password-file $password_file"  >> $INSTALL_LOG 2>&1
+        else
+            /bin/sh -c "$DXSRCSH; \
+                     cd ${DXHOME}/dxagent; ./setup_dxagent.sh --name $DXAGENTCLIENT --password-file $password_file"  >> $INSTALL_LOG 2>&1
+        fi
+        # Password file scrubbed and deleted by setup_dxagent.py
+        
+        # Add DXAGENT_PORT config line into dxagent_config.py
+        if ! grep -q '^DXAGENT_PORT' $DXHOME/dxagent/dxagent_config.py ; then
+            echo >> $DXHOME/dxagent/dxagent_config.py
+            echo "DXAGENT_PORT = $DXAGENTPORT" >> $DXHOME/dxagent/dxagent_config.py
+        fi
+    else
+        if [ ! -z "$DXAGENT_CONFIG_BAK" -a -f "$DXAGENT_CONFIG_BAK" ]; then
+            mv -f $DXAGENT_CONFIG_BAK $DXHOME/dxagent/dxagent_config.py
+        fi
+    fi
+
+    echo "  Starting DXagent" | $LOG
+    if [ $NONROOTUSER -eq 0 ]; then
+     su - $DXUSER -c "$DXSRCBASH \
+                 cd ${DXHOME}/dxagent; ./start_dxagent.sh&"  >> $INSTALL_LOG 2>&1
+    else
+        /bin/sh -c "$DXSRCSH; \
+                 cd ${DXHOME}/dxagent; ./start_dxagent.sh&"  >> $INSTALL_LOG 2>&1
+    fi
+    echo "  DXagent installation complete" | $LOG
+}
+
+#########################################################################
+# Check if Directory is already installed and is supported by DXagent
+#########################################################################
+dxagent_check_cadir_version()
+{
+    if [ "$INSTALLDXAGENT" = "n" ]; then
+        return
+    fi
+    FIRST_DXAGENT_MAJOR=`echo "$DXAGENT_FIRST_VERSION"|awk -F. '{print $1}'`
+    FIRST_DXAGENT_MINOR=`echo "$DXAGENT_FIRST_VERSION"|awk -F. '{print $2}'`
+    FIRST_DXAGENT_BLDNUM=`echo "$DXAGENT_FIRST_VERSION"|awk -F. '{print $3}'`
+
+    REQ_MAJOR=`echo "$CADIR_MIN_VERSION"|awk -F. '{print $1}'`
+    REQ_MINOR=`echo "$CADIR_MIN_VERSION"|awk -F. '{print $2}'`
+    REQ_BLDNUM=`echo "$CADIR_MIN_VERSION"|awk -F. '{print $3}'`
+
+    echo $LINUX_USE_BACKSLASHES "  Checking current install of Directory... \c" | $LOG
+	if [ $NONROOTUSER -eq 0 ]; then
+	  OUTPUT=`su - $DXUSER -c "$DXSRCBASH $DXHOME/bin/dxserver version"  2>/dev/null`
+	else
+      OUTPUT=`$DXHOME/bin/dxserver version 2>/dev/null`
+	fi
+
+# build number can either be V8.0 or r8 or r8.1 or 12.0
+# try V8.0 style
+    CUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                awk -FV '{print $2}' |  \
+                                awk -F. '{print $1}'`
+    CUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                awk -FV '{print $2}' |  \
+                                awk -F. '{print $2}'`
+
+# try r8.1 style
+    if [ -z "$CUR_MAJOR" ]; then
+        CUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                    awk -Fr '{print $2}' |  \
+                                    awk -F. '{print $1}'`
+        CUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                    awk -Fr '{print $2}' |  \
+                                    awk -F. '{print $2}'`
+    fi
+
+# must be 12.0 or 12.5 style
+    if [ -z "$CUR_MAJOR" ]; then
+        CUR_MAJOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                    awk -F. '{print $1}'`
+        CUR_MINOR=`echo "$OUTPUT" | awk     '{print $2}' |  \
+                                    awk -F. '{print $2}'`
+    fi
+    
+    if [ -z "$CUR_MAJOR" ]; then
+        echo
+        echo "Your system does not have Directory installed, DXagent install cannot continue"
+        echo
+        echo "  Installation terminated."
+        exit 1
+    fi
+
+    if [ -z "$CUR_MINOR" ]; then
+        CUR_MINOR=0
+    fi
+
+# extract nn from "xxxx (build nn) xxxx"
+    CUR_BLDNUM=`echo "$OUTPUT" | awk -F'(' '{print $2}' | awk -F')' '{print $1}' | awk '{print $2}'`
+
+# used for archive name
+    CUR_VERSION=$CUR_MAJOR.$CUR_MINOR.$CUR_BLDNUM
+    export CUR_VERSION
+    echo "$CUR_VERSION" | $LOG
+
+# Compare current version with required version
+    if [ $CUR_MAJOR -lt $REQ_MAJOR ]; then
+        CADIR=n
+    elif [ $CUR_MAJOR -eq $REQ_MAJOR ]; then
+        if [ $CUR_MINOR -lt $REQ_MINOR ]; then
+            CADIR=n
+        elif [ $CUR_MINOR -eq $REQ_MINOR ]; then
+            if [ $CUR_BLDNUM -lt $REQ_BLDNUM ]; then
+                CADIR=n
+            fi
+        fi
+    fi
+
+# Compare current version with first dxagent version
+    if [ $CUR_MAJOR -lt $FIRST_DXAGENT_MAJOR ]; then
+        UPDATE_AUTO_STARTUP=y
+        UPDATE_UNINSTALL_SCRIPT=y
+    elif [ $CUR_MAJOR -eq $FIRST_DXAGENT_MAJOR ]; then
+        if [ $CUR_MINOR -lt $FIRST_DXAGENT_MINOR ]; then
+            UPDATE_AUTO_STARTUP=y
+            UPDATE_UNINSTALL_SCRIPT=y
+        elif [ $CUR_MINOR -eq $FIRST_DXAGENT_MINOR ]; then
+            if [ $CUR_BLDNUM -le $FIRST_DXAGENT_BLDNUM ]; then
+                UPDATE_UNINSTALL_SCRIPT=y
+                if [ $CUR_BLDNUM -lt $FIRST_DXAGENT_BLDNUM ]; then
+                    UPDATE_AUTO_STARTUP=y
+                fi
+            fi
+        fi
+    fi
+
+    if [ "x$CADIR" = "xn" ]; then
+        echo
+        echo "Your system has unsupported CA Directory version ($CUR_VERSION), please upgrade to 12.0SP15 ($CADIR_MIN_VERSION) or higher."
+        echo "DXagent install cannot continue"
+        echo
+        echo "  Installation terminated."
+        exit 1
+    fi
+}
+
+########################################################
+# check available space, given a directory path.       #
+# this works even if the directory path doesn't exist. #
+########################################################
+check_dir_space()
+{
+    CHECKDIR=$1
+    CHECKSPACE=$2
+
+    while [ "${CHECKDIR}" ]; do
+    # does directory exist ?
+        if [ -d $CHECKDIR ]; then
+            # check that filesystem of directory has enough space
+            fs_space $CHECKDIR
+            if [ $RETURN -lt $CHECKSPACE ]; then
+                echo "    \`${CHECKDIR}' only has $RETURN Mb of free space." | $LOG
+                RETURN="n"
+                return
+            else
+                RETURN="y"
+                return
+            fi
+        else
+            # chop last arc of the path
+            CHECKDIR=`dirname $CHECKDIR`
+        fi
+    done
+
+    RETURN="n"
+    return
+}
+
+#############
+# help_text #
+#############
+help_text()
+{
+    filename="`${pwd}`/help/$HELP.hlp"
+    if test ! -s "${filename}" ; then
+       ${echo} HELP not available. Help file "'${filename}'" does not exist!
+       return
+    fi
+    ${cat} help/$HELP.hlp
+}
+
+#####################
+# remove_temp_files #
+#####################
+remove_temp_files()
+{    
+    rm -f ${TMPFILE}
+}
+
+##############
+# checkpoint #
+##############
+checkpoint()
+{
+    remove_temp_files
+
+    # 9016: need to remove any directories created during (aborted) install
+    # but have to be really really careful that we don't delete anything
+    # that was there before! See also 9017: getowner
+
+    if [ -n "$DXUSER_CREATED" ]; then
+        dxuserdel $DXUSER
+        rm -Rf $DXHOME
+    fi
+
+    echo | $LOG
+    echo "  Installation terminated." | $LOG
+    exit 1
+}
+
+###############################################################
+# get_response                                                # 
+#                                                             #
+# print a prompt message and show the user the default value. #
+# return the value entered, or a yes/no answer.               # 
+###############################################################
+get_response()
+{
+    qtype=$1
+    while [ 1 ] ; do
+        RETURN=""
+        echo | $LOG
+        if [ "${qtype}" = "cont" ] ; then
+            printf "%s" "  Press <Return> to continue" | $LOG
+            read response
+            return
+        else
+            printf "%s" "$QUESTION [${DEFAULT}] " | $LOG
+            read response
+            if [ $? != 0 ] ;  then
+                 checkpoint
+            fi
+
+            # Output response to install log so we know what the user has selected
+            if [ -f "$INSTALL_LOG" ] && [ "$qtype" != "password" ]; then
+                echo >> $INSTALL_LOG
+                echo >> $INSTALL_LOG
+                if [ -z "${response}" ]; then
+                    echo "  User has chosen the option: ${DEFAULT}" >> $INSTALL_LOG
+                else
+                    echo "  User has chosen the option: ${response}" >> $INSTALL_LOG
+                fi
+            fi
+
+            if [ "${qtype}" = "ynq" ] ; then
+                case "${response}" in
+                    [Yy]*) RETURN="y"
+                           return
+                           ;;
+                    [Nn]*) RETURN="n"
+                           return
+                           ;;
+                    [Qq]*) checkpoint
+                           ;;
+                       \?) help_text
+                           ;;
+                       "") RETURN="${DEFAULT}"
+                           return
+                           ;;
+                esac
+
+            elif [ "${qtype}" = "path" ] ; then
+                case "${response}" in
+                    \?) help_text
+                       ;;
+                    "") RETURN="${DEFAULT}"
+                        return
+                        ;;
+                    .*) echo ""
+                        echo "  Please enter an absolute pathname." | $LOG
+                        ;;
+                    ~*) echo ""
+                        echo "  Please enter an absolute pathname." | $LOG
+                        ;;
+                    #13275: needs to be a check here for absoulte pathname. 
+                    *) echo $response | cut -c 1-1 |grep "/" > /dev/null
+                       if [ $? -ne 0 ]; then
+                       		echo " Please enter an absolute pathname." | $LOG
+                       else
+                      		RETURN="$response"
+                       		return
+                		fi
+                       ;;
+                esac
+                
+            elif [ "${qtype}" = "12345" ]; then
+                # dxsetup and dxwebsetup main menu
+                case "${response}" in
+                    1) RETURN="1" 
+                       return
+                       ;;
+                    2) RETURN="0"
+                       return
+                       ;;
+                    3) express_information 
+                       return
+                       ;;
+                    4) upgrade_information
+                       return
+                       ;;
+                    5) checkpoint
+                       ;;
+                   "") RETURN="${DEFAULT}"
+                       return
+                       ;;
+                esac
+
+            elif [ "${qtype}" = "port" ]; then    
+                case "${response}" in
+                    "") RETURN="${DEFAULT}"
+                        return
+                        ;;
+                    [!0-9]*) echo ""
+                        echo "  Please enter a valid number." | $LOG
+                        ;;
+                    [0-9]*) RETURN="$response"
+                        return
+                        ;;
+                esac 
+
+            elif [ "${qtype}" = "yniq" ] ; then
+                case "${response}" in
+                    [Yy]*) RETURN="y"
+                           return
+                           ;;
+                    [Nn]*) RETURN="n"
+                           return
+                           ;;
+                    [Ii]) RETURN="i"
+                           return
+                           ;;
+                    [Qq]*) checkpoint
+                           ;;
+                       \?) help_text
+                           ;;
+                       "") RETURN="${DEFAULT}"
+                           return
+                           ;;
+                esac
+
+            elif [ "${qtype}" = "executable" ]; then
+                if [ -x "${response}" ]; then
+                    RETURN="${response}"
+                    return
+                elif [ -z "${response}" ]; then
+                    RETURN="${DEFAULT}"
+                    return
+                else
+                    echo "  Please enter a valid executable." | $LOG
+                fi
+
+            elif [ "${qtype}" = "license" ]; then
+                responselow=`echo $response | tr '[A-Z]' '[a-z]' `
+                if [ "$responselow" = "proceed" ]; then
+                    RETURN="y"
+                    return
+                else
+                    RETURN="n"
+                    return
+                fi
+                
+            elif [ "${qtype}" = "hostname" ] ; then
+                    if [ -z "${response}" ]; then
+                    	echo ""
+                        echo "  Hostname Cannot be blank."  | $LOG
+                    else
+                    	RETURN="$response"
+                       	return
+                	fi 
+                	
+            else
+                case "${response}" in
+                    \?) help_text
+                       ;;
+                    "") RETURN="${DEFAULT}"
+                        return
+                        ;;
+                    *) RETURN="$response"
+                       return
+                       ;;
+                esac
+            fi
+        fi
+    done
+}
+
+#################################
+# Check if a directory is empty #
+#################################
+remove_empty_dir()
+{
+    TARGET_DIRECTORY=$1
+
+    if [ -z "$TARGET_DIRECTORY" ]; then
+        echo | $LOG
+        echo "  Bad parameter supplied to remove_empty_dir. Please check" | $LOG
+        checkpoint
+    fi
+
+    if [ -d $TARGET_DIRECTORY ]; then
+        FILES_LEFT_IN_DIR=`ls -laR $TARGET_DIRECTORY |wc -l`
+
+        if [ "$FILES_LEFT_IN_DIR" -eq $OS_EMPTYDIR_COUNT ]; then
+            cd / # Otherwise you cannot remove the old directory
+            echo "$TARGET_DIRECTORY is no longer required and will be removed." | $LOG
+            rmdir $TARGET_DIRECTORY | $LOG
+         else
+            echo "$TARGET_DIRECTORY is required and will not be removed." | $LOG
+        fi
+    fi
+}
+
+# pass required directory name to check_product_dir
+# each component MUST be installed to a known basename
+
+get_dx_new_dir()
+{
+    PROD=$DXPROD
+    PRODSIZE=$DXSIZE
+    INSTDIR=$DXHOME
+    get_product_dir dxserver
+    DXHOME=$INSTDIR
+}
+
+get_dxwebserver_new_dir()
+{
+    PROD=$DXWEBSERVERPROD
+    PRODSIZE=$DXWEBSERVERSIZE
+    INSTDIR=$DXWEBHOME
+    get_product_dir dxwebserver
+    DXWEBHOME=$INSTDIR
+}
+
+get_masterkey_pass()
+{
+    if [ -n "$WRITE_RESPONSE_FILE" ] && [ -z "$DXMASTERKEYPASS" ]; then
+	echo " "
+	echo "  Provide master key details for Directory Encryption"
+	echo " "
+          while [ 1 ]; do
+              echo $LINUX_USE_BACKSLASHES "  Enter DXServer master key certificate passphrase (min 5 chars): \c"
+              stty -echo
+              read DXMASTERKEYPASS
+              stty echo
+              echo | $LOG
+
+	      if [ ${#DXMASTERKEYPASS} -lt 5 ]; then
+		  echo "  Passphrase cannot be less than 5 chars. Please try again." | $LOG
+                  echo | $LOG
+	      else
+		  
+		  echo $LINUX_USE_BACKSLASHES "  Confirm DXServer master key certificate passphrase (min 5 chars): \c"
+		  stty -echo
+		  read DXMASTERKEYPASS2
+		  stty echo
+		  echo | $LOG
+
+		  if [ -z "$DXMASTERKEYPASS" ]; then
+                      echo "  Password cannot be blank. Please try again." | $LOG
+                      echo | $LOG
+		  elif [ "$DXMASTERKEYPASS" = "$DXMASTERKEYPASS2" ]; then
+                      break
+		  else
+		      echo "  Passwords do not match, please try again." | $LOG
+                      echo | $LOG
+		  fi
+	      fi
+          done
+      elif [ "$DXMASTERKEYPASS" = "" ]; then
+        # This value will not be used in case of non - silent installation.
+        DXMASTERKEYPASS="defaultpass"
+      fi
+
+      export DXMASTERKEYPASS
+
+      if [ -n "$WRITE_RESPONSE_FILE" ]; then
+            echo
+            echo "  Please note that the DXServer master key certificate password has been written to the " | $LOG
+            echo "  responsefile at "                                                   | $LOG
+            echo "    $WRITE_RESPONSE_FILE. "                                           | $LOG
+            echo "  If this is a security concern, you may edit the file to remove it"  | $LOG
+            echo "  and pass the password to directory setup on the commandline: "      | $LOG
+            echo "    ./dxsetup.sh -dxmasterkeypass <value>  ... "                      | $LOG
+      fi
+
+
+}
+
+get_product_dir()
+{
+    RETURN="n"
+    BADDIR=0
+
+    while [ $RETURN = "n" ]; do
+        if [ -n "$DEFANS" ] && [ $DEFANS -eq 1 ]; then
+            if [ $BADDIR -eq 1 ]; then
+                checkpoint
+            fi
+            RETURN=$INSTDIR
+        else
+            echo | $LOG
+            echo "  The $PROD product files require $PRODSIZE Mb of disk space." | $LOG
+            nice_df $PRODSIZE | $LOG
+            echo | $LOG
+            echo "  Please specify the $PROD installation directory" | $LOG
+            QUESTION=""
+            DEFAULT=$INSTDIR
+            get_response path
+        fi
+        GETDIR=$RETURN
+        check_product_dir $1
+    done
+
+    INSTDIR=$GETDIR
+}
+
+check_product_dir()
+{
+    # idiot-proofing
+    TESTSTR=$GETDIR
+
+    while [ -n "$TESTSTR" ]; do
+        echo $TESTSTR | cut -c 1-1 | grep -v "[a-zA-Z0-9/._-]" > /dev/null
+        if [ $? -eq 0 ]; then
+            echo
+            echo "  $GETDIR contains an invalid character. Please re-enter." | $LOG
+            get_response cont
+            RETURN="n"
+            BADDIR=1
+            return
+        fi
+        TESTSTR=`echo $TESTSTR | cut -c 2-`
+    done
+    echo $GETDIR | grep " " > /dev/null 
+    if [ $? -eq 0 ]; then
+        echo
+        echo "  $GETDIR contains an invalid character. Please re-enter." | $LOG
+        get_response cont
+        RETURN="n"
+        BADDIR=1
+        return
+    fi
+    echo $GETDIR | cut -c 1-1 | grep "/" > /dev/null
+    if [ $? -ne 0 ]; then
+        echo
+        echo "  $GETDIR must be a full path. Please re-enter." | $LOG
+        get_response cont
+        RETURN="n"
+        BADDIR=1
+        return
+    fi
+
+    # force basename to comply to expectations
+    if [ -n "$1" ] && [ "`basename $GETDIR`" != "$1" ]; then
+        echo 
+        echo "  $PROD must be installed to a '$1' directory location. " | $LOG
+        echo "  For example, `dirname $GETDIR`/$1. " | $LOG
+        echo "  Please re-enter." | $LOG
+        get_response cont
+        RETURN="n"
+        BADDIR=1
+        return
+    fi
+	#need to check to see if user is trying to install to / or /dxserver
+	if [ "`dirname $GETDIR`" = "/" ]; then
+		echo
+		echo "  $PROD must not be installed to the '/' directory, and " | $LOG
+		echo "  should be a few levels down from the '/' directory." 	| $LOG
+		echo "  for example /$PROD/$1. " 								| $LOG
+		echo "  Please re-enter." 										| $LOG
+		get_response cont
+		RETURN="n"
+		return
+	fi
+	#need to check to see if user is trying to install to / or /dxserver
+	if [ "`dirname $GETDIR`" = "/root" ]; then
+		echo
+		echo "  $PROD must not be installed to the '/root' directory, and " | $LOG
+		echo "  should be a few levels down from the '/root' directory." 	| $LOG
+		echo "  for example /$PROD/$1. " 								| $LOG
+		echo "  Please re-enter." 										| $LOG
+		get_response cont
+		RETURN="n"
+		return
+	fi
+	
+    if [ "$PROD" = "jre" ]; then
+        # bail out
+        QUESTION="  Do you want to change the directory ? (y/n)"
+        DEFAULT="n"
+        get_response ynq
+
+        # invert the response
+        if [ $RETURN = "y" ]; then
+            RETURN="n"
+        else
+            RETURN="y"
+        fi
+        return
+    fi
+
+    # check that dir is NOT A FILE
+    if [ -f $GETDIR ]; then
+        echo 
+        echo "  $GETDIR is a file. You must supply a directory name."  | $LOG
+        get_response cont
+        RETURN="n"
+        BADDIR=1
+        return
+    fi
+
+    # ... or a link
+    if [ -h $GETDIR ]; then
+        echo 
+        echo "  $GETDIR is a link. You must supply a directory name."  | $LOG
+        get_response cont
+        RETURN="n"
+        BADDIR=1
+        return
+    fi
+
+    # check PATH length
+    get_path_length # returns MAXPATHLENGTH
+    CURPATHLENGTH=`echo $GETDIR | awk '{print length($0)}'`
+    if [ $CURPATHLENGTH -gt $MAXPATHLENGTH ]; then
+        echo "  $GETDIR " | $LOG
+        echo "  is too long. Maximum path length is $MAXPATHLENGTH" | $LOG
+        get_response cont
+        RETURN="n"
+        BADDIR=1
+        return
+    fi
+
+    if [ "$PROD" != "backup" ]; then
+        # check potential directory has enough space
+        check_dir_space $GETDIR $PRODSIZE
+        if [ $RETURN = "n" ]; then
+            if  [ -n "$DEFANS" ] && [ $DEFANS -eq 1 ]; then 
+                checkpoint
+            else
+                use_another_dir
+                return
+            fi
+        fi
+    fi
+
+    if [ -d $GETDIR ]; then
+        echo  | $LOG
+        echo "  $PROD will selectively overwrite files in $GETDIR."  | $LOG
+    else
+        echo  | $LOG
+        echo "  The directory $GETDIR will be created."  | $LOG
+    fi
+
+    if [ "$PROD" = "backup" ]; then
+        # called from dxuninst.sh
+        RETURN="n"
+    elif  [ -n "$DEFANS" ] && [ $DEFANS -eq 1 ]; then
+        RETURN="n"
+    elif [ "$PROD" = "$DXPROD" -a $UPGRADEDX -eq 1 ] \
+      || [ "$PROD" = "$DXWEBSERVERPROD" -a $UPGRADEDXWEBSERVER -eq 1 ]; then
+        RETURN="n"
+    else
+        QUESTION="  Do you want to change the directory ? (y/n)"
+        DEFAULT="n"
+        get_response ynq
+    fi
+
+    # invert the response
+    if [ $RETURN = "y" ]; then
+        RETURN="n"
+    else
+        RETURN="y"
+    fi
+}
+
+use_another_dir()
+{
+    echo 
+    QUESTION="Do you want to enter another directory (y/n)?"
+    DEFAULT="y"
+    get_response ynq
+
+    if [ "$RETURN" = "q" -o "$RETURN" = "n" ]; then
+        checkpoint
+    fi
+    RETURN="n"
+}
+
+
+##### Taken from caprofile to reliably obtain the CASHCOMP value ####
+##### actually taken from lic98 code and heavily modified, but hey, who's counting.
+QueryVariable()
+{
+    qvar="$1"
+    case "$qvar" in
+        "CASHCOMP" )
+            Chk_Env_in_Profile CASHCOMP
+            return "$?"
+            ;;
+        *)  Chk_RegularVar "$qvar"
+            return $?
+            ;;
+    esac
+}
+Chk_Env_in_Profile()
+{
+    qvar="$1"  # either CASHCOMP or CALIB
+    qvar_value=""
+
+    for file in /etc/profile /etc/profile.CA
+    do
+        if [ -f "$file" ];then
+            vals_qvar=`grep "${qvar}=" "$file" |grep -v "[a-zA-Z0-9_-]${qvar}=" |\
+                       grep -v "\#[ \t]*${qvar}" | awk -F= '{print $2}'|awk -F\; '{print $1}'`
+
+            for qvar_val in $vals_qvar
+            do
+                qvar_value="$qvar_val"
+            done
+        fi
+    done
+
+    if [ "$qvar_value" = "" ];then
+        return 12
+    else
+	eval "$qvar"="$qvar_value"
+	export "$qvar"
+        return 0
+    fi
+}
+
+Chk_RegularVar()
+{
+    qvar="$1"
+
+    Chk_Env_in_Profile "$qvar"
+    if [ "$?" != "0" ];then
+        return $?
+    fi
+
+    Chk_Dir_Perms "$qvar"
+    if [ "$?" != "0" ];then
+        return "$?"
+    fi
+
+    eval q_var_val="$"`echo $qvar`""
+
+    if [ "$q_var_val" != "" ];then
+        echo "$q_var_val"
+        return 0
+    else
+        return 9
+    fi
+}
+Chk_Dir_Perms()
+{
+    qvar="$1"
+    eval q_var_val="$"`echo $qvar`""
+
+    if [ ! -d "${q_var_val}" ];then
+        mkdir -p "${q_var_val}" 2>/dev/null
+        if [ "$?" != "0" ];then
+            #cannot create the directory
+            return 10
+        fi
+        create_dir="1"
+    fi
+
+    touch "${q_var_val}/.tmp" 2>/dev/null
+    if [ "$?" != "0" ];then
+        #cannot create files in the directory
+        return 11
+    else
+        rm -f "${q_var_val}/.tmp" 2>/dev/null
+
+        # try to remove what we created
+        [ "$create_dir" = "1" ] && rmdir -p "${q_var_val}" 2>/dev/null
+
+        return 0
+    fi
+}
+#### End - Taken from caprofile to obtain CASHCOMP value ####
+

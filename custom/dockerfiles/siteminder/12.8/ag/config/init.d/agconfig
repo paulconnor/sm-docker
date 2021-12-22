@@ -1,0 +1,73 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides: agconfig
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Description: CA Access Gateway Docker sample image configurator
+### END INIT INFO
+# This script configures Access Gateway based on available environment variables
+# at boot time
+
+export PROXY_HOME=/opt/CA/secure-proxy/default
+
+case "$1" in
+
+'start')
+
+for e in $(tr "\000" "\n" < /proc/1/environ); do
+        eval "export $e"
+done
+
+echo "Configuring Access Gateway" > /tmp/agconfig
+
+fqdn="${fqdn:=rapidsso.securitydemo.io}"
+
+cd /opt; grep -R rapidssoimage * | grep -v @ | awk -F ":" '{ print $1 }' | xargs -r sed -i "s/rapidssoimage.securitydemo.io/$fqdn/g"
+HOSTNAME=`echo $fqdn | cut -d. -f1`; cd /opt; grep -R rapidssoimage * | grep -v @ | awk -F ":" '{ print $1 }' | xargs -r sed -i "s/rapidssoimage/$HOSTNAME/g"
+
+
+while [ ! -f /opt/CA/sm-config/secret/trustedhost ] ;
+do 
+   RSP=$(/opt/CA/secure-proxy/registerApp/registerApp.sh)
+   if [[ "$RSP" != "null" ]]; then
+      echo -n $RSP > /opt/CA/sm-config/secret/trustedhost
+      echo "Creating Trusted Host" >> /tmp/agconfig
+   else
+      sleep 10
+      echo "Waiting for Policy Server to response" >> /tmp/agconfig
+   fi
+done
+
+export SM_SMREGHOST_CLASSPATH=./:/opt/CA/secure-proxy/registerApp/java/smagentapi.jar:/opt/CA/secure-proxy/registerApp/java/smcrypto.jar:/opt/CA/secure-proxy/registerApp/java/bc-fips-1.0.1.jar
+
+export LD_LIBRARY_PATH=${PROXY_HOME}/agentframework/ETPKI/lib:${PROXY_HOME}/agentframework/bin
+export SHLIB_PATH=${PROXY_HOME}/default/bin
+export LIBPATH=${PROXY_HOME}/default/bin
+export CAPKIHOME=${PROXY_HOME}/agentframework/CAPKI
+export RAPIDSSO_SECRET=$(cat /opt/CA/sm-config/secret/trustedhost)
+
+printf "Storing the SM-SECRET locally\n" >> /tmp/agconfig
+${PROXY_HOME}/agentframework/bin/smreghost -i ${RAPIDSSO_PS_ADDR} -hn "${RAPIDSSO_TRUSTED_HOST_NAME}" -hc "${RAPIDSSO_HOST_CONFIG}" -f "${RAPIDSSO_SMHOST_CONF}"  -sh "${RAPIDSSO_SECRET}" >> /tmp/agconfig
+
+if [ -f /opt/CA/rapidsso/certs/cert ] ; then
+   cp /opt/CA/rapidsso/certs/cert ${PROXY_HOME}/SSL/certs/server.crt
+   echo Updated CERT >> /tmp/agconfig
+fi
+if [ -f /opt/CA/rapidsso/certs/key ] ; then
+   cp /opt/CA/rapidsso/certs/key ${PROXY_HOME}/SSL/keys/server.key
+   echo Updated KEY >> /tmp/agconfig
+fi
+
+
+${PROXY_HOME}/proxy-engine/sps-ctl startssl
+
+
+;;
+
+'stop')
+
+${PROXY_HOME}/proxy-engine/sps-ctl stop
+
+;;
+
+esac

@@ -1,0 +1,27 @@
+[ req ]
+utf8 = yes
+default_md = sha256
+default_bits = 2048
+string_mask = utf8only
+distinguished_name = req_distinguished_name
+
+[ req_distinguished_name ]
+countryName = Country Name (2 letter code)
+stateOrProvinceName = State or Province Name (full name)
+organizationName = Organization Name (eg, company)
+organizationalUnitName = Organizational Unit Name (eg, section)
+commonName = Common Name (eg, your dxagent client name or your dxagent server's hostname)
+
+[ openssl_server_extensions ]
+basicConstraints = critical,CA:false
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage=digitalSignature, nonRepudiation
+extendedKeyUsage=serverAuth
+
+[ openssl_client_extensions ]
+basicConstraints = critical,CA:false
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage=digitalSignature, nonRepudiation
+extendedKeyUsage=clientAuth

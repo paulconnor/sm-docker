@@ -1,0 +1,17 @@
+set force-encrypt-auth = true;
+set min-auth = clear-password;
+set route-non-compliant-ldap-error-codes = true;
+
+set password-policy = true;
+set password-min-length = 8;
+set password-alpha = 1;
+set password-numeric = 1;
+set password-uppercase = 1;
+set password-non-alpha-num = 1;
+set password-retries = 3;
+set password-max-suspension = 10;
+set password-history = 2;
+set password-enforce-quality-on-reset = true;
+
+set target-password-policy = Superuser;
+set password-allow-ignore-suspended = true;

@@ -1,0 +1,92 @@
+[ ca ]
+default_ca = openssl-ca
+
+[ openssl-ca ]
+# lauch the commands in the openssl-ca directory
+dir = ./CA
+
+# directory for the issued certificates
+certs = $dir/certs
+
+# directory for the certificate revocation lists
+crl_dir = $dir/crl
+
+# database index file
+database = $dir/index.txt
+
+# default directory for new certificates
+new_certs_dir = $dir/certs
+
+# The Certificate Authority certificate
+certificate = $dir/certs/ca.pem
+
+# The private key of the Certificate Authority
+private_key = $dir/private/ca.key
+
+# The current serial number
+serial = $dir/serial
+
+# The current certificate revocation list
+crl = $dir/crl/crl.pem
+
+# private random number file
+RANDFILE = $dir/private/.rand
+
+# number of days the new certificates will be valid for
+default_days = 365
+
+# number of days before a new certificate revocation list is created
+default_crl_days= 30
+
+# the default hash algorithm
+default_md = sha256
+
+# don't keep DN ordering. This means openssl will reorder them to keep them consistent
+preserve = no
+
+# Section names
+policy = ca-policy
+
+[ ca-policy ]
+commonName = supplied
+stateOrProvinceName = supplied
+countryName = supplied
+organizationName = supplied
+organizationalUnitName = supplied
+
+# this req section is only used for setting up CA (self-signed CA certificate)
+[ req ]
+utf8 = yes
+default_md = sha256
+default_bits = 2048
+string_mask = utf8only
+x509_extensions = selfsigned_ca_extensions
+distinguished_name = req_distinguished_name
+
+[ req_distinguished_name ]
+countryName = Country Name (2 letter code)
+stateOrProvinceName = State or Province Name (full name)
+organizationName = Organization Name (eg, company)
+1.organizationalUnitName = Organizational Unit Name (eg, section)
+2.organizationalUnitName = Organizational Unit Name Two
+commonName = Common Name (eg, your name or your server's hostname)
+commonName_default = Root CA for CA Dxagent
+
+[ selfsigned_ca_extensions ]
+basicConstraints = critical,CA:true
+keyUsage = critical,keyCertSign,cRLSign
+subjectKeyIdentifier = hash
+
+[ openssl_server_extensions ]
+basicConstraints = critical,CA:false
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage=digitalSignature, nonRepudiation
+extendedKeyUsage=serverAuth
+
+[ openssl_client_extensions ]
+basicConstraints = critical,CA:false
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage=digitalSignature, nonRepudiation
+extendedKeyUsage=clientAuth

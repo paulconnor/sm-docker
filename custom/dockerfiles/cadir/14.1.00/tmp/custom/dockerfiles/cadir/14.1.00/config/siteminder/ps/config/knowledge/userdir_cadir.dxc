@@ -1,0 +1,17 @@
+# CA DXserver/config/knowledge/
+#
+# Refer to the Admin Guide for the format of the set dsa command.
+
+set dsa "userdir_cadir" =
+{
+    prefix        = <o com><ou ca><ou im>
+    dsa-name      = <o com><ou ca><ou im><cn userdir_cadir>
+    dsa-password  = "secret"
+    address       = tcp "cadir" port 19389
+    disp-psap     = DISP
+    snmp-port     = 19389
+    console-port  = 19390
+    auth-levels   = clear-password
+    dsa-flags     = multi-write, no-service-while-recovering
+    trust-flags   = allow-check-password, trust-conveyed-originator
+};

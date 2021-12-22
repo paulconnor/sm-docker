@@ -1,0 +1,3813 @@
+--------------------------------------------------------------------------------
+                          Symantec Directory - Release Notes
+
+                             14.1.02 Build 16555
+
+                                29 December 2020
+--------------------------------------------------------------------------------
+
+Directory embeds the following components:
+    CAPKI               5.2.6 (OpenSSL 1.0.2t)
+
+The following 3rd party components are included
+With Directory:
+    Kerberos   V5 Distribution SDK              1.10.3
+    OpenLDAP Foundation OpenLDAP                2.3.20
+    PCRE.org   PCRE                             8.44
+    zlib.net   zlib                             1.2.11
+    Microsoft  Cabinet Kit (CAB SDK)            1
+    Microsoft Visual C++ 2010 Service Pack 1 Redistributable Package MFC Security Update:
+               vcredist_x64.exe & msvcr100.dll  10.0.40219.325
+    SmartBear Software         SwaggerUI        3.24.3
+    Eric Haszlakiewicz          json-c          0.13.1
+    Steven J. Bethard          python-argparse  1.4.0
+    Marcel Hellkamp            bottle           0.12.9
+    CherryPy                   CherryPy         12.0.2
+    Python-Future              future           0.18.2
+    acubedaaa@bzfx.net        jsonschema        2.5.1
+    SourceForge  Python for Windows extensions  227
+    Repoze                   repoze.lru         0.7
+    Patrick Mooney           asn1               0.2.3
+    pypi.python              six                1.14.0
+    pklaus                  wsgi-request-logger 0.4.5  
+    Python                   python             3.8.2
+    Metaparadigm             json-c             0.11
+    CherryPy Team            cheroot            8.2.1
+    Erik Rose(pypi.python)   more-itertools     5.0.0
+    Jason R. Coombs(pypi.python)  tempora       1.14.1
+    Raymond Hettinger(pypi.python)   backports.functools_lru_cache 1.6.1
+    Jason R. Coomb(pypi.python) jaraco.classes  2.0
+    Jason R. Coombs(pypi.python) jaraco.functools 2.0
+    Jason R. Coombs(pypi.python) portend        2.6
+
+With Directory Management:
+    Microsoft  Cabinet Kit (CAB SDK)               1
+    Microsoft Visual C++ 2010 Service Pack 1 Redistributable Package MFC Security Update:
+               vcredist_x64.exe & msvcr100.dll     10.0.40219.325
+    SmartBear Software      SwaggerUI              3.24.3
+    NodeJS                  nodejs                 12.16.3
+    Google Chart            angular-google-chart   0.1.0
+    AngularJS               angular-1.7.9          1.7.9
+    AngularTranslate        angular-translate      2.18.2
+    AngularJS-VisJs         angularjs-visjs        4.16.0
+    Messageformat           messageformat          0.2.2
+    Pfmooney                ldap-filter            0.2.2
+    Patrick Mooney          asn1                   0.2.4
+    Caolan McMahon          async                  3.1.0
+    Jonathan Ong            body-parser            1.19.0
+    Trent Mick              bunyan                 1.8.12
+    dougwilson              connect-multiparty     2.2.0
+    Jonathan Ong            cookie-session         1.4.0
+    Jonathan Ong            csurf                  1.11.0
+    npmjs.com               debug                  4.1.1
+    Eleith                  emailjs                2.2.0
+    Strongloop              express                4.17.1
+    Sindre Sorhus           file-type              3.8.0
+    Charles Robbins         forever                2.0.0
+    James Butler            generic-pool           2.5.4
+    Marcus Spiegel          i18n                   0.8.4
+    Acubedaaa               jsonschema             1.2.5
+    Raybsolomon             ldap2date              2.0.0
+    Patrick Mooney          ldapjs                 1.0.2
+    John-David              lodjs                  4.17.4
+    Jonathan Ong            Morgan                 1.9.1
+    Passport                passport               0.4.1
+    Jared hanson            passport-http          0.3.0
+    Passport                passport-local         1.0.0
+    Sindre Sorhus           read-chunk             3.2.0
+    Nicolai Kamenzky        request                2.88.0
+    Danny Grove             swagger-jsdoc          3.5.0
+    Jose Romaniello         winser                 1.0.3
+    winstonjs               winston                3.2.1
+
+--------------------------------------------------------------------------------
+
+This version includes all changes previously applied to Directory 14.1
+
+In Build No. 16555 (14.1.02 GA)
+-------------------------------
+
+Wolken No: 32375767 Rally No: DE484590
+LDAP bind issue when userPassword has reserved characters.
+
+Wolken No: 32126745 Rally No: DE472584
+Unable to add host in management-ui environment when hostname in knowledge settings differ with case.
+
+
+In Build No. 16107 (14.1.01 GA)
+-------------------------------
+
+Wolken No: 20305783 Rally No: DE447295
+One-level search with critical LDAP control(s) is not working in a HP DSA setup.
+
+Wolken No: 20152890 Rally No: DE442862
+set unique-attrs command fails to work when using with multiple subtrees.
+
+Wolken No: 20104034 Rally No: DE439963
+Management UI no longer controls the DSA instance after an upgrade from 12.6 to 14.1 when dsa-password is missing in knowledge settings of unmanaged DSA.
+
+Wolken No: 20058961 Rally No: DE436645
+User is able to successfully login even after exceeding the Password Last Use number of days.
+
+Wolken No: 20086320 Rally No: DE435888
+DSA becomes unresponsive after Assertion Failed when multiple search request with large number of return entries.
+
+Wolken No: 20069566 Rally No: DE433786
+The dxdumpdb fails on Windows when the .db or .zdb file size is greater than 4GB.
+
+Wolken No: 20055290 Rally No: DE430329
+Management UI upgrade from 12.6 SP4 to 14.1 fails with custom installation in windows.
+
+Wolken No: 20023231 Rally No: DE426747
+Persistence search delete events not coming from one replicated server.
+
+Wolken No: 20022123 Rally No: DE426715
+Directory does not log error messages when the MemberUrl filter is invalid for Dynamic Group.
+
+Wolken No: 20009061 Rally No: DE421877
+DXConfig crashes when it cannot process the precedence settings is present in multiple lines.
+
+
+In Build No. 16027 (14.1.00 CR1)
+-------------------------------
+
+
+ServiceCloud No: 20013345 Rally No: DE422766
+dxserver logs an invalid warning message (DSA_W3180) in the alarm log at startup, when min-auth is not set with multi-write flag as "Enabled".
+
+ServiceCloud No: 01317206 Rally No: DE410186
+dxserver crashes when dxMemberURL has invalid syntax and the number of characters in dxMemberURL are more than 4300.
+
+ServiceCloud No: 01311499 Rally No: DE408106/DE410418
+Hub switching does not happen as expected in a MW-DISP MW groups.
+
+ServiceCloud No: 01311499 Rally No: DE408106/DE410419
+Hub switching does not happen as expected in a plain MW setup with MW groups.
+
+ServiceCloud No: 01263878 Rally No: DE402024
+Log rollover gets created incorrectly when yesterday's alarm/trace log file is deleted/moved.
+
+ServiceCloud No: 01233159 Rally No: DE401288
+Log rollover for alarm or trace log on day light saving (DST) date occurred an hour early.
+
+ServiceCloud No: 01143479 Rally No: DE381488
+When a user tries to login to the Management UI, when one of the Host is down, the Management UI gets unresponsive and slow.
+
+ServiceCloud No: 01141632 Rally No: DE375438
+After upgrading from CA Directory v 12.0.18 to v 12.6.04, users were unable to manage the old versions of DSAs through the new Management UI.
+
+ServiceCloud No: 00999368 Rally No: DE420424
+Deletion of a dynamic group fails with the following error-  Delete Result: Administrative limit exceeded (11).
+
+ServiceCloud No: 01215318 Rally No: DE390004
+When configuring SCIM server, there were restrictions in the length of the Default Parent DN field.
+
+ServiceCloud No: 01275406 Rally No: DE400895
+Failing to set precedence of DSAs in Management UI, when DSA names which were embedded with period (.) characters were not enclosed with quotes ("").
+
+ServiceCloud No: 20030837 Rally No: DE425605
+"objectClass" attribute has been removed from the default list of attributes when MW-DISP is enabled in a DSA. This has been done to improve the performance of delete operations in case of large datasets.
+
+ServiceCloud No: 20010758 Rally No: DE421898
+If one or more results from a view phase contain attribute with round brackets in it, then during the next phase, the DSA  assumes the round bracket which is actually part of the attribute value as the end of the filter, and results in generating incorrect filter.
+
+ServiceCloud No: 01270203 Rally No: DE399897/DE405407
+From the trace log, one cannot distinguish a replication message, whether the message is coming from the MW or MW-DISP Process.
+
+ServiceCloud No: 01270203 Rally No: DE399897/DE405409
+When a DSA is configured with MW-DISP, and if that DSA is down for more than a week, then there are chances of DSA going out of sync, if restarted without performing a recovery mechanism.
+
+ServiceCloud No: 01270203 Rally No: DE405412
+When a modify request is done prior to ModRDN and then a DISP recovery takes place, the change made before ModRDN gets dropped.
+
+
+
+In Build No. 15741 (14.1.00 GA)
+-------------------------------
+
+ServiceCloud No: 01195819 Rally No: DE386728
+In the Management UI, if the "use-roles" or "use dynamic roles" setting is set to "true," and the user tries to re-initialize the dsa, the dsa stops and a warning log is reported.
+
+ServiceCloud No: 01186106 Rally No: DE384685
+Fixed an issue where SCIM Server Trace Log and Timeout Issue is observed due to the same connection handle getting used for all incoming API Requests.
+
+In Build No. 14812 ( GA)
+-------------------------------
+
+ServiceCloud No: 00953315 Rally No: DE343765
+Fixed an issue where management ui is not able to create DSA when large number of knowledge DSAs are added.
+
+ServiceCloud No: 00956667 Rally No: DE344441
+Fixed an issue where management ui is not able to create host when a DSA in the host has large list of DSAs in precedence and write-precedence settings.
+
+ServiceCloud No: 00935034 Rally No: DE340014
+Fixed an issue where setting "precedence" for subordinate DSAs caused peer DSAs precedence to be reversed.
+
+Rally No: DE328635
+
+Addressed an issue for handling the dxMemberURL attribute in dynamic groups, where the default filter ("(objectClass=*)") is added if it is not provided.
+
+Rally No: DE275934
+Fixed an assertion failure that could occur intermittently during pull replication request when the connection is dropped at the same time.
+
+Rally No: DE311966
+A MW-DISP issue has been resolved when the minimum authentication level was configured as clear-password and the auth-levels included anonymous (i.e. auth-levels = anonymous, clear-password). During this configuration the DSAs would never successful synchronize with a "WARN : Bind: Credentials not supplied" error. While auth-levels should not include anonymous, this DSA now tolerates this in the case where this is set unintentionally.
+
+Rally No: DE323740
+Editing raw settings of a DSA no longer prevents the user from moving forward in Internet Explorer.
+
+ServiceCloud No: 00858152 Rally No: DE324891
+Avoid automatic retry against another peer DSA when pull replication search request fails. There can only be one pull replication source.
+
+Rally No: DE295156
+A warning is now logged if a multi-write DSA is configured with "min-auth" that is higher than the lowest "auth-level"
+
+ServiceCloud No: 00879936 Rally No: DE326858
+A server side sorting memory leak has been resolved where a sort search is in the scope of multiple DSAs. The memory is cleared when the connection is cleared, however, if the connection is continuously busy the DSA can consume a large amount of memory over time.
+
+ServiceCloud No: 00834973 Rally No: DE322150
+Fixed a defect in DXconfig that was causing it not to populate the "prefix" property for DSA configurations that were migrated from DXmanager. This has resulted in the error message "DxagentException: Schema validation failed on property '1': 'prefix' is a required property" when such DSA was being modified via the Management UI.
+
+Rally No: US365390
+Upgraded third party library CAPKI to 5.2.4. All executable binaries now link with this CAPKI version.
+
+Rally No: DE322276
+Fixed a defect in DXconfig that left external monitoring in an active state after being removed. This was caused by the omission of "clear external-monitoring" statement in server configuration when external monitoring was completely removed. A re-init of the DSA would have no effect on the active external monitoring and only a restart would stop it.
+
+Rally No: DE320425
+Fixed a defect in DXagent where it was not reading the dxgrid-db-location of DSAs that were created by DXmanager. These DSAs have their configuration stored in an XML file.
+
+Rally No: DE315916
+'dsa-name' property is no longer hard-coded and is visible in the Management UI.
+
+Rally No: DE277354
+Host can be edited in Management UI after certificates have been regenerated. Certs are now retrieved from embedded DSA cache.
+
+Rally No: DE317496
+Fixed buffer overflow in DSA when it receives a request with attribute options that are not ";binary" and ";lang-en".
+
+Rally No: DE308875
+When changing an unmanaged DSA from "ca" to "dxlink" in the Management UI, the defaults for a "dxlink" DSA (and vice-versa) weren't updated.
+
+ServiceCloud No: 00839026 Rally No: DE317112
+The 'get user;' DXconsole command now displays the current value of cpu-starvation-threshold.
+
+Rally No: DE313983
+Removed the grey highlight on the DSAs that aren’t selected in Charts tab.
+
+Rally No: DE313984
+Added caret icon to counter dropdown on Chart tab.
+
+ServiceCloud No: 00840118 Rally No: DE315652
+The Management UI Server only loads the first certificate from the DSA trusted certificate bundle (trusted.pem). If the embedded DSA certificate's issuer is not first on the list then it will not be loaded. This can happen if the command "dxcertgen certs" is used to regenerate all DSA certificates because the root CA ("DXCertGenCA") is added in the last position. This is now fixed so that all certificates in the bundle are loaded.
+
+ServiceCloud No: 00754930 Rally No: DE315039
+Management UI no longer sends default value for dsa.config.ssl.cert-dir if the input is left blank.
+
+ServiceCloud No: 00825287 Rally No: DE312236/DE313078
+CA Directory now supports ciphers that use Elliptic Curve Diffie–Hellman (ECDH) key exchange.
+
+Rally No: DE309137
+On Linux during the management UI upgrade from 12.5.01 to 12.6.03 the $DXUIHOME/CA folder is deleted. To fix this problem webserver certificates are now re-generated during installation if CA folder is missing.
+
+ServiceCloud No: 00799111 Rally No: DE308880
+From the management UI, the support and documentation links now point to the correct pages.
+
+Rally No: DE304477
+When selecting a managed DSA icon from the management UI topology or tree view, the CA Directory version of the DSA is now displayed.
+
+Rally No: US373615
+Upgraded third-party libraries json-c to version 0.12.1, libxml2 to 2.9.4, libxmlsec to 1.2.24, pcre to 8.41, zlib to 1.2.11.
+
+Rally No: DE303608
+DXserver pull replication will perform a range check on ODSEE when no changelogs are returned after configured number of retries. The changelog range determines if DXserver will need to adjust its pull replication window. This addresses the issue of ODSEE changelog clean-up leaving DXserver pull replication window out-of-range, and resulting in the pull replication not progressing to the next batch/window of changelogs.
+
+Rally No: DE306578
+Configuration items containing multiple DNs are now supported. Entering a comma in DN list inputs will no longer add a new item as DN's contain commas. DN items are now added using the Enter key.
+
+Rally No: US344778
+CA Directory can contain entries that are critical to the operation of CA Directory and applications. If these entries are accidently removed or renamed then this has the potential to cause unexpected outages. Access controls are the first line of defence to ensure these entries aren't updated, but there are circumstances where this protection isn't enough, for example, if a super-user is performing updates via a LDAP browser.
+
+The new command 'set critical-entries = <DN list>;' can be set to prevent these entries and their parent entries from being renamed or removed.
+
+For example,
+
+set critical-entries = <c AU><ou users><cn admin>,
+                       <c AU><ou groups>,
+                       <c AU><ou users><cn admin : uid 1234>;   # multi-valued RDN example
+
+A rename/remove of the following entries will be prevented with unwillingToPerform:
+* <c AU>
+* <c AU><ou users>
+* <c AU><ou users><cn admin>
+* <c AU><ou groups>
+* <c AU><ou users><cn admin : uid 1234>
+
+If "set role-subtree = <c AU><ou groups>;" is configured, then this will now be protected by critical-entries is renaming this entry may cause access controls to start failing.
+
+Rally No: DE300927
+Fixed a defect where the Management UI and DXserver Windows installers were not deleting the installation folder on uninstall.
+
+Rally No: DE304222
+Fixed an issue where DXagent returned DSA knowledge in reverse order. If the DSA config was modified in the Management UI this resulted in the knowledge being persisted in reverse order.
+
+ServiceCloud No: 00741609 Rally No: DE304458
+An issue has been resolved where a rename request specifying a new naming attribute was permitted even though the attribute did not exist in the object class list for that entry.
+
+For example,
+dn: ou=acme,c=au
+objectClass: organizationalUnit
+
+A rename request of ou=acme,c=au with a new RDN of cn=acme would be permitted, even though cn is not supported by the organizationalUnit object class.
+
+
+This behavior has been corrected, however, there maybe use cases that rely on this non-standard behvior. If this is the case, the original functionality can be re-instated, 'set rename-check-oc = false;'
+
+Rally No: DE300928
+Fixed a defect in Management UI windows installer where the backup dialog prompt was hidden during uninstallation.
+
+Rally No: DE303910
+Fixed a defect in the Management UI installer for Linux where a hostname FQDN failure is not correctly detected to abort the installation. This resulted in the web server certificate to be an empty file.
+
+ServiceCloud No: 00754930 Rally No: DE298852
+Fixed a defect where the 'Edit DSA' modal would hang due to a syntax error in its config, preventing the UI from determining if the DSA is a data or router DSA.
+
+Rally No: DE296274
+Added management UI product version information in the about box.
+
+ServiceCloud No: 00780276 Rally No: DE302449
+Fixed an vulnerability issue in management UI. The solution is to intercept the error code "File not found" and return a generic error message so that no internal directory structure information can be revealed and no script injection can be done. 
+
+ServiceCloud No: 00756389 Rally No: DE299080
+Fixed an issue in SCIM 1.0 server that when connections became invalid (e.g. shut down from DSA end due to time out), those connections were not destroyed and still returned to the pool which caused later problems.
+
+ServiceCloud No: 00778822 Rally No: DE302549
+Fixed an issue in DXserver where access control roles are not propagated to subordinate/peer DSAs, which causes access control denial in the subordinate/peer DSAs.
+
+Rally No: DE302125
+A memory issue has been addressed when processing a DXlink response while the same DXlink connection is in the process of being closed. The following assertion failure is logged:
+    * [6] 20170626.120632.761 /release/HEAD.new/dxgrid/src/dsa/rstack/support/xmpool.c(290): Assertion failed
+
+Rally No: US340297
+Added support for entryUUID (RFC4530). This feature can be enabled by specifying the following configuration:
+    set add-entryuuid = true;
+As entryUUID is an operational attribute, "op-attrs" must also be set to true (its default value is true) to enable entryUUID.
+It is not enabled by default. When enabled, the DSA will generate new entryUUID when an entry is added. The DXloaddb utility generates entryUUID for every entry that does not have one specified in the source LDIF file.
+ 
+ServiceCloud No: 00771362 Rally No: DE300157
+Fixed an issue in DXserver where when in FIPS mode the Protocol configuration was ignored and always used TLS 1.0.
+
+ServiceCloud No: 00753364 Rally No: DE295295
+Fixed an assertion failure in dxadmind that led to a crash. This can only occur in a specific scenario where
+sending of persistent search response encounters a short write and at the same time the socket is being
+closed. The fix involves a partial merge of openldap fix for ITS#4667.
+
+ServiceCloud No: 00743318 Rally No: DE292979
+The force-encrypt-auth setting is now ignored for local DXconsole connections. Bind authentications in cleartext are always allowed if clients are connected to the local DXconsole port (console-port).
+
+ServiceCloud No: 00685446 Rally No: DE289845 & DE278954
+DXserver will no longer log benign replication errors when handling delete requests with the 'tree-delete' LDAP control where the target of the delete does not exist.
+
+Rally No: DE293205
+A potential DXserver memory leak has been addressed when LDAP clients abort connections while in the process of performing a large number of asynchronous requests.
+
+Rally No: DE291770
+Improved DXserver memory utilization when sending a lot of small requests/responses and the connection is blocked.
+
+Rally No: DE290952
+Fixed an issue in DXagent that occurs when some special characters are included in string type settings. Enabled relative path conversion for SSL path based settings.
+
+Rally No: US324697
+Added support in DXserver to allow outgoing SSL/TLS connections without certificate/key. No configuration is necessary to enable this. If no certificate can be found for a particular DSA, then outgoing SSL/TLS connections from that DSA will be attempted without certificate.
+
+Rally No: DE277472 & DE281464
+Fixed Management UI not giving user ability to edit embedded DSA if any dxagents were unreachable.
+
+Rally No: DE283561 & DE256361
+Fixed inconsistent escaping of horizontal partitioning configuration in DXagent. Relaxed partition count checking in DXtools & DXagent to allow partitions to be created in Management UI.
+
+ServiceCloud No: 00714415 Rally No: DE288357
+Fixed Management UI Windows installer failure when the selected target is on a volume that does not have short filename (8dot3) enabled. Typically this problem is observed when installing on other than drive C:.
+
+Rally No: US320035
+Added support for configuring External Monitoring in DXagent.
+    
+Rally No: DE279152
+Fixed inconsistent error code in DXagent when retrieving an online backup in DB format from a DSA that does not have an online backup. Error code 404 is now returned for both DB and LDIF formats.
+
+Rally No: DE262933
+Fixed an internal issue in DXemptydb utility where it would crash when invoked with no arguments.
+
+ServiceCloud No: 00665085 Rally No: DE273676
+Fixed DXserver crash on Windows platform. Root cause of the problem was incorrect usage of a 32-bit variable to store a 64-bit value. This caused DXserver to reference an invalid memory address when the 64-bit value was greater than 2147483647.
+
+In Build No. 14043 (12.6.00 GA)
+-------------------------------
+Rally No: DE277481
+A DXagent setup issue has been resolved where certificate creation would fail for long hostnames.
+
+Rally No: US287317
+To assist with migration from Oracle Directory Server Enterprise Edition (ODSEE), CA Directory has received several enhancements.
+
+Please consult the "Migrating from Oracle Directory Server Enterprise Edition to CA Directory" Guide in the product documentation for further details.
+
+dxloaddb
+  Now supports a continuous mode of operation. The option -e that ignores issues that prevent entries from loading and continuous processing the LDIF. This works in both normal and dry run modes.
+
+dxmigrate
+  A new tool is now shipped in the CA Directory packages to assist with migration of ODSEE password policy configuration and exported data. Please consult the documentation for further details.
+
+Phased migration - To allow for a phased migration from ODSEE, CA Directory now supports two-way replication.
+
+  CA Directory -> ODSEE (DXlink replication)
+  * When replicating over DXlink, multi-write will always replicate using the configured LDAP DSA Name and LDAP DSA password user.
+  * Replication now supports Multwrite Ignore Attrs to specify a list of attributes that should not be included when replicating add and modify requests.
+
+  ODSEE -> CA Directory
+  CA Directory now supports pull replication from ODSEE using the retro changelog feature. This can be configured via the following command or via the Settings tab in the Management UI:
+
+  set pull-replication = {
+      source = "dxlink"
+      location = <cn changelog>
+      interval   = 10
+      window-size = 20
+      retries     = 30
+      ignore-attrs = aci, pwdFailureTime, pwdAccountLockedTime, pwdHistory, passwordHistory, modifiersName, modifyTimestamp
+  };
+
+  Where
+    source: is the DSA name from the DXlink reference or unmanaged DSA (UI)
+    location: is where the retro changelog entries are stored
+    interval: Number of seconds between when replication is performed
+    window-size: The window of updates retrieved per replication request
+    retries: The number attempts where no entries were retrieved before logging an alert
+    ignore-attrs: Attributes from ODSEE to ignore from add and modify requests
+
+Rally No: F33742
+The Management UI have been internationalized. Localized resources have been added for Japanese and French.
+
+Rally No: DE276228
+The ldif2dxc tool has been enhanced when presented with non-standard's compliant schema. When a structural object class definition is missing a super class, it is not longer treated as abstract. The object class will be kept as structural and a super class of "top" included in the definition.
+
+Rally No: DE275936
+An issue has been resolved in DXagent where when uploading a DSA DB file on Windows, the Local Service user was not assigned appropriate file permissions.
+
+Rally No: TA528192
+New "-e" option is added to dxloaddb tool, which allows dxloaddb to ignore errors in LDIF file and continues processing. This does not include errors in object relations, where an object cannot be found for a relative DN. These errors are fatal and cannot be ignored.
+
+Rally No: DE272171
+In Linux Management UI installer default option is changed to N for 'Do you want to use your own certificates to secure Management UI web server communications?' question. Also added certificate and private key validation:	check if provided file can be accessed, check if provided files actually contains a certificate and a private key, check if provided certificate matches the private key.
+
+Rally No: DE274620
+An issue has been resolved where CAPKI package remains installed after CA Directory is uninstalled on Windows.
+
+Rally No: DE272662
+An issue with express install of CA Directory Management UI on Linux has been resoved where the installer asks for mangement UI details instead of using defauls values, and does not install dxagent.
+
+Rally No: DE256362
+An issue with CA Directory installer on Linux has been resolved where, if CA Directory is installed on top of the Management UI, the DXUIHOME environment variable becomes unset, which prevents the Management UI to work properly.
+
+Rally No: US285006
+Data functionality removed from DSA update modal and placed in new 'Upload' modal. 
+
+Rally No: US285028
+Management UI now supports a default password policy. Password policies are also displayed in a more intuitive tab form.
+
+Rally No: DE275583
+An issue has been resolved where configuration redefintion alarms were erroneously logged for password policy settings that may be set multiple times for different policies.
+
+Rally No: US257139
+CA Directory is now certified on Windows 2016
+
+Rally No: US257138
+CA Directory is now certified on RHEL 7.3
+
+Rally No: US257137
+CA Directory is now certified on CentOS 7.3
+
+Rally No: DE265364
+A Management UI issue has been resolved during DSA creation, where DB file uploading would result in an error.
+
+Rally No: US261705
+For synchronous multi-write replication, when updates are sent and enter the pending state the DSA now stores a timeout on each queued item. This timeout is cleared when an acknowlegement is received.
+When queueing a new item the DSA will now check if the first item in the queue has timed out, if so an alarm is logged.
+
+Rally No: DE274939
+To improve compatibility with the Management UI/DXagent, the dxnewdsa tool no longer accepts multi-byte DSA names. DSA names are now restricted to the following range of characters [a-zA-Z0-9-_.].
+
+ServiceCloud No: 00660525 Rally No: DE272674
+A MW-DISP conflict resolution issue has been resolved where:
+* dsa1 and dsa2 lose contact
+* entryA is renamed to entryB on dsa1
+* entryA is updated on dsa2 (with old name)
+
+When contact is re-established
+* MW-DISP recovery from dsa1 -> dsa2 will continually fail
+* The entry will no longer by synchronized between dsa1 and dsa2 as the update
+  will be applied using the old name
+
+The DSA will now resolve this conflict by allowing the rename to be applied during MW-DISP recovery from dsa1 -> dsa2 and the DSA will attempt to apply the update from dsa1 to the renamed entry.
+
+As part of this change, DE206334 has been backed out. While this produces consistent modifyTimestamps for renames, it had the side effect of impacting data integrity. When an entry is updated on one DSA and renamed on another while the link between them was down. During conflict resolution the more recent rename now wins over the update ensure the entries (apart from modifyTimestamp) are identical.
+
+Rally No: DE271462
+Fixed an issue that prevents weak hash algorithm usage in FIPS mode warning to be logged if the SSL configuration precedes password-storage setting in configuration file.
+
+Rally No: US209892
+When a search request exceeds max-op-time or exceeds non-zero value of time-log-search-threshold with time logging enabled. The search filter is examined for attributes that are not indexed. A warning is logged for each non-indexed attribute.
+E.g. WARN : Attribute used in filter: mail is not indexed
+These warnings assist in the diagnosis of abnormally slow requests and assist in the tuning of indexes.
+
+Rally No: US261211
+Stats log now includes two new items CPU Seconds and CPU kTicks. CPU Seconds is the number of seconds within the last minute that the DSA scheduler iterated at least once. CPU kTicks is the number of times the DSA scheduler iterated in the last minute, each unit is 1000 ticks.
+A new setting has been introduced "cpu-starvation-threshold" this defaults to 5, to disable set to -1. If the CPU starvation threshold is exceeded an alarm is logged indicating that CPU starvation has been detected. 
+For example if the DSA has the default threshold of 5 seconds and CPU Seconds falls below 55 seconds in the last minute an alarm is logged. Or if the stats log entry is overdue by more than 5 seconds e.g it was logged at 20170118.150411 instead of 20170118.150400 it is overdue by 11 seconds and has exceeded the threshold.
+CPU starvation alarms may correlate with abnormally slow requests in a customers environment and provide an indication of root cause such as a VMware vMotion event.
+
+Rally No: US271932 & US271933
+Upgraded to CAPKI 5.2.0. An alarm message will now be logged if password-storage is set to a non FIPS compliant algorithm when the DSA
+is configured to run in FIPS mode.
+
+ServiceCloud No: 00609880 Rally No: DE265302
+Dxloaddb utility aborts when it encounters malformed GeneralizedTime attribute values. This avoids creating a DB file that contains corrupted values.
+
+In Build No. 13559 (12.5.01 GA)
+-------------------------------
+Rally No: US262453 & US262454
+Added standalone install package for DXagent that can be installed into prior versions of Directory up to and including 12.0.15.
+
+Rally No: US259556
+Added support for two modes of knowledge management, explicit and global. DSA knowledge references may be explicitly configured or automatically if the DSA is part of the global knowledge group.
+
+Rally No: DE262932
+When CA Directory is installed using an existing account (./dxsetup.sh -dxuser acct_name) or installed using a non-root account, an embedded version of CAPKI is used. An uninstall issues has been resolved when using the embedded version of CAPKI, where the uninstall attempts to remove a globally shared CAPKI installation (/opt/CA/SharedComponents) that may not exist
+
+Rally No: DE258722
+Fixed issue in DXagent where support for knowledge items credits and multi-write-attrs was missing.
+
+Rally No: US250305
+During a fresh install on a clean machine, CAPKI can now be installed to a custom location.
+
+ServiceCloud No: 00621556 Rally No: DE258119
+Improved error message when using dn-substring-match and the DN values stored in the .db are invalid. The DSA will no longer stop when indexing such values.
+ 
+Rally No: DE256119
+Fixed an issue in DXagent where the DSA forcestop action failed when running on Windows with a DXserver instance older than 12.5.
+
+Rally No: DE257880
+Fixed an issue in the CA Directory Windows installer that wasn't configuring the port number to be used by
+DXagent. DXagent was always using the default port number 9443 regardless of what was specified by user during
+installation.
+
+ServiceCloud No: 00614094 Rally No: DE256305
+Passwdtool failed with the error "Numerical result out of range" when /etc/group has large entries, such as groups
+with many members. This is now fixed so that passwdtool would retry with larger buffer size when getgrnam/getpwnam
+returns with error code ERANGE.
+
+Rally No: DE256162
+Directory Management UI Linux installer was prompting for port number and certificates on upgrade when it should not.
+These values are now no longer being asked for and existing installation's configuration are retained following an
+upgrade.
+
+ServiceCloud No: 00606859 Rally No: DE255000
+An issue has been addressed where modifyTimeStamp was not replicated in a multiwrite setup when password policies are enabled and a user is changing their own password.
+
+ServiceCloud No: 00609632 Rally No: DE254551
+This defect is a follow-up to DE224007. The previous fix requires a recovering DSA to receive an "empty modify" to switch out of
+recovery mode. In a rolling upgrade scenario, DSA's of older versions/service packs do not send "empty modify" and the newly
+upgraded DSA remains in recovery indefinitely. A timeout of 30 seconds in now implemented for a recovering DSA to wait for the
+"empty modify".
+
+ServiceCloud No: 00608367 Rally No: DE254734
+Fixed an issue where CA Directory RPM upgrade was deleting the "dsa" user and some required files.
+
+Rally No: DE249815
+Fixed an issue where DXagent returned multiple copies of raw settings when multiple unsupported statements were on the same line.
+
+Rally No: DE249814
+Fixed an issue in DXagent when running as a daemon on Linux was failing to resolve relative path to swagger files.
+
+Rally No: DE246123
+Fixed an issue where DXagent failed to create a DSA witha "." in the name.
+
+Rally No: DE244418
+Fixed an issue when parsed by DXagent if a dxi file has multiple schema source statements on the same line, only the first is read and others are ignored.
+
+ServiceCloud No: 00595578 Rally No: DE249303
+An issue has been addressed preventing installs on AIX 6.x/7.x
+
+Rally No: DE206709
+Fixed incorrect error message being returned when unique attribute violations occur. The error message is corrected now so that it
+contains only the attributes whose values violated uniqueness check.
+
+Rally No: DE204727
+Fixed a potential deadlock that could occur when a DSA is being shut down while it has ongoing multiwrite operations.
+
+Rally No: DE244385
+Removed restriction in dxserver installer that requires source directory and all its parent directories to be world
+readable and executable. If permission issues are detected in source directory or in any of its parent directories
+then the installer copies source files to a temporary directory before proceeding with the installation process.
+
+Rally No: DE243560
+Fixed an issue the dxserver installer where .dxprofile was not being sourced by .bash_profile.
+
+Rally No: DE243558
+The default shell defined for user 'dsa' was incorrect in the installer response file. This is now corrected to use bash.
+
+Rally No: DE248339
+Management UI Windows Installer has been enhanced to handle static files in the "public" sub-directory that change constantly.
+
+Rally No: DE243561
+Removed a misleading message "Please provide password for user <USER>" at the completion of DXserver installation.
+
+Rally No: DE250315
+Fixed Management UI windows custom installation that always place files into the standard location, even if a custom location is selected. 
+
+In Build No. 12858 (12.5.00 GA)
+-------------------------------
+Rally No: F19165
+Directory Management UI is now GA. This component is a new UI for managing DSA's. It is supported on Linux and Windows.
+Please see the user guide for more information.
+
+Rally No: US197155
+The 'dxserver init' command now supports configured log files to be deleted from, or commented, out of configuration files. This style of configuration change was previously only picked up on a restart.
+
+Rally No: F5490
+Dxagent is now GA. This component provides a RESTful service for managing DSA's. Dxagent is supported on Linux and Windows.
+Please see the user guide for more information.
+
+Rally No: DE224247
+An issues has been addressed for DXmanager configured DSAs, due to order of parsing the value of Rollover Alarm and Rollover Trace was re-initialized after being read.
+
+Rally No: DE206334
+When using multi-write groups in conjunction with MW-DISP, entry renames will now produce consistent modifyTimestamps across all replicating DSAs.
+
+Rally No: TA433660
+The dxserver status command now reports "Recoverable" to indicate that a DSA abnormally terminated but has transaction log enabled. "Inconsistent" state remains for a DSA that abnormally terminated with the transaction log disabled.
+
+Rally No: TA438986
+Upgraded embedded CAPKI to version 5.1.1.
+
+Rally No: DE203799
+The dxsoak tool now reports connection error instead of exiting with assertion failure.
+
+Rally No: DE203800
+The dxserver forcestop command now kills a DSA in the case where the DSA status is not "started".
+
+Rally No: DE176360
+An abnormally terminated router DSA no longer reports the status as "inconsistent". This will be reported  as "stopped" instead as the router DSA not have a DB file attached.
+
+Rally No: TA372810
+CA Directory installer now supports user or group information sources other than files (/etc/passwd), for example LDAP source.
+
+Rally No: TA372811
+To allow using ports 1-1024 instead of using setuid, CA Directory installer on linux uses cap_net_bind_service capability. On Solaris a new rights profile is created and assigned to a directory user for the same purpose.
+
+ServiceCloud No: 00419557 Rally No: DE171636
+For the following configuration, it is difficult to stop all the DSAs servicing a specific multi-write group (region) when under a reasonable modify load:
+* vanilla multi-write replication (MW-DISP not enabled)
+* multi-write groups specified in the knowledge
+* set wait-for-multiwrite = true;
+
+To assist with maintenance activities that require all the DSAs from a specific group to be stopped, the command "set isolate-multi-write-group = true;" has been introduced.
+
+An example procedure for stopping all the DSAs in a group is:
+* connect to DXconsole for each DSA that will be shut down and perform "set isolate-multi-write-group = true;", or temporarily enabled "set isolate-multi-write-group = true;" in the configuration and re-init the DSAs of a particular group individually
+* once set, all connections to other groups and non-peer DSAs will be aborted, allowing replication within a group to complete while taking on no further updates from other groups/relays/routers
+* when replication has completed the DSAs in the group may be stopped
+* once stopped, if using the configuration based approach, the 'isolate-multi-write-group' command can be removed or set to false and DSAs can be started
+
+Rally No: 202644
+An issue has been addressed where the DSA can be left in an unresponsive state when a client disconnects that has a large number of pending requests.
+
+ServiceCloud No: 00471191 Rally No: DE202354
+An issue has been resolved where a client performing dynamic group (member=<DN>) searches disconnects while the search is in progress. This has the potential to cause the DSA to crash. This issues was initially resolved in 12.0.17 under the exclude member attribute change (CES: 80679 RTC No: 160194) and has now been strengthened.
+
+As part of this fix, the following assertion failure has been downgraded to a warning as this is triggered by the above disconnect:
+** FATAL ERROR **: Assertion failed (/release/HEAD.new/dxgrid/src/dsa/user/roles.c???)
+
+The following assertion failure has also been fixed:
+** FATAL ERROR **: Assertion failed (/release/HEAD.new/dxgrid/src/dsa/user/uDynamicGroup.c129?)
+
+Rally No: DE175087
+Addressed MW-DISP recovery performance issue where operational attributes, required by MW-DISP, are explicitly excluded from the cache indexes.
+
+Rally No: DE186404
+A long standing SSL assertion failure has been addressed. The assertion failure is harmless, but can raise concerns when encountered in the alarm log. The root cause of the assertion is when the number of concurrent SSL connections increases beyond 20. This is normally seen when performing SSL stress testing where a client creates a lot of new connections.
+
+/net/potaroo/release/BRANCHSP14.new/src/dsa/rstack/support/openssl.c(804): Assertion failed 
+
+Note: The line number tends to vary between releases ranging from 750-850.
+
+Rally No: TA388654
+The dxsoak tool now includes a "-l <time limit>" option. The tool will run in continuous mode until <time limit> seconds have elapsed.
+
+For example, to run the requests from searches.ldif for 60 seconds:
+% dxsoak -l 60 -t 8 -q 100 -h host:port -f searches.ldif
+
+Rally No: US170076
+The new command "set dsp-link-count = <num>;" when set, will increase the number of outbound links from a router DSA to each subordinate DSA to <num>. By default, only a single outbound (DSP) link is created for each authentication level between DSAs. However, this can reduce router throughput in high volume environments, as the router DSA only has a single connection to send requests and receive responses from.
+
+The "get dsas;" commandsetuid  will display virtual references to the same DSA that will be used to create the outbound links.
+
+Note: Setting <num> larger than 10 may degrade performance, so 'dsp-link-count' should be tuned to your specific environment.
+
+Rally No: TA372800
+To bring DXcertgen in line with 3rd certificate authorities, the default key size of certificates generated using DXcertgen has been increased from 1024 bits to 2048 bits.
+
+Rally No: TA368117
+The SSL configuration has been enhanced to support a single personality certificate that can be shared among all DSAs. To configure a single certificate replace cert-dir with cert-file in the set ssl ... command. This will reduce the overhead when issuing DSA personality certificates from 3rd party certificate authorities where there are a large number of DSAs.
+
+Note: This removes the restriction that the subjectDN must contain dsa-name.
+
+set ssl = {
+    # generic DSA personality certificate
+    cert-file = "config/ssld/personalities/generic.pem"
+
+    # trusted root CA that signed DSA certificates
+    ca-file = "config/ssld/trusted.pem"
+    protocol = tls
+};
+
+Rally No: TA368120
+To complement TA368117, the dxcertgen tool has been enhanced to generate a generic personality certificate using the -g option. For example, the following command creates trusted.pem containing a root CA certificate and a generic DSA personality certificate under $DXHOME/config/ssld/personalities/{generic}.pem that can be configured against all DSAs using the set ssl command above.
+
+% dxcertgen -g {generic} certs
+
+ServiceCloud No: 00410356 Rally No: DE166038
+When multiple passwords are stored against a user entry, using the 'set enable-nonstandard-behaviour = true;' feature, a modify request removing a specific password value from the userPassword attribute will no longer remove all passwords. Only password specifically requested will be removed.
+
+ServiceCloud No: 00411105 Rally No: DE165704
+The DSA no longer crashes when an encrypted connection is terminated before the DSA has been able to negotiate the SSL/TLS protocol version.
+
+ServiceCloud No: 00361898 Rally No: DE165174
+The new command "set max-persistent-searches = <num>;" can be used to configure the maximum number of concurrent persistent searches. This was previously capped at 10, which is the default if max-persistent-searches is not set.
+
+Note: Having a large number of active persistent searches may have a performance impact on directory updates.
+
+Rally No: DE154880
+The "get users;" DXconsole command that displays the list of active connections has been expanded to provide diagnostics for links created using the concurrent-bind-user account. This will assist with checking that the concurrent-bind-user feature is correctly configured.
+
+Rally No: DE163192
+The new command "set dn-substring-match = true;" enables support for substring (wildcard) filtered searches against attributes with distinguishedName syntax. This makes the directory index distinguishedName values using the LDAP string form.
+
+For example, the following attribute:
+
+member: cn=joeBloggs,ou=users,o=CA,c=AU
+
+Will match following filters:
+    (member=cn=joe*)
+    (member=*AU)
+    (member=*users*)
+
+Note: The search filter does not support virtual attributes, for example, the member attribute populated by dynamic groups.
+
+ServiceCloud No: 00326444  Rally No: DE144136
+An issue has been resolved where executing the start-up script ("/etc/init.d/dxserver start" or "service dxserver start") when the DSAs are already running will leave the running DSAs in an invalid run state. The invalid state is where the DSAs are running without pid files under $DXHOME/pid preventing the "dxserver status" and "dxserver stop" commands from working. Note: we recommend starting DSAs using the dxserver binary (as the configured dsa user) rather than start-up script.
+
+ServiceCloud No: 00263264  Rally No: DE138821
+A multi-write replication issue has been resolved when replicating over an SSL encrypted link. If the link between DSAs hangs up while a master is sending to a slave, the multi-write queue for the slave can enter an invalid state causing the master to stop replicating. When this occurs, the warning "No MW response from DSA '{Slave DSA Name}' in last 60 seconds" is displayed every minute until the master of restarted.
+
+ServiceCloud No: 00334990  Rally No: DE153975
+A dynamic group issue has been resolved that has the potential to cause the following alarm message to be continually displayed.
+r:/head.new/dxgrid/src/dsa/rstack/support/xmpool.c(326): Assertion failed
+
+ServiceCloud No: 00332527  Rally No: DE154865
+A CA Directory issue has been resolved where a search request returning a dynamic group will now populate the member attribute when a return attribute list is specified.
+
+ServiceCloud No: 00328650  Rally No: DE144532
+To improve integration with WebSphere Application Server, dynamic group membership searches have been expanded to support LDAP filters of the following form:
+
+   (|(&(A)(B)(C)(...)(member={DN}))(&(D)(E)(F)(...)(uniqueMember={DN})))
+
+Note: {DN} must be the same in both sections of the filter.
+
+ServiceCloud No: 00314752  Rally No: DE143115
+A timing issue has been resolved where the same DSA is used to process a view request with a search phase that includes dynamic group searches. A vie search would periodically return unwillingToPerform instead of the expected search result.
+
+Rally No: DE155915
+Newly created Windows DSA services are now configured as "Automatic (Delayed Start)" instead of "Automatic". This is to allow time for operating system networking services to start up that can impact hostname resolution.
+
+Rally No: DE157378
+An issue has been addressed where the SCIM docker container may be misconfigured at runtime. This issue was caused by missing environment variables. Additional error check are now implemented to ensure all required environment variables are set before configuring the SCIM server.
+
+ServiceCloud No: 00352422  Rally No: DE157530
+Fixed an issue in JXweb where uploading jpegPhoto using Chrome browser would cause NullPointerException. This was because Chrome used mixed-case boundary string for the multi part form data and JXweb was not handling this correctly.
+
+Rally No: DE157588
+Some SSL information was missing in trace/logs following a previous enhancement in SP17. This is now fixed.
+
+Rally No: DE157589
+Fixed an issue where "get ciphers;" command was returning wrong set of values when the DSA was configured to use "protocol = tlsv12"
+
+Rally No: DE158234
+Fixed a search performance issue when relaxed-not-search is enabled. The root cause was the introduction of redundant conditions for a search filter that involves a nested not expression, eg. "((a=*)(!(|(a=j)(a=k))))".
+
+Rally No: DE139252
+The DSA will now use <num> threads (set user-threads = <num>;) when building indexes at start-up. Before this change, the DSA was limited to 8.
+
+Rally No: DE171433
+Fixed DSA crash in _GLOBAL_OFFSET_TABLE_ when built using later versions of gcc (eg. 4.8).
+
+Rally No: DE171227
+The maximum number of horizontal partitions support by the configuration of 30 has been removed. Any number of DSAs can serve in a horizontal partition configuration, as long as there is at least one DSA defined for each partition ID.
+
+Rally No: DE171204
+Fixed an SSL/TLS issue where dxsearch, dxmodify, dxrename & dxdelete would fail to negotiate a shared SSL protocol version when the DSA was configured to only use TLSv1.2 (protocol = tlsv12 in set ssl command).
+
+Rally No: DE174464
+The performance of the enhancement to roll-over log files when max-lines is reached (US32008) has been tuned to remove unnecessary delays when a log roll is in progress.
+
+Rally No: DE176094
+The dxinfo will no longer collect the same log file more than once. This issue was introduced by enhancement US179310.
+
+Rally No: DE175079
+The DSA no longer produces an assertion failure when cleaning up a SSL connection while a SSL handshake is in progress. This issue was introduced in newer versions of OpenSSL (>= CAPKI to 5.1.0).
+
+Rally No: DE186749
+A configuration validation check when using multi-write group hubs has been improved to ensure there is one hub for each group for each prefix. Previously, the check only ensured there was one hub for each group.
+
+ServiceCloud No: 00454002 Rally No: DE198421
+Fixed a memory leak issue that was introduced by a bug fix in SP17. A leak of 4kb occurred for each bind request, when password policy was enabled. 
+
+ServiceCloud No: 00440843 Rally No: DE199294
+A performance issue has been resolved that occurred when the grid DB synchronized with disk for the first time after a restart. Symptoms of this issue include a "Forced sync" warning message and the DSA not servicing requests for an extended period of time.
+
+ServiceCloud No: 00471975 Rally No: DE202799
+Corrected unique attribute checking by not returning an error when the unique attribute is being replaced with the same value.
+
+Rally No: DE200933
+DSA no longer processes update operations in the main thread.
+
+Rally No: DE203165
+Fixed an issue where the DSA could hang when connections are aborted. The root cause was unlocking of a wrong mutex. 
+
+Rally No: US149339
+CA Directory now supports scrypt and bcrypt hashing of the 'userPassword' attribute.
+
+This is controlled by the 'set password-storage = <hashMethod>;' command, where <hashMethod> for the new algorithms can be 'scrypt' or 'bcrypt'.
+
+Rally No: US222239
+The Linux version of DSA is now built with ASLR/PIE (Address Space Layout Randomisation) enabled. On systems that support ASLR, the dxserver process memory space is randomised to prevent exploits. 
+
+ServiceCloud No: 00487553 Rally No: DE224006
+Fixed a crash when a slave DSA receives mwdisp deletions on parent entries with child entries. This crash only occurs when dxgrid-queue is false.
+
+ServiceCloud No: 00487377 Rally No: DE224007
+A slave dsa may switch out of recovery mode prematurely after applying shadow updates. This causes problems when there are still pending updates and
+and the same time the slave dsa begins to accept client updates. This is now fixed such that the slave dsa always waits for a confirmation from the
+master dsa, which is received after pending updates.
+
+In Build No. 12074 (12.0.18 GA)
+-------------------------------
+Rally No: DE140306
+Fixed erroneous syntax error reported when executing "get log;" in console.
+
+Rally No: DE140304
+Fixed incorrect parsing of rollover-trace-log = false and rollover-alarm-log = false that always parsed as true.
+
+Rally No: US32023
+Debian installation packages are added to the CA Directory distribution. Three packages are included:
+cadirectory_12.0.18-12074_amd64.deb containing directory binaries and configuration
+cadirectory-samples_12.0.18-12074_amd64.deb containing directory samples
+cadirectory-dxagent_12.0.18-12074_amd64.deb containing dxagent module
+setuid 
+Rally No: US32029
+RPM installation packages are added to the CA Directory distribution. Three packages are included:
+cadirectory-12.0.18-12074.x86_64.rpm containing directory binaries and configuration
+cadirectory-samples-12.0.18-12074.x86_64.rpm containing directory samples
+cadirectory-dxagent-12.0.18-12074.x86_64.rpm containing dxagent module
+
+Rally No: US32008
+Support roll-over of log files when the file number of lines exceeds the threshold configured.
+The following commands have been added to turn on/off this feature for different types of logs:
+set alarm-log-max-lines=$NUMBER
+set summary-log-max-lines=$NUMBER
+set trace-log-max-lines=$NUMBER
+set stats-log-max-lines=$NUMBER
+set query-log-max-lines=$NUMBER
+set update-log-max-lines=$NUMBER
+set alert-log-max-lines=$NUMBER
+set connect-log-max-lines=$NUMBER
+set warn-log-max-lines=$NUMBER
+set diag-log-max-lines=$NUMBER
+set time-log-max-lines=$NUMBER
+
+$NUMBER needs to be either at least 1000 or 0 which means the feature is off. 
+When the feature is on and the configured threshold is reached, 1) for all types of logs except Trace and Alarm, new logs with _YYYYMMDD_HHMMSS format extension will be opened for future writing. e.g. router_summary_20150914_120413.log 2)for the Trace and Alarm log, the current Trace or Alarm log will be renamed to whatever the current log name with the _YYYYMMDD_HHMMSS format extension (e.g. router_alarm_20150914_110348.log), and a new log with the same name (e.g. router.alarm.log) will be opened for future writing. 
+A new DXconsole command called "roll-logs;" has been added. It causes all logs configured with max-lines to rollover immediately. This will assist in creating a fresh set of logs when reproducing issues. Similarly a new dxserver commandline command has been added to do the same thing, e.g. "dxserver logroll democorp".
+To assist with debugging the "get log;" DXconsole command displays a line count for each file currently open. Please refer to the document for an example.
+
+Rally No: DE15508
+'forcestart' command line option has been added to dxserver application. The option allows to start a DSA that may not be started and reports inconsistent state.
+
+Rally No: DE15391
+Addressed an issue where 'dxserver start {dsa name}' command reports inconsistent state when called twice in a row and when the command 'set disable-transaction-log = true;' is set.
+
+ServiceCloud No: 00302492  Rally No: DE136861
+dxsyntax application is extended to include a check that reports an error when DSAs in a horizontal partition have different partitioning attributes. Also removed the check that forces horizontal partitions to have the same number of replicas.
+
+ServiceCloud No: 00249232  Rally No: DE20671
+Addressed an issue with CA Directory installer where CAPKI libraries become corrupted when installing on Linux 64-bit
+
+Rally No: DE140310
+The dxsoak tools has been extended to support filters that contain distinguished name values to allow for stress testing of group and dynamic group searches, for example, 
+
+dn: ou=groups,o=CA
+changetype: search
+scope: subtree
+filter: (member=uid=12345,ou=users,o=CA)
+
+Rally No: DE140309
+When the schema is sourced by the DSA and an attribute fails to be defined, a better diagnostic message is now produced including the name of the offending attribute.
+
+Rally No: DE140307
+The "get oper;" DXconsole command now displays the current value for paging-threshold.
+
+ServiceCloud No: 00303587  Rally No: DE139188
+Fixed a crash in dxadmind. This particular crash leaves the following entry in the dxadmin.log:
+20160123.161422.528 OPERATION: dxadmind Server Starting - Configuration version=8, status=Encrypted
+dxadmind: /net/potaroo/release/HEAD.new/src/dxadmin/dxadmind2/../../openldap/openldap/servers/slapd/connection.c:822: connection_destroy: Assertion `c->c_writewaiter == 0' failed 
+
+Rally No: US118314
+Addressed an issue where the DSA would only attempt to use TLS1.0 protocol and also improve logging of protocol version in trace and query logs.
+Two new SSL 'protocol' settings have been introduced to limit the negotiated protocol to TLS1.1 (tlsv11) and TLS1.2 (tlsv12). These can be set within the "set ssl = {" statement.
+
+ServiceCloud No: 00144381 Rally No: DE130126
+An issue has been resolved where a router/relay DSA with roles enabled, may halt when concurrently chaining requests received from the same LDAP client.
+
+ServiceCloud No: 00265426  Rally No: DE46448
+Addressed two instances where response network packet corruption could occur. Both of these cases would cause the LDAP client to reject the response as invalid.
+
+1. When the DSA sends a result that is blocked or partially sent, this is accompanied by the trace message "comms_send: combining buffer".
+2. When handling multiple search requests from the same LDAP client. The search response may become corrupt when one of the search results contains more than approximately 200 entries (depending on size of information being returned).
+
+ServiceCloud No: 00258039 Rally No: DE35672
+CA Directory no longer halts after displaying:
+Assertion failed (r:/head.new/dxgrid/src/dsa/dxgrid/caAdd.c 511/512)
+
+The assertion is triggered when running MW-DISP in a multi-master environment where a high volume of and adds/deletes are performed, where the names of the entries remain the same.
+
+Rally No: DE122722
+A code defect was fixed which allowed a MW-DISP slave DSA to replicate back to a master DSA during recovery.
+
+Rally No: DE140275
+A code defect was fixed which allowed Password Modify Operation to succeed when DSA was configured to use dxlink ldap
+
+Rally No: US118300
+An enhancement was implemented in DXagent to support for mime-type application/x-gzip. This is for returning the online backup file (.zdb)
+
+In Build No. 11556 (12.0.17 GA)
+-------------------------------
+Please note that CA Directory 12.0.17 supports only 64-bit platforms.
+
+RTC No: 166606
+Increased max DN size to 10240 characters. Fixed a buffer overflow bug in dxdumpdb.
+
+RTC No: 165558
+Performed necessary work for SCIM Server to be release as GA.
+
+The SCIM server comes in two parts: a backend DSA and a frontend webserver.
+The DSA can be installed from a machine with dxserver by going to $DXHOME/samples/scim and running setup.sh
+The webserver can be configured from a machine with dxwebserver by going to $DXWEBHOME/webapps/ca and running scim-websetup.sh
+
+SCIM server performance has been improved.
+
+US46798:
+Simplified deployment of DXagent
+
+DXagent can now be deployed by using the install_dxagent.sh and start_dxagent.sh shell scripts in $DXHOME/dxagent
+
+ServiceCloud No: 00123991 RTC No: 159565
+An issue has been addressed where the DSA may become unresponsive when computing STATS information.
+
+ServiceCloud No: 00211047 RTC No: 166529
+Addresses errors returned by dxinstall.sh script in CA Directory and CA Directory Management DVDs.
+
+ServiceCloud No: 00225155 RTC No: 167767
+The CA Directory Management (DXmanager) package now installs on Windows when using the Java 8 JRE. This also fixes an issue introduced in 12.0.16 preventing the DXwebserver service from starting on a fresh install.
+
+ServiceCloud No: 00174452 RTC No: 166127
+Password policy is now enforced on a data DSA when performing password compares/updates via a 'concurrent-bind-user' that has roles configured.
+
+ServiceCloud No: 00232506 RTC No: 168578
+A router DSA no longer crashes when it receives a bind request under a 'concurrent-bind-user' connection and the bind is abandoned before it completes. 
+
+RTC No: 168069
+Add support to JXweb for URL rewriting by removing use of absolute paths and client side redirects.
+setuid 
+CES: 80679 RTC No: 160194
+The dynamic group configuration now supports a new item 'exclude-member-attr' to prevent a configured list of members from appearing in dynamic group expansion, membership lookup searches and role lookups, even if the configured member matches the ldapURL search criterion.
+
+This is enabled using the following dynamic group definition and members can be excluding by adding dxExcludeMember = <DN list> to the dynamic group entry.
+clear dynamic-groups;
+set dynamic-group groups = {
+    subtree = <c au><ou groups>
+    object-class = dxDynamicGroupOfNames
+    url-attr = dxMemberURL
+    member-attr = member
+    exclude-member-attr = dxExcludeMember
+};
+
+ServiceCloud No: 00200394 RTC No: 165533
+Schema checking of the following password policy attributes now enforces "single-valued" to prevent ambiguity their use:
+* dxPwdLocked
+* dxPwdIgnoreExpired
+* dxPwdIgnoreSuspended
+
+Please ensure that existing processes that update these attributes remove the previous value before applying the new one.
+
+RTC No: 148834
+Added support for LDAP Password Modify extended operation (RFC 3062).
+
+To assist with verification, the LDUA client supports this extended operation via the new command "modify-passwd-req".
+
+ServiceCloud No: 00146389 RTC No: 161856
+A CA Directory password policy issue has been resolved, where a binding LDAP client disconnecting before receiving a bind response may cause the DSA to halt.
+
+RTC No: 164351
+A CA Directory upgrade issue has been resolved on 32-bit UNIX platforms when upgrading from 12.0.15.
+
+RTC No: 156540
+When SSL is enabled the version in use is included in logs when possible
+
+In Build No. 11032 (12.0.16 GA)
+-------------------------------
+Please note CA Directory 12.0.16 is the last release that will support 32-bit platforms.
+
+ServiceCloud No: 00131493 RTC No: 162341
+CA Directory 12.0.16 now ships with Tomcat 6.0.44 which addresses tomcat vulnerabilities.
+
+RTC No: 161759
+Upgraded embedded CAPKI to version 5.0.2. This version of CAPKI includes support for TLSv1.2.
+
+RTC No: 161864
+The csv2ldif tool now supports templates to generate LDIF that work with dxmodify/ldapmodify.
+
+RTC No: 161189
+Added a mechanism to suppress parser warning messages in dxdumpdb utility. This will provide cleaner LDIF files.
+
+ServiceCloud No: 00127786 RTC No: 160413
+Binds performed under the "concurrent-bind-user" no longer leak memory.
+
+ServiceCloud No: 00089140 RTC No: 158823
+Addressed the issue where dxdisp utility produced Segmentation Fault when a router DSA had "set multi-write-disp-recovery = true;" configured.
+
+ServiceCloud No: 00099275 RTC No: 156817
+The new command "set ignore-null-value-attrs = true;" will enable the DSA to ignore null attribute values received via add or modify requests, if null values are not supported by the underlying syntax (as per RFC-4517). This is to provide compatibility with applications built on Sun/Oracle directory servers that rely on this feature.
+
+ServiceCloud No: 00078885 RTC No: 155815
+The DXtools no longer fail when DSA server name contains dot or dash.
+
+ServiceCloud No: 00083524 RTC No: 155760
+The format of the Netscape Password Policy expiring/expired LDAP controls now conforms to https://tools.ietf.org/html/draft-vchu-ldap-pwd-policy-00. The new command "set password-netscape-legacy-mode = true;" will re-instate the previous format if applications have been built assuming this incorrect format.
+
+RTC No: 151988
+Addressed the issue where an attempt to add a new value to a multi-valued binary attribute sometimes resulted in overwriting of an existing attribute value.
+
+In Build No. 10203 (12.0.15 GA)
+-------------------------------
+
+RTC No: 154873
+Updated default dxpassword hashing method to SSHA512.
+
+RTC No: 153795
+Addressed a "dxserver init" issue where the DSA would falsely detect knowledge changes and abort these associations when no knowledge change had been made.
+
+RTC No: 151779
+The CA Directory version number has now been aligned with other CA products.
+
+RTC No: 151509
+Addressed issue where the cleaning up of MW-DISP tombstone entries was failing due to an assertion failure in caRemove.c.
+
+RTC No: 150834
+Implemented a new "onlinebackup" option to the dxserver command to trigger an online dump of the DSA data. This achieves the same end result as issuing the
+"dump dxgrid-db" command through the DSA console.
+
+RTC No: 150596
+The DSA now supports entries modified during a leap second (23:59:60).
+
+ServiceCloud No: 00049300 RTC No: 149836
+The DSA no longer hangs on Windows when the number of concurrent connections exceeds 4096. Any subsequent connections will be refused and a warning logged.
+
+RTC No: 71556
+Dxagent is included in CA Directory installation package. This component provides a RESTful service for managing DSA's. Dxagent is supported on Linux only.
+Please see the user guide for more information.
+
+RTC No: 148531
+Upgraded embedded CAPKI to version 4.3.8. This version of CAPKI addresses various bugs/vulnerabilities including the SSL/TLS FREAK attack.
+
+RTC No: 146313
+SCIM REST server is included in the CA Directory Management CD. This component provides a RESTful service that implements the SCIM (System for Cross-domain
+Identity Management) protocol 1.1. SCIM server is not installed by the installer and installation must be done manually. Please see the user guide for
+more information.
+
+RTC No: 145249
+Fixed a defect that affects server-side sorting. This defect causes incorrect sort order in the search results when a same attribute is used in the search
+filter and also as the server-side sort attribute.
+
+RTC No: 141407
+The DSA now supports a new command (set external-monitoring ...) to enable
+external HTTP monitoring of configured events.
+See the documentation for more information.
+
+RTC No: 117706
+DSA logging has been enhanced to capture the stack backtrace in the event of a crash. This information is written to the alarm log file. The backtrace is a list of addresses pointing to the crash.
+
+RTC No: 117703
+A new password storage mechanism known as PBKDF2 (Password-Based Key Derivation Function) is now supported. This feature introduces three new settings to control the number of rounds, the salt length and the digest length:
+
+    set pbkdf2-iterations = 64000;
+    set salt-length = 128;
+    set pbkdf2-digest-length = 128;
+
+The salt and digest values are specified in bits. 
+Please see http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf for more information.
+
+RTC No: 141761
+The DSA no longer crashes when deleting all entries via the root entry from JXplorer when running MW-DISP.
+
+StarTrak No: 21933948 RTC No: 134579
+The default DXmanager thread pool has been increased from 20 -> 60 to allow for the monitoring/configuration of up to 30 hosts. The previous maximum was 10 hosts.
+
+StarTrak No: 21952941 RTC No: 135451
+A 'dxgrid-queue' stability issue has been resolved caused by an association disconnecting while a large number of updates received on that connection are being processed by the DSA.
+
+StarTrak No: 21973737 RTC No: 138504
+DXmanager applets have been updated to work up to Java 8u25, 7u72 & 6u45.
+
+RTC No: 137195
+In response to the POODLE vulnerability the CA Directory cipher list now defaults to "ALL:!EXPORT40:!ADH:!SSLv2:!EXP:!LOW" and the setting 'protocol' set to 'tls'.
+If there are connectivity issues after upgrading to this release then check if TLS can be enabled on the client. If this is not possible then set 'protocol' to 'ssl'.
+
+StarTrak No: 21914789 RTC No: 137281
+CA Directory now supports hostnames that have a digit as the first character.
+
+StarTrak No: 21869323 RTC No: 125223
+A role based access control issue has been resolved that has the potential to cause the router DSA to halt.
+
+StarTrak No: 21952941 RTC No: 135451
+A password policy stability issue has been addressed where a LDAP client disconnects prior to receiving a response.
+
+StarTrak No: 21925122 RTC No: 127759
+A dxserver issue has been addressed where the DSA may leave behind a core file if stopped while an update is in progress.
+
+RTC No: 135259
+A MW-DISP and DXgrid queue interoperability issue has been addressed.
+
+StarTrak No: 21889822 RTC No: 118153
+The interruptible searches features has received a number of fixes that resolve the following symptoms:
+* DSA crash
+* memory leak
+* providing incorrect search results
+
+RTC No: 120185
+A timing issue has been resolved where a "WARN : Connection timed out" takes down an active DXlink connection after only 15 seconds.
+
+StarTrak No: 21893560 RTC No: 119322
+Addressed a Multi-write Hub replication issue, where a child entry is removed from a non-hub DSA and its parent is immediately removed from a hub in the same group. On replication the parent removal was rejected by the non-hub with an assertion failure causing a data inconsistency.
+
+RTC No: 125300
+A MW-DISP boundary condition has been rectified where an entry may be omitted during MW-DISP recovery if a peer disconnects as the machine clock rolls into the next second.
+
+RTC No: 98845
+A data integrity issue has been addressed where it was possible for an update added to a MW queue while MW-DISP recovery was in progress, to be confirmed before it was sent.
+
+RTC No: 125301
+An issue introduced in r12 SP14 has been resolved where a MW queue cleared during MW-DISP recovery may cause the DSA to halt.
+
+StarTrak No: 21887440 RTC No: 117860
+Addressed an issue with role-based configuration where the administrative limit override was ignored for dynamic group searches performed via a router DSA.
+
+StarTrak No: 21796708 RTC No: 66465
+The DSA no longer crashes when a data inconsistency prevents an entry being removed during MW-DISP recovery when "set interrupt-searches = true;"
+
+StarTrak No: 21858503 RTC No: 79772
+The DSA no longer halts on Windows when it encounters an Invalid Parameter Exception (Exception code: 0xc0000417).
+
+RTC No: 280953
+The LDAP tree delete control is now interoperable with MW-DISP.
+
+In Build No. 9118 SP14 GA
+-------------------------
+CA Directory has a setting called 'dxgrid-queue' which changes the way operation/thread scheduling is handled in order to have more threads executing under normal operating conditions. This feature has been significantly improved and is now enabled by default. To revert this setting put the line 'set dxgrid-queue = false;' in the DSA's config file.
+
+The cryptographic libraries used by CA Directory (CAPKI) have been updated to address a number of vulnerabilities (CVE-2014-0224, CVE-2014-0221, CVE-2014-3470, CVE-2014-0076).
+
+StarTrak No: 21814350 RTC No: 66470
+A CA Directory access control security issue has been addressed, whereby a user could bypass specific access control settings. CA Directory now differentiates between distinguished names that differ only by relative distinguished name attribute types. For example, the following will now be treated differently when making access control decisions:
+ * <c AU><ou Users><cn Admin>
+ * <c AU><ou Users><uid Admin>
+
+Warning: This tightening of security may impact existing access controls that exploit this weakness.
+
+RTC No: 308561
+CA Directory views filter substitution now supports view search requests that contain multiple filter items for the same attribute.
+
+StarTrak No: 21567646 CQ No: PROD00181879
+An issue has been addressed on the AIX platform where a compiler issue caused the DSA to intermittently display assertion failures and hang.
+
+StarTrak No: 21594805, 21584907, 21726231 RTC No: 281444
+A significant number of improvements and bug fixes have been made to the MW-DISP "multi-write-group-hub" feature to improve data consistency between peer DSAs.
+
+StarTrak No: 21770200 CQ No: PROD00185039
+An issue has been addressed where a filter containing the item (!(attr<=value)) would cause the DSA to crash if 'attr' did not exist on DSA start-up, was added and then removed.
+
+StarTrak No: 21658942 RTC No: 300374
+As per RFC-4522, binary attributes are now always returned with the ;binary option in the attribute description. This was previously non-deterministic.
+
+RTC No: 295151
+Glue DSE entries can now be manually corrected when created due to MW-DISP data inconsistencies.
+
+RTC No: 282617
+MW-DISP recovery updates are now logged in the query-log.
+
+RTC No: 290748 CQ No: PROD00182007
+Multi-write group hub DSA now correctly replicates to a peer DSA if the peer was initially empty.
+
+StarTrak No: 21640495 CQ No: PROD00180310
+The new command 'set max-filter-norm-size = <Num>;' where <Num> is the maximum memory (in MB) used by CA Directory during filter processing (default: 100MB). This will prevent the DSA from consuming too much system memory when normalizing very complex filters.
+
+When exceeded, a warning will be produced, and the search refused with 'unwillingToPerform'.
+
+StarTrak No: 21453922-01 RTC No: 71558
+The new command 'set max-ldap-filter = <Num>;' where <Num> is the maximum length (in characters) of a ldap search filter.
+
+When exceeded, a warning will be produced, and the search refused with 'unwillingToPerform'.
+
+
+In Build No. 8091 SP13 GA
+-------------------------
+CQ No: PROD00180081
+The fix applied under PROD00164462 now supports searches chained through a router DSA.
+
+CQ No: PROD00179599
+CA Directory now supports compares of hybrid group (static + dynamic members) entries asserting member=<DN>, where <DN> is a static member.
+
+StarTrak No: 21606178 CQ No: PROD00178948
+Addressed a "dxserver start all" issue on UNIX when accessing the "dxserver" binary using a path that isn't relative to $DXHOME.
+
+For example, "./dxserver start all"
+
+StarTrak No: 21588357 CQ No: PROD00178401
+DXmanager now supports the use of shadow DSAs during replication.
+
+CQ No: PROD00178013
+dxloaddb now supports horizontally partitioned DSAs configured using a wildcard, for example, <c au><o users><* "[hash1(2)=0]">.
+
+StarTrak No: 21581540 CQ No: PROD00177771
+CA Directory now supports searches containing the server side sorting control, where the sort key has not been requested in the return attribute list.
+
+StarTrak No: 21559077 CQ No: PROD00177664
+The CA Directory horizontal partitioning feature is now interoperable with searches containing the simple paged results, server side sorting and virtual list view LDAP controls.
+
+StarTrak No: 21562715 CQ No: PROD00177071
+Removed superfluous dynamic group 'subtree' warning message introduced in r12 SP12 CR1.
+
+StarTrak No: 21552817 CQ No: PROD00177288
+Addressed a CA Directory views issue when using conditional phases. An equality condition will now evaluate to TRUE, if the condition references a multi-valued attribute and any of the values satisfy the condition.
+
+StarTrak No: 21560192 CQ No: PROD00176900
+Addressed an issue with the creation of a new LDAP connection sent over SSL where the first part of the LDAP message was a single byte in length.
+
+This was noticed with applications using newer versions of the NSS LDAP library.
+
+StarTrak No: 21554239 CQ No: PROD00176593
+Addressed a dxloaddb issue where the load fail with an assertion failure when encountering an entry named by an attribute with DN syntax.
+
+StarTrak No: 21545535 CQ No: PROD00176437
+The status of an individual DSA can once again be displayed using 'dxserver stats <dsaname>'.
+
+StarTrak No: 21544099 CQ No: PROD00176189
+Addressed a CA Directory issue where removing a multi-write group hub and performing a "dxserver init" may cause DSAs to hang.
+
+StarTrak No: 21536571 CQ No: PROD00175914
+Addressed DXmanager issue preventing applets from loading under the latest JRE versions.
+
+StarTrak No: 21536081 CQ No: PROD00175572
+To integrate with Weblogic, CA Directory translates a (entryDn=<DN>) LDAP filter into a base object search. Preference will now be given to "entryDn" over transparent routing.
+
+StarTrak No: 21526048 CQ No: PROD00175564
+Addressed a memory leak when SSLv3/StartTLS fail due to directory not being configured with a personality certificate.
+
+StarTrak No: 21514928 CQ No: PROD00174708
+An access control issue has been addressed affecting membership lookup searches (member=<DN>) of static and dynamic groups. The static groups are now correctly returned when the user performing the search has access granted to the "member" attribute.
+
+StarTrak No: 21513551 CQ No: PROD00174953
+The logic controlling the rolling of log files into a new day has been reworked
+* All configured logs will roll at midnight local time each day
+* The message timestamps will always match the log filename datestamp for which they are written
+
+CQ No: 174535
+To assist with consolidation, the information gathering utility dxinfo now includes the host name of the machine from which it is run.
+
+StarTrak No: 21499975 CQ No: PROD00174144
+The "memberOf" attribute used by the memberOf auto-population feature of directory is no longer predefined. This removes the chance of an attribute name conflict during upgrade when custom schema also contains an attribute of this name.
+
+StarTrak No: 21503353 CQ No: PROD00173906
+Removed superfluous warnings "WARN : get_comms_ctx(a, b, c): d" logged when there is a large volume of disconnecting clients.
+
+CQ No: PROD00173594
+CA Directory now ships with CAPKI 4.3.3 on all platforms.
+
+StarTrak No: 21482686 CQ No: PROD00173090
+The handling of referral errors during dynamic group and view searches has been improved. These errors had the potential to cause the DSA to crash.
+
+StarTrak No: 21483180 CQ No: PROD00173202
+Removed obsolete username validation preventing the use of a leading uppercase character when installing with the -dxuser option during a UNIX install.
+
+StarTrak No: 21466068 CQ No: PROD00172340
+Performance has been improved when using hybrid groups (groups with dynamic and static members) where the number of static members is large (>200K). This is particularly important when using roles in high volume environments.
+
+The output of the "get users;" DXconsole command has been extended to display the roles a connected user is a member of.
+
+StarTrak No: 21444723 CQ No: PROD00171640
+An issue has been addressed that can cause the resultant .zdb file of a DXgrid online dump to be corrupt when run in parallel with a high volume of serial MW updates (typically a MW group hub DSA).
+
+StarTrak No: 21434513 CQ No: PROD00171388 
+Addressed a long standing relay/router failover over timing issue where a DSA may crash when:
+* the relay/router sends (chaining) a request to a remote DSA
+* the link to the remote DSA is dropped by the the remote DSA (idle timeout / DSA stopped etc)
+* the dropped link is processed before the request has been written to the socket
+
+The warning when this situation is detected has been updated from "lstate 21" to "Failed to send as network connection now closed".
+
+In Build No. 7338 SP12 GA
+-------------------------
+CQ No: PROD00170767
+DXmanager now supports wildcards in horizontal partition definitions.
+
+For example,
+
+Router prefix: ou=Users,c=AU
+HP prefix: *="[hash1(3)=0]",ou=Users,c=AU
+HP prefix: *="[hash1(3)=1]",ou=Users,c=AU
+HP prefix: *="[hash1(3)=2]",ou=Users,c=AU
+
+CQ No: PROD00170029
+Removed chance of deadlock when a "dxserver init <dsaname>" is performed after changing the knowledge of a multi-write DSA.
+
+CQ No: PROD00170026
+"dxserver init <dsaname>" no longer aborts DSP connections when using "link-flags = ssl-encryption-remote".
+
+StarTrak No: 21368102/21368122 CQ No: PROD00169637/PROD00169638
+When using multi-write groups in conjunction with MW-DISP, we recommend setting a preferred master from each group with 'multi-write-group-hub'. Only one multi-write group hub is supported per group and this is now enforced at start-up.
+
+StarTrak No: 21361941 CQ No: PROD00169448
+The 'set excluded-controls' command will now reject excluded controls if the criticality is set to true or strip the control if set to false.
+If query-log-advanced is set the query log will now display a circumflex accent "^" before the ldap control if it has been configured as excluded.
+
+StarTrak No: 21357052 CQ No: PROD00169323
+Addressed a linear performance degradation issue when using the simple paged results control to page through a large result.
+
+StarTrak No: 21349968 CQ No: PROD00169273
+Addressed CA Directory stability issue using the unique attribute values feature (set unique-attrs) in high volume/concurrent environments.
+
+StarTrak No: 21348305 CQ No: PROD00169075
+Expanded filter support for dynamic group membership searches. Prior to this change, the only filter type supported was (member={DN}), this has been expanded to (&(A)(B)(C)(...)(member={DN})).
+
+For example, filters of the form (&(objectClass=groupOfNames)(member={DN}) are now accepted.
+
+The dynamic member found in a dynamic group membership search will now be returned with the search results.
+
+StarTrak No: 21341719 CQ No: PROD00168952
+Corrected an issue where dxserver would consume all available CPU when processing a dynamic group membership lookup that requested an operational attributed to be returned
+
+StarTrak No: 21343836 CQ No: PROD00168995
+Enhanced 'hybrid groups' (groups containing both static and dynamic members) to interoperate with the referential integrity feature
+
+StarTrak No: 21335248 CQ No: PROD00168737
+Addressed an issue when using static roles in conjunction with dynamic groups. Group membership searches no longer produce an assertion failure.
+
+StarTrak No: 21332743 CQ No: PROD00168573
+Addressed assertion failures produced when a modify fails and an updated multi-valued attribute is rolled back.
+
+StarTrak No: 21329181 CQ No: PROD00168741
+Addressed a compatibility issue introduced in r12 SP11 where replication between different versions of directory would fail when using roles.
+
+StarTrak No: 21313604 CQ No: PROD00164462
+When a search request includes a return attribute list the attributes in the search result will now match the names requested.
+
+Addressed issue where return attribute types with the ";binary" option may not be returned as binary.
+
+StarTrak No: 21308899 CQ No: PROD00167960
+Removed superfluous warning messages produced when auto-register attributes are used in a search filter.
+
+StarTrak No: 21307777 CQ No: PROD00168224
+Addressed a views issue when using an attribute of uniqueMember syntax as a substitution item in a phase "subtree". The DN portion of the uniqueMember (syntax = NameAndOptionalUID) is now used.
+
+StarTrak No: 21306119 CQ No: PROD00167369
+UNIX install now supports upgrades via a response file.
+
+StarTrak No: 21293757 CQ No: PROD00166863
+The FD_SETSIZE has been increased back from 1024 to 4096. This means the DSA now supports greater than 4000 connections.
+
+StarTrak No: 21285628 CQ No: PROD00166799
+ldifsort now supports LDIF files that contain multi-line comments
+
+StarTrak No: 21267767 CQ No: PROD00168910
+The 'dsp-idle-time' logic has been modified to:
+* prevent unnecessary failover triggering when both ends of a DSP link timeout
+* simplify configuration
+
+The 'dsp-idle-time' is now only set on outbound connections to child (subordinate) DSAs using the local DSAs idle timer.
+
+StarTrak No: 21267767 CQ No: PROD00165800
+Addressed failover problem when the preferred master (write-precedence) was the last DSA sourced in a group of replicating peer DSAs (same prefix/multi-write). Before this change a router could return a referral error rather than trying the next DSA in write-precedence list.
+
+StarTrak No: 21259902 CQ No: PROD00163409
+CA Directory now supports DISP shadowing where the DISP update is initiated (pulled) by the consumer. This allows satellite DSAs to be configured & controlled independently of the master.
+
+To enable consumer-initiated DISP, replace the line "initiator = <dsa> supplier" with "initiator = <dsa> consumer" in an agreement. 
+
+StarTrak No: 21249481 CQ No: PROD00165329
+CA Directory password policy quality rules applied during an update now support character sets (2-byte UTF-8 characters) containing diacritics and ligatures. These will be a treated as a single character.
+
+For example, a password of "���������" will have the following attributes from a password quality perspective:
+ * password-length = 9
+ * password-uppercase = 4
+ * password-lowercase = 5
+ * password-alpha = 9
+
+CQ No: PROD00164458
+DXmanager now stores the DXmanager Trusted Host by hostname rather than address. This will allow for DXmanager to run on machines with dynamically assigned IP addresses or the changing of static IP addresses.
+
+StarTrak No: 21229209 CQ No: PROD00164257
+Addressed a DXmanager issue where adding a new namespace partition would fail when a null-prefix router was already defined.
+
+StarTrak No: 21226570 CQ No: PROD00164320
+When using dxcertgen with a Java keystore to store the root CA certificate/private key (JAVA_HOME set in environment), the first personality generated after the root CA will start at serial number 1. This ensures that the serial number of the personality is unique to the public root CA certificate written to trusted.pem.
+
+CQ No: PROD00163693
+If query-log-advanced is set the query log will now display an exclamation mark "!" before the ldap control if it is critical.
+
+StarTrak No: 21104876 CQ No: PROD00161945
+A timing issue has been addressed where a DSA may reject a SSL connection attempt when receiving concurrent SSL connections directly after start-up.
+
+CQ No: PROD00161430
+DXmanager numeric configuration items, for example MaxOpSize, now support a value of 0(zero) - unlimited.
+
+StarTrak No: 20119778 CQ No: PROD00160254
+dxdumpdb has been enhanced to dump entries that either include (-y) or exclude (-j) the specified list of object classes.
+
+Note: For the resultant LDIF file to load, ensure object classes of intermediate entries are included.
+
+In Build No. 7065 SP11 GA
+-------------------------
+StarTrak No: 21198837 CQ No: PROD00163408
+The default password storage mechanism has been changed to salted SHA512.
+
+StarTrak No: 21198548 CQ No: PROD00162880
+Addressed an intermittent issue where deleting an entry immediately after modifying the same entry would fail when MW-DISP was enabled on the Windows platform.
+
+This occurs because Windows default time resolution is 15.6 milliseconds making it possible that both actions have the same timestamps preventing a successful MW-DISP conflict resolution.
+To mitigate against this a new Windows specific flag has been introduced:
+    set windows-high-resolution-time = [ true | false ];
+When enabled, this will change the system-wide default time resolution from 15.6 milliseconds to 1 millisecond.
+This will provide better granularity in timestamps (logs/entries) and will reduce the chance of MW-DISP conflict resolution where the same entry is updated at  the same time.
+
+StarTrak No: 21194026 CQ No: PROD00162631
+Addressed an issue where a data DSA search with an SPR control would report 'Unavailable critical control' error when the search was outside the scope of that particular DSA.
+Example:
+    DSA1 � prefix = <o democorp>
+    DSA2 � prefix = <o democorp><ou subtree1>
+    DSA3 � prefix = <o democorp><ou subtree2>
+Now, if a search request with a base-object of <o democorp><ou subtree2> and with the SPR control was sent to DSA1 then it returned an error with 'unavailable critical control' because DSA2 was outside the scope of the search. The search was then aborted instead of chained to DSA3.
+
+StarTrak No: 21172614 CQ No: PROD00161933
+Addressed an issue handling dynamic group membership lookups, where dynamic groups are configured with the ldapURL filter "(objectClass=*)".
+
+StarTrak No: 21158150 CQ No: PROD00161683, PROD00137516
+Dynamic groups and dynamic roles now support membership lookups and membership compares of groups containing static members.
+
+StarTrak No: 21101428-01 CQ No: PROD00159304
+DXcertgen can now generate certificates with keys of length >= 2048 using the following command line option:
+    DXcertgen -k 2048 certs
+
+StarTrak No: 21086703 CQ No: PROD00158801
+Addressed an issue where an incorrect memory value can be displayed in the stats log/tracing.
+
+StarTrak No: 20990924-5 CQ No: PROD00127507
+Addressed an issue where DXdelete generated an unsupported critical LDAP control during it's LDAP search operations.
+
+CQ No: PROD00162276
+Addressed an issue where the setting 'max-pdu-size' would not take effect when the search result was larger than 2GB.
+
+CQ No: PROD00161910
+DXmanager now supports the 'Nexor DSA' type.
+
+CQ No: PROD00161150
+CA Directory is now certified on CentOS 6.3 64-bit.
+
+CQ No: PROD00161064
+Addressed an issue where the Directory Management installer refused to install DXmanager on RHEL if the standard C++ libraries were not installed. See also PROD00157560.
+
+CQ No: PROD00160989
+CA Directory is now certified on Windows Server 2012 64-bit Standard and Core.
+
+CQ No: PROD00159974
+The attribute 'memberOf' is now set to 'no-user-modification' in the shipped schema.
+
+CQ No: PROD00159973
+DXdumpdb now supports a new option -w. This option prevents the LDIF output being wrapped at 72 characters.
+
+CQ No: PROD00159329
+DXloaddb now prevents loading invalid date values. 
+
+CQ No: PROD00159027
+Added the datastore tuning parameter
+    set dxgrid-db-tuning = 0 | 1 | 2;
+    0 - only basic tuning is performed
+    1 - more extensive tuning
+    2 - same as '1' but allocates more time to the process.
+
+CQ No: PROD00158992
+Addressed an intermittent issue where the DSA couldn't read the transaction file when starting. The result was 'Error in initialization files' without any other signs.
+
+CQ No: PROD00158981
+A DXmanager issue has been addressed where charts stop working after the configuration is deployed multiple times.
+
+CQ No: PROD00158797
+DXnewdsa's handling of optional command line arguments has been improved.
+
+CQ No: PROD00158762
+The mandatory schema item memberOf is now configured even if it is not explicitly configured in the schema.
+
+CQ No: PROD00158545
+On Windows, CA Directory now conforms to Microsoft security features as outlined in http://msdn.microsoft.com/en-us/library/bb430720.aspx
+
+CQ No: PROD00158431
+CA Directory now supports large numbers as part of schema OIDs. ie the valid range of an arc is now between 0 .. 2^64. 
+
+CQ No: PROD00158055
+Disabled the DXmanager Backbone 'Enforce FIPS mode' setting since DXmanager, DXadmind and CA Directory, when configured via DXmanager, are not FIPS 140-2 compliant.
+
+CQ No: PROD00157963
+Addressed an issue where upgrading DXmanager and then changing the settings of a running pre-SP10 DSA would cause a halt of the DSA.
+
+CQ No: PROD00157477
+CA Directory is now certified on RHEL 6.3 64-bit.
+
+CQ No: PROD00155391
+When proxying via the proxy authorisation control, access control will be applied only to the proxied identity. Previously, access control was also applied to the proxying identity as well and required a grant from both in order to proceed.
+
+CQ No: PROD00154944
+CA Directory is now certified on SLES 11.2.
+
+CQ No: PROD00154943
+CA Directory is now certified on RHEL 10.4.
+
+CQ No: PROD00153897
+Addressed an issue where DXmanager was not able to edit a configuration after a session timeout.
+
+CQ No: PROD00138368
+Dynamic groups now support compare and membership searches without requiring dynamic roles to be configured.
+Dynamic groups definitions can now be scoped with a configured subtree, for example:
+  set dynamic-group all = {
+    subtree = <c au><o groups>
+    object-class = dxDynamicGroupofNames
+    url-attr = dxMemberURL
+    member-attr = member
+  }; 
+
+CQ No: PROD00108874
+DXmanager now supports the 'allow-upgrading' setting.
+
+CQ No: PROD00162275
+Addressed an issue where negative integers were stored as positive numbers.
+
+CQ No: PROD00125684
+Applied OpenLDAP code patches to DXadmind to address vulnerabilities [CVE-2010-0211] and [CVE-2010-0212].
+
+In Build No. 6892 SP10 CR2
+--------------------------
+StarTrak No: 21182044 CQ No: PROD00162517
+CA Directory DISP recovery now honours the order of attribute values when keep-order-of-values is set for an attribute type.
+
+StarTrak No: 21174539 CQ No: PROD00161976
+Addressed an issue where a DSA may crash if the return result of a query is very big(> 4GB).
+
+StarTrak No: 21150552 CQ No: PROD00161353
+Addressed an issue where the stats log may show wrong entry counts with concurrent multi-chained SSS/SPR search requests.
+
+StarTrak No: 21138578 CQ No: PROD00160646
+Addressed an issue where a DSA could stop processing many concurrent SPR, SSS, SPR+SSS, and VLV requests.
+
+CQ No: PROD00160552, PROD00160248
+JXweb�s handling of binary attributes is now configurable.
+The jxweb.properties file under DXWEBHOME/jxweb includes a new item binary.attributes.
+This contains a comma separated list of attributes (and optional extensions) that JXweb will treat as binary data.
+
+CQ No: PROD00160014
+Addressed an issue where JXweb would not modify values containing a newline <LF> character.
+
+In Build No. 6885 SP10 CR1
+--------------------------
+StarTrak No: 21107076 CQ No: PROD00159454
+CA Directory now returns "unwilling to perform" error when an invalid cookie is presented during a SPR.
+
+StarTrak No: 21105668 CQ No: PROD00159398
+Addressed an issue where a SSS with a secondary sort attribute failed to honour the secondary sort attribute in the search results.
+
+StarTrak No: 21073605 CQ No: PROD00158858
+Added simple-paged-results to the excluded-controls command:
+   set excluded-controls = [tree-delete] [,] [virtual-list-view] [,] [simple-paged-results];
+
+StarTrak No: 21019525 CQ No: PROD00157970, PROD00158757
+Addressed an issue with timestamps where an early update had a timestamp later than a later update when performing a memberOf operation. This can cause a problem for Multiwrite DISP.
+
+CQ No: PROD00159364
+Addressed an issue with LDAP Sort Control returning inconsistent results if the sort attribute was indexed, but the index was not used to collect the results, and there were at least 17,000 entries in the result set.
+
+CQ No: PROD00157560
+DXmanager is no longer dependent on the standard C++ libraries.
+
+In Build No. 6880 SP10
+----------------------
+StarTrak No: 21040343 CQ No: PROD00157547
+Improvements have been made to how CA Directory handles the configuration problem that allows a user to bind and perform an update at an authentication level (min-auth) that isn't included in the knowledge 'auth-levels' of multi-write peer DSAs. This scenario would cause the DSA to produce an assertion failure and crash.
+* The knowledge 'auth-levels' and link upgrading/downgrading are now validated to ensure consistency across CA Directory multi-write peers. An alarm will be produced if an inconsistency is detected.
+* If an update is performed by a user at an authentication level that is not supported by the current DSAs knowledge 'auth-levels', then an alarm is produced and the update isn't replicated.
+To avoid this situation the 'set min-auth/authentication' setting will be deprecated in future releases. This will be derived from the knowledge 'auth-levels'.
+Note: DXmanager controlled DSAs aren't affected.
+
+StarTrak No: 21019525 CQ No: PROD00157515
+When the memberOf feature is enabled, CA Directory no longer produces an assertion failure when removing a member from a group where the member/uniqueMember attribute does not contain the DN value supplied.
+
+StarTrak No: 21017989 CQ No: PROD00156897, PROD00156574
+On Windows CA Directory now ships with the Microsoft Visual Studio C++ 2008 SP1 Redistributable Package. This addresses an issue where the previous version would leave temporary installation files under 'C:\'.
+
+StarTrak No: 21011133 CQ No: PROD00156665
+The following 3rd party components have been updated in CA Directory:
+* libxml2-2.8.0
+* xmlsec1-1.2.18
+* libpcre-8.12
+* zlib-1.2.5
+
+StarTrak No: 20997251 CQ No: PROD00156664
+Addressed an issue where an error was returned when unknown attributes appeared in a server-side sort control. They are now ignored and the sort is performed only on the recognized attributes.
+
+StarTrak No: 20995588 CQ No: PROD00156412
+DXsoak now handles 'begins with' filters like '(cn=bob*)' correctly.
+
+StarTrak No: 20981498 CQ No: PROD00155809
+The maximum size of an expanded view phase filter is now configurable and the default size has been increased to 32KB. The new command is 'set max-view-filter = <Num>;' where <Num> is the maximum size in KB that a view phase filter can expand to, when substituting values from previous phases.
+
+StarTrak No: 20977710 CQ No: PROD00155808
+Addressed an issue where a search using the LDAP virtual-list-view control may crash CA Directory.
+
+StarTrak No: 20957885-1 CQ No: PROD00155104
+Addressed DXsearch issue when displaying values containing unsafe characters (like CR or LF) in conjunction with the -B option. The value displayed is corrupted.
+Note: The resultant LDIF when using the -B DXsearch option breaks RFC-2849 where unsafe characters must be base64 encoded. Therefore, it cannot be used by any DXtools.
+
+StarTrak No: 20954841 CQ No: PROD00154996
+A view issue has been addressed where the invoking search specifies a return attribute list and the last search phase returns an entry that does not contain any attributes. This causes the DSA to halt if the view doesn't specify one of the result collapsing options.
+
+StarTrak No: 20936014 CQ No: PROD00157886
+Addressed an issue where MW-DISP replication did not honour the 'set prune-oc-parents=true;' setting.
+Warning: CA Directory now may reject update operations if they contain auxiliary object classes subclassed from structural object classes or structural object classes subclassed from auxiliary object classes.
+
+StarTrak No: 20931391 CQ No: PROD00154532
+Addressed a rare timing issue that has the potential to cause the DSA to halt during multi-write replication over SSL.
+
+StarTrak No: 20891490 CQ No: PROD00154288
+View phase filters now support multiple attribute types from the search filter used when invoking the view, or the same phase search result.
+
+StarTrak No: 20833965 CQ No: PROD00152699
+CA Directory now issues proper diagnostic messages where the compression key in the datastore is corrupted.
+
+StarTrak No: 20747701;01 CQ No: PROD00154359
+A VLV request is now rejected with unwillingToPerform and a warning if one of the supplied parameters (before, after, offset) is negative.
+
+StarTrak No: 20682727 CQ No: PROD00148745
+Addressed an issue where potentially many userOPTimeOut WARN messages were issued when many clients connected to a router triggering role searches.
+
+StarTrak No: 20549113 CQ No: PROD00155388
+CA Directory is now able to store timestamp values down to the microsecond.
+
+StarTrak No: 20262194-02 CQ No: PROD00155274
+Reduced the number of startup warnings by downgrading cache index warning messages to the 'oper' trace level. 
+
+StarTrak No: 19708396 CQ No: PROD00155271
+DXsyntax will now produce an error if a non-existent DSA is passed to it as an argument.
+
+CQ No: PROD00160872
+Addressed an issue with the handling of referrals encountered during multi-chained searches containing the simple paged results LDAP control.
+
+CQ No: PROD00158620
+The new command 'set update-log-show-all-values = true;' will cause all values in an add or modify request to be written to the update log if it is enabled. Practically, the difference between this setting and the 'update-log-show-values' setting is that the password and certificate values will be written to the update log, and that all values written to the update log are base-64 encoded. This is designed for downstream processing and customers may prefer to stay with the 'update-log-show-values' setting. 
+
+CQ No: PROD00158190
+Addressed a CA Directory Denial of Service attack issue.
+
+CQ No: PROD00158188
+Addressed several JXweb vulnerability issues.
+
+CQ No: PROD00158057
+Addressed an intermittent DXmanager upgrade problem where existing configuration models would disappear. 
+
+CQ No: PROD00157918
+The performance impact when a value is added of an attribute that hasn't been used before has been reduced.
+
+CQ No: PROD00157187
+Addressed an issue where an add operation may have used new space in the datastore rather than reusing deleted space immediately.
+
+CQ No: PROD00156998
+The schema file 'components.dxc' is no longer shipped as it relies on server-side support not present in DXgrid.
+
+CQ No: PROD00156806
+CA Directory is now certified on Ubuntu12.04 64-bit for the DXgrid package.
+
+CQ No: PROD00155924
+Added 'admin-protected-items' to protect items from admin-users:
+'set admin-protected-items = { <users> <target> ... };'
+This is similar to 'set protected-items = { [users] <target> ... };' but it protects items with a precedence greater than that of admin users. This command can therefore be used to protect items from admin-users. It does not protect items from super-users.
+
+CQ No: PROD00155903
+CA Directory now supports alias of an alias.
+
+CQ No: PROD00155839
+Addressed an issue where a search filter containing an AND of a  greater-or-equal filter item with a less-or-equal filter item yielded a wrong result.
+For example the filter '(&(!(cn<=b*))(!(cn>=d*)))' works now as expected. 
+
+CQ No: PROD00155754, PROD00158510
+CA Directory now ships with CAPKI 4.2.9 on all platforms except Solaris x86 where it ships with CAPKI 4.2.8.
+
+CQ No: PROD00155713
+CA Directory now allows importing NTLM or LM hashes from Active Directory.
+
+CQ No: PROD00155389
+CA Directory now stores passwords in the history with the same hash as the original password rather than using SHA1 for all passwords in the history.
+
+CQ No: PROD00155283
+CA Directory now returns the correct error message (Attribute Or Value Exists) when processing a modify request that adds an object class that already exists in the entry.
+
+CQ No: PROD00155205
+When using the 'tcp' address prefix, the DSA now collects all the matching IPv6 addresses followed by all the matching IPv4 addresses. This now allows clients to connect with a matching IPv4 address without having to modify the knowledge file.   
+
+CQ No: PROD00155101
+Added a workaround so that RSA's ClearTrust product is able to interoperate with CA Directory.
+
+CQ No: PROD00154710
+Addressed an issue where a data DSA returned loop detected when the base of a search was the prefix of a superior router DSA and a server-side-sort control was present in the search.
+
+CQ No: PROD00154629
+CA Directory supports now multiple password policies per DSA.
+
+CQ No: PROD00154286
+Entries can now be renamed from one horizontal partition to another provided the number of entries subordinate to the target entry is less than the rename threshold established with
+    set rename-threshold = <num>;
+The default rename-threshold is 10.
+
+CQ No: PROD00154285
+Views error handling has been improved when an error is encountered while processing a one-to-many relationship between objects. Assertion failures will no longer be produced.
+Have improved handling of a view search phases (excluding the first phase) that return noSuchObject. The view will continue processing, treating these results as empty search results, unless the phase includes "options = result-required".
+
+CQ No: PROD00154264
+CA Directory is now certified on Solaris 11 x86.
+
+CQ No: PROD00154263
+CA Directory is now certified on CentOS 6.2 64-bit.
+
+CQ No: PROD00152817
+CA Directory now returns the correct error message when chaining is prevented by access controls.
+
+CQ No: PROD00151064
+CA Directory is now certified on CentOS 6.1 64-bit.
+
+CQ No: PROD00151063
+CA Directory is now certified on RHEL 6.2.
+
+CQ No: PROD00140307
+The handling of aliases with password policy has been corrected. This may affect the way customers have been using aliases with password policy via the dereference-alias-on-bind feature.
+All password policy operations now take place on the real entry and not on the alias as before. The change was necessary because it was previously not possible to change the password through the alias entry as the password would be changed on the alias. This would then prevent binding to the alias as authentication would be performed against the old password in the real entry.
+
+CQ No: PROD00128294
+The version output from CA Directory and associated components now includes the service pack number.
+
+In Build No. 6671 SP9 CR1
+-------------------------
+StarTrak No: 20925675 CQ No: PROD00154319, PROD00153550
+CA Directory is now certified on RHEL 5.8.
+
+StarTrak No: 20900980 CQ No: PROD00154091
+It is now possible to disable individual LDAP controls.  The following command will prevent controls from being recognised:
+   set excluded-controls = [tree-delete] [,] [virtual-list-view];
+
+In Build No. 6667 SP9
+---------------------
+StarTrak No: 20854912 CQ No: PROD00152652
+Addressed an issue where binding with an invalid certificate may cause established SSL connections to be closed.
+
+StarTrak No: 20815622 CQ No: PROD00151991
+Addressed an assertion related to multiwrite DISP with multiwrite groups.
+
+StarTrak No: 20801856 CQ No: PROD00151649
+Addressed an issue when using PAM-LDAP authentication in conjunction with dynamic groups, where a compare request returned a positive response even though the member supplied in the request was not a dynamic member.
+
+StarTrak No: 20801394 CQ No: PROD00151515
+DXnewdsa now processes special characters in the prefix value correctly. 
+
+StarTrak No: 20791964-01 CQ No: PROD00151250
+The Netscape password-expired control is no longer set on bind refusals. This is to enable better interoperability with third-party clients.
+
+StarTrak No: 20788718 CQ No: PROD00151220
+A CA Directory upgrade no longer overwrites the trusted.pem in DXHOME/config/ssld. Any DXcertgen generated or imported certificate authority certificates will be preserved.
+
+StarTrak No: 20775329, 20728366 CQ No: PROD00150902, PROD00149845
+Addressed an issue where MW-DISP didn't work with SSL.
+
+StarTrak No: 20774688 CQ No: PROD00151738
+Addressed an issue where intermittently a log-file didn't roll-over at midnight.
+
+StarTrak No: 20767761-2 CQ No: PROD00151488
+CA Directory now allows extending the schema by adding items to the may-contain list without restarting the DSA.
+
+StarTrak No: 20758521 CQ No: PROD00150963
+DXdumpdb -z no longer performs a hostname lookup, which prevents unexpected "unknown host" syntax errors.
+
+StarTrak No: 20747240 CQ No: PROD00150279
+Addressed an issue where it was not possible to reference attributes in a view definition containing a hyphen character.
+
+StarTrak No: 20659087 CQ No: PROD00148267, PROD00148269
+DXmanager has been upgraded for the first time since SP2. As a result, DXmanager now supports most DXserver settings. For accessing DXmanager itself, a broader range of special characters is now acceptable in DXmanager passwords.
+
+StarTrak No: 20584327 CQ No: PROD00148105
+Addressed an issue with multiple unique attributes defined with different scopes.
+
+StarTrak No: 20530015 CQ No: PROD00145242
+Addressed an issue where DXsoak wasn't able to bind using simple authentication and a queue size bigger than 1.
+
+StarTrak No: 17531355 CQ No: PROD00108640
+Improved MW peer availability monitoring.
+
+CQ No: PROD00143498
+The setuid mode for the dxserver and dxadmind binaries is now optional and may be set during an install/upgrade if required to access ports below 1024.
+
+CQ No: PROD00149626
+Addressed an issue where DXsetup didn't refresh the system environment when connected via Remote Desktop on Windows. 
+
+CQ No: PROD00149681
+Added "event timing" when un-indexing attributes. If the time taken is more than a millisecond, the actual time taken is reported as an "event" report if event tracing has been enabled. Also, "get cache;" will show more information for indexes. In addition to the number of values indexed, it also shows the number of distinct values and the number of times the index was used to evaluate a search.
+
+CQ No: PROD00149933
+Addressed an issue where interrupted searches no longer worked.
+
+CQ No: PROD00150427
+The default max-op-size for DXgrid is now 10000.
+
+CQ No: PROD00150928
+Addressed an issue on UNIX where "dxserver <command> <dsaname>" didn't report a non-existing DSA.  
+
+CQ No: PROD00151065
+CA Directory is now certified on Solaris SPARC 11.
+
+CQ No: PROD00151636
+CA Directory now supports the LDAP Tree Delete Control.
+
+CQ No: PROD00152136
+Addressed an issue where a Server-side-sort with limited result size where the sort attribute was not indexed returned inconsistent results.
+
+In Build No. 6501 SP8 CR3
+-------------------------
+StarTrak No: 20890033 CQ No: PROD00154116
+Addressed an issue where CA Directory rejected searches where the requested attributes specified ;binary or ;lang-en options.
+
+StarTrak No: 20874830 CQ No: PROD00153485
+Addressed an issue when processing a search containing the simple paged results LDAP control. Only a single page of results was being returned when searching a DSA containing both data, and a subordinate DSA, occupying the same level of the directory information tree.
+
+StarTrak No: 20861959 CQ No: PROD00153009
+Addressed an issue where a running MW-DISP DSA did not accept a MW-DISP synchronization attempt from a peer DSA that has been stopped and started.
+
+StarTrak No: 20832069, 20851213 CQ No: PROD00152409, PROD00153162
+Addressed an issue where a DSA handling a view request may crash if a "phase 1" search involves multiple DSAs (multi-chained).
+
+StarTrak No: 20662396, 20903417 CQ No: PROD00154329, PROD00154026
+CA Directory now supports SLES 10.3.
+
+In Build No. 6498 SP8 CR2
+-------------------------
+StarTrak No: 20764827 CQ No: PROD00150871
+The content of the Netscape password-expired control has been reformatted to contain the time-to-expiration, even where this value is 0. This is to enable better interoperability.
+
+StarTrak No: 20742973 CQ No: PROD00150182
+Addressed an issue where a mod-rdn operation which attempted to make the objectClass a naming attribute would corrupt the datastore.
+
+StarTrak No: 20737653 CQ No: PROD00150172
+Addressed an issue where a paged results search via a router returned no results when a page size > 32k is specified.
+
+StarTrak No: 20685448 CQ No: PROD00148766
+Addressed an issue where a distributed search with SSS control erroneously returned "unwillingToPerform" when access control prevented access to protected items.
+
+StarTrak No: 20660228, 20679637 CQ No: PROD00148129, PROD00148639
+Addressed an issue where the DSA could produce a corrupted online backup zdb file.
+
+CQ No: PROD00150297
+Addressed an issue where a search using the VLV control would return inconsistent page results when the attribute referenced in the filter has multiple values for some of the matching entries.
+
+CQ No: PROD00150253
+Addressed an issue where a search using the VLV control did not have the max-op-size administrative limit enforced.
+
+CQ No: PROD00149719
+Addressed an issue where salted SHA512 passwords could be truncated and/or rehashed.
+
+CQ No: PROD00149674
+Addressed an issue where a search using the VLV control with a large page size and with the sort attribute not indexed would cause the DSA to crash.
+
+In Build No. 6491 SP8 CR1
+-------------------------
+StarTrak No: 20662396, 20599460 CQ No: PROD00148263, PROD00148481
+Addressed a stability issue affecting multiple searches running in parallel returning more than 1000 entries.
+
+StarTrak No: 20592168 CQ No: PROD00147988
+Addressed a "query-log-advanced" issue where a large number of attributes specified in the search EIS would cause a buffer overrun if it contained more than 4096 characters.
+
+In Build No. 6484 SP8
+---------------------
+StarTrak No: 20641263 CQ No: PROD00147733
+DXloaddb now supports an LDIF file where the last line doesn't include a line-feed character.
+
+StarTrak No: 20633887 CQ No: PROD00147483
+Addressed an issue with DXmodify when using the -s option.
+
+StarTrak No: 20593798 CQ No: PROD00146432
+Addressed an issue where a search using the simple paged results control would return an incorrect result if the search subtree that covered a data DSA that had a subordinate DSA.
+
+StarTrak No: 20554839 CQ No: PROD00145593
+Addressed an issue where an add/update request containing a zero length userPassword value would not be replicated via multi-write to a peer DSA.
+
+StarTrak No: 20554717 CQ No: PROD00146699
+Addressed a DXlink failover issue.
+
+StarTrak No: 20553134 CQ No: PROD00147595
+Added new setting to allow selecting the TCP buffer sizes:
+   set tcp-buff-size = <txSize>, <rxSize>
+where sizes are in Bytes.
+
+These values affect the send/receive buffer sizes as passed to the socket() system call.
+Setting the values both to 0 allows the OS to automatically scale the buffers up to the OS imposed maximum. This would be the recommended setting and is the default in SP8.
+
+StarTrak No: 20525817 CQ No: PROD00144687
+Addressed issue where crypto related error messages are produced during a UNIX upgrade when DSAs have been configured via DXmanager.
+
+StarTrak No: 20504741 CQ No: PROD00144043
+The Entrust schema shipped with CA Directory has been adjusted to conform with their schema as defined by the following document:
+http://download.entrust.com/resources/download.cfm/21121/.
+Specifically a number of entrust object classes are now defined as auxiliary object classes.
+
+StarTrak No: 20477261 CQ No: PROD00143749
+Addressed an issue where a router DSA would halt when handling a one-level search request returning dxTotalEntryCount,
+where the scope of the search includes a subordinate DSA where the prefix entry has not been populated.
+
+StarTrak No: 20436799 CQ No: PROD00142678
+Addressed a Windows issue where it was not possible to install CA Directory where the registry did not contain the string "Path" under HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment.
+
+StarTrak No: 20420119 CQ No: PROD00142682
+Addressed an issue on UNIX where a "dxserver start" command issued while a DSA is starting would orphan the process.
+This meant that the running process would display as stopped when issuing a "dxserver status", and therefore, the process could not be stopped by normal means and attempts to start the process would always fail.
+
+StarTrak No: 20270505 CQ No: PROD00144402
+CA Directory now supports Virtual List Views (VLV). For more information see the Release Summary.
+
+StarTrak No: 20263749 CQ No: PROD00137632
+Addressed a DXloaddb issue where it failed to load two distinct entries where the RDN is different only by case and the syntax of that RDN uses a case sensitive matching rule. 
+
+StarTrak No: 20253863 CQ No: PROD00138864
+Addressed an issue where invalid telephone numbers caused DISP to fail.
+
+StarTrak No: 19837074-02 CQ No: PROD00141662
+Horizontal partitioning now supports a wildcard '*' as an attribute type in the horizontal partitioning definition. This will partition all objects in the scope of the horizontally partitioned set of DSAs.
+For example, the set with prefix
+
+prefix       = <c AU><o Users><* "[hash1(4)=0]">
+prefix       = <c AU><o Users><* "[hash1(4)=1]">
+prefix       = <c AU><o Users><* "[hash1(4)=2]">
+prefix       = <c AU><o Users><* "[hash1(4)=3]">
+
+Will partition objects named by commonName, uid, etc...
+
+<c AU><o Users><cn "Craig LINK">
+<c AU><o Users><uid 456788>
+
+StarTrak No: 19824733-2 CQ No: PROD00135836
+Addresses an issue where the webserver reported "Null pointer exception". 
+
+StarTrak No: 19516003 CQ No: PROD00121903
+DXloaddb is now able to directly load LDIF files created by DXsearch.
+
+StarTrak No: 17705080 CQ No: PROD00108694
+Various Dxloaddb/DXdumpdb error message improvements have been made.
+
+CQ No: PROD00147152
+Addressed an issue where a DSA asserts and returns "unwilling to perform" when the page size is larger than 100 when performing a search with the SPR+SSS controls set.
+
+CQ No: PROD00145219
+Addressed AIX install issue where a superfluous error message is produced during the reboot script update phase when the file "/etc/rc.shutdown" is not present.
+
+CQ No: PROD00145016
+When using MW_DISP with MW groups, the synchronisation process has been refined so that we don't get every DSA updating every other DSA.
+Local DSAs only synchronise with the local group, hub DSAs synchronise with the local group and the hubs of other groups.
+
+CQ No: PROD00144520
+Addressed an issue where Server Side Sort (SSS) with limited result size returned an inconsistent result.
+
+CQ No: PROD00144257
+CA Directory now ships with the latest CA OpenSSL which addresses known vulnerabilities. These new libraries require glibc 2.5 or greater.
+
+CQ No: PROD00143589
+CA Directory is now certified on CentOS 6.0.
+
+CQ No: PROD00143588
+CA Directory is now certified on RHEL 5.7.
+
+CQ No: PROD00132515
+Addressed query and summary log issue where operation errors received over DXlink are incorrectly logged.
+
+CQ No: PROD00120021
+DXmodify, DXsearch, DXdelete and DXrename now support the -Z (TLS) option out of the box (requires SSL enabled DSAs).
+
+In Build No. 6279 SP7 CR1
+-------------------------
+StarTrak No: 20539881 CQ No: PROD00144844
+Addressed an issue where an LDAP client could cause a data DSA to crash when performing single level searches.
+
+StarTrak No: 20516425 CQ No: PROD00144473
+Improved the load-sharing algorithm to address the case where update collisions could occur during replication.
+This issue is related to low time resolution and may be more pronounced in particular operating systems and/or running in virtualized environments.
+The issue occurred when multiple update operations for the same entry appeared to be processed in the same millisecond.
+
+StarTrak No: 20509885 CQ No: PROD00144210
+Addressed an issue where a specially crafted SNMP packet could cause a buffer overflow and a termination of the DSA service.
+
+In Build No. 6275 SP7
+---------------------
+StarTrak No: 20388993 CQ No: PROD00141388
+DXloaddb is now tolerant of old-style configuration.
+This will allow the migration of DSA data during an upgrade from r8.1, where the old configuration contains commands that are no longer supported by the DSA. Note: Under these circumstances the DSAs will not start until the configuration is manually adjusted.
+
+StarTrak No: 20382122 CQ No: PROD00141537
+Addressed an issue where an LDAP SSL/TLS bind returned -1 instead of INVALIDCREDENTIALS(49).  
+
+StarTrak No: 20380251 CQ No: PROD00142257
+'multi-write-dsp-idle-time' is now set correctly either side of a DSP link between multi-write peers.
+
+StarTrak No: 20378801 CQ No: PROD00141818
+Addressed an issue where max-op-time wasn�t always honored when there was disk swapping.
+
+StarTrak No: 20369812 CQ No: PROD00140706
+Addressed an issue where a Windows 8.1 DXserver only upgrade failed during the restoration phase.
+
+StarTrak No: 20334289, 20027429 CQ No: PROD00139597, PROD00140344
+Searches containing the simple paged results LDAP control distributed over multiple DSAs no longer crash if the search is abandoned while being serviced by a remote DSA.
+
+StarTrak No: 20332847, 20352724 CQ No: PROD00140300
+The password-min-length-repeated-substring setting will now only be active if the password-max-substring-repetition flag is set.
+The 'get assoc' command no longer displays the password-min-length-repeated-substring value if the password-max-substring-repetition flag is set to 0 or is not set.
+
+StarTrak No: 20326202 CQ No: PROD00139209
+On UNIX, the CA Directory specific profile is no longer included multiple times when multiple upgrades are performed.
+
+StarTrak No: 20321493 CQ No: PROD00139207
+Addressed an issue where the NilCredit counter was artificially inflated when performing a dynamic group or a distributed simple paged result search.
+
+StarTrak No: 20299924 CQ No: PROD00138307
+Addressed an issue with the dxpassword CADIR option, where passwords containing certain text would result in an invalid password.
+
+StarTrak No: 20248075 CQ No: PROD00137523
+Addressed an issue where the max-op-time setting wasn't enforced when running a complex query.
+
+StarTrak No: 20236438 CQ No: PROD00137050
+It is not possible anymore to have a space at the end of an attribute name.
+
+StarTrak No: 20213191 CQ No: PROD00136870
+An issue has been addressed where dxadmind was stopped when disconnecting a Remote Desktop Connection via the Start-> Log Off button.
+
+StarTrak No: 20189918 CQ No: PROD00135986
+DXdumpdb now escapes quotes in the RDN properly.
+
+StarTrak No: 20159467 CQ No: PROD00135741
+DXcertgen now validates the DSA name DN (certificate subject) to ensure the country RDN value is exactly two characters in length (as per X.520).
+
+StarTrak No: 20157078 CQ No: PROD00135240
+DXadmind is now able to handle log files bigger than 2GB on all platforms except Windows and HP-UX PA RISC.
+
+StarTrak No: 20153610 CQ No: PROD00135428
+An issue with log file rollover after transitioning from/to Daylight Saving Time has been addressed by calculating the time offset every day rather than during start up only.
+
+StarTrak No: 20141033 CQ No: PROD00136184
+Dynamic groups now support a compare request of the dynamically populated member/uniqueMember attribute.
+Correct results are now returned when an equality search of member/uniqueMember attribute is subordinate to the dynamic group role subtree.
+
+StarTrak No: 20133799 CQ No: PROD00135048
+ldifdelta no longer creates superfluous add and remove attribute records when comparing two entries with a removed attribute.
+
+StarTrak No: 20049937 CQ No: PROD00139329
+CA Directory has been enhanced to listen on all returned DNS addresses. This ensures correct fail-over even if some of the returned addresses are not valid.
+
+CA Directory queries the DNS for a particular logical address (hostname). If more than one physical address is returned, all are retained.
+In case the first address is not valid, the DSA will failover to the second, etc. Previously, only the first address would be accepted.
+
+Note that the returned addresses are still screened according to preference. That is, if IPv4 is preferred, only IPv4 addresses will be accepted;
+if IPv6 is preferred, only IPv6 addresses will be accepted; if no preference is stated, we will accept all the IPv6 addresses followed by all the IPv4 addresses.
+Preference is expressed by using the prefixes tcp, ip, rfc1006, ipv6, ipv4. All except for ipv4 and ipv6 prefer IPv6 followed by IPv4.
+Ipv6 specifies only IPv6 addresses and ipv4 specifies only IPv4 addresses.
+
+StarTrak No: 20027429 CQ No: PROD00138195
+A search containing the simple paged result LDAP control involving multiple DSAs will now continue even if some DSAs in the scope of the search cannot be contacted. 
+The response will be a search confirm containing a continuation reference (if a DSA cannot be contacted when processing the current page), rather than a search refuse containing a referral.
+
+StarTrak No: 19926610-02 CQ No: PROD00139328
+userPasswords are now replicated as hashed  passwords rather than in cleartext assuring that the stored values of master and replica are exactly the same even when using salted hashes.
+
+StarTrak No: 19663325-02 CQ No: PROD00138872
+An ALARM has been added to the alarm log at startup reporting on data store size, used bytes, and reclaimable bytes. 
+
+StarTrak No: 15093092 CQ No: PROD00105333
+It is now possible to configure the query log to display information about 
+ldap-controls, ssl, source of request, ldap-error information, update-timer, and eis information.
+For more information see the manual ('set query-log-advanced' command).
+
+CQ No: PROD00141033
+DXserver now correctly handles terms containing multiple wildcards in search filters, such as '(&(uid=a*a*)(uid=*b*))'.
+
+CQ No: PROD00140607
+CA Directory is now certified on Windows 7 SP1 64-bit.
+
+CQ No: PROD00140605
+CA Directory is now certified on Windows 2008 R2 SP1 64-bit.
+
+CQ No: PROD00140604
+CA Directory is now certified on RHEL 6.1 64-bit.
+
+CQ No: PROD00140543
+Server Side Sorting (RFC 2891) has been enhanced to work via Router DSAs.
+
+CQ No: PROD00140504
+Addressed an issue where an incorrect value for dxTotalEntryCount was returned when performing a distributed search to a number of subordinate DSAs.
+
+CQ No: PROD00139117
+dxpassword no longer adds a newline to the value when re-directed to a file allowing it to be used directly by the LDAP tools without having to remove a newline character at the end of the file first.
+
+CQ No: PROD00137992
+EIS and attribute type only support has been improved on searches that check membership of a dynamic group allowing Siteminder dynamic group membership lookups.
+
+CQ No: PROD00137936
+Addressed an issue where updates were lost if MW queues were purged (100% full) while a MW-DISP operation was in progress.
+
+CQ No: PROD00137086
+The root DSE now shows the 'supportedSASLMechanism'.
+
+CQ No: PROD00136787
+DXrename will no longer truncate the last character of the new RDN value when the last line of the supplied LDIF doesn't contain a newline.
+
+CQ No: PROD00136709
+Improved the DISP / MW-DISP logging to assist troubleshooting of replication problems.
+
+CQ No: PROD00136650
+Size limits for Simple Paged Results LDAP control searches are now applied to the page rather than to the complete result set. 
+
+CQ No: PROD00136469
+The UNIX install will default to the 64-bit CA Directory when both 32-bit and 64-bit versions are available in the install package.
+
+CQ No: PROD00136186
+CA Directory on AIX 64-bit now supports the creation of data stores larger than 2GB.  
+
+CQ No: PROD00135450
+Clear schema is now deprecated.
+Note, new schema can be added at any time with an 'init' command. Changing schema (but not syntaxes), for example, changing ldapnames, will require a restart of the server. 
+Changing the syntax of attribute types in general will require a dump and reload, as it did before.
+
+CQ No: PROD00135448
+Added a new flag 'set interrupt-searches = true;' which allows searches to be abandoned and prevents long searches blocking updates.
+The interrupt-searches flag must be used in conjunction with the 'set dxgrid-queue = true;' flag.
+See the documentation for more information.
+
+CQ No: PROD00132501
+CA Directory now embeds CA OpenSSL 0.9.8.3-9.
+
+CQ No: PROD00131207
+CA Directory is now certified on RHEL 6.0 64-bit.
+
+In Build No. 6058 SP6
+---------------------
+StarTrak No: 20210988 CQ No: PROD00136323
+CA Directory is now certified on RHEL 5.6 32/64-bit.
+
+StarTrak No: 20136710 CQ No: PROD00134811
+DSAs are now stopped synchronously during a server shutdown preventing possible data corruption.
+
+StarTrak No: 20088591, 19902527 CQ No: PROD00133687, PROD00133478
+Addressed an issue where a log-file roll-over at midnight intermittently stopped the corresponding DSA.
+
+StarTrak No: 20087609 CQ No: PROD00133594
+CA Directory now supports Salted SHA-512 hashing of the 'userPassword' attribute.
+This is controlled by the 'set password-storage = <hashMethod>' command, where <hashMethod> can be
+'sha-1', 'sha-512', 'md5', 'crypt', 'ssha-1', 'smd5' and 'ssha-512'.
+
+StarTrak No: 20067442 CQ No: PROD00133544
+Addressed an issue where some of the DISP agreements were not honored.
+
+StarTrak No: 20061559 CQ No: PROD00133218
+All unused SNMP counters are now correctly initialized to zero.
+
+StarTrak No: 20035164 CQ No: PROD00132958
+As with r8.1 the "set dxconsole-users" command again supports role DNs as well as user DNs.
+
+StarTrak No: 20032786-01 CQ No: PROD00132239
+Addressed an issue with the memberOf auto-population feature, where a bulk group update would get stuck
+if adding a memberOf attribute to an entry where it already exists (compromised data integrity)
+with multi-write enabled and the DXgrid operation queue isn't enabled.
+
+StarTrak No: 20014267-1 CQ No: PROD00133996, PROD00133815
+Addressed an issue where a mod-rdn operation caused duplicate entries. 
+
+StarTrak No: 20011351 CQ No: PROD00132142
+The warning message "Attempt to add a structural object class" will now be suppressed when using
+'set enable-nonstandard-behaviour = true;' to bypass structural object class restrictions.
+
+StarTrak No: 20010348 CQ No: PROD00131801
+The warning message "Too many structural object classes" will now be suppressed when using
+'set enable-nonstandard-behaviour = true;' to bypass structural object class restrictions.
+
+StarTrak No: 19996317-01 CQ No: PROD00131611
+Following assertion messages:
+Assertion failed (/net/potaroo/release/HEAD.new/src/dsa/mgmt/dumpIdu.c122) &&
+Assertion failed (/net/potaroo/release/HEAD.new/src/dsa/user/dispQueue.c235)
+
+are not issued anymore during MW-DISP updates.
+
+StarTrak No: 19981413 CQ No: PROD00131308
+Performance of DXdumpdb when using STDOUT is now the same again as in SP3.
+
+StarTrak No: 19975163-01 CQ No: PROD00130822
+Addressed an issue where a data DSA didn't honor "max-op-time".
+
+StarTrak No: 19966322 CQ No: PROD00132223
+Addressed an issue where upgrading from a CA Directory with an Ingres backend to a DXgrid backend on Windows (32-bit)
+took a very long time in the migration phase.
+
+StarTrak No: 19929453 CQ No: PROD00131437
+CA Directory no longer produces memory related assertion failures when processing disconnected LDAP connections
+where the credit limit for the connection has been exceeded.
+
+StarTrak No: 19582866 CQ No: PROD00121846, PROD00132974
+Addressed an issue where DXdumpdb would report "No DN attributes found for this entry" when the datastore was consistent.
+
+CQ No: PROD00134992
+Addressed an issue where DXlink crashed in non-FIPS mode.
+
+CQ No: PROD00132889
+Improved memory usage for DISP updates.
+
+CQ No: PROD00131733
+Addressed an issue with views when a phase subtree would expand to multiple subtrees, after substitution,
+where the scope of the subtrees were local to the DSA handling the view request.
+
+CQ No: PROD00131459
+Reinstated DXcertgen support for -D {dsaName} option, where {dsaName} is a DSA running on another machine that the DSAs on current machine have knowledge of.
+
+CQ No: PROD00131208
+CA Directory is now certified on HP-UX 11v3 IA-64.
+
+CQ No: PROD00131206
+CA Directory is now certified on IBM AIX 7.1 64-bit.
+
+CQ No: PROD00131147
+When CA Directory fails to start when it cannot listen on the configured SNMP port,
+it will now include operating system diagnostic information in the log files.
+
+CQ No: PROD00130561
+Improved performance of small modifies on Windows near to the level of SP4.
+
+CQ No: PROD00119297
+CA Directory will no longer listen on the IPv6 loopback address on Windows platforms >= 2008.
+This is returned by Windows during hostname resolution even when IPv6 isn't enabled.
+If it is required that the DSA listens on the IPv6 loopback address then "::1" needs to be explicitly specified in the address list.
+
+In Build No. 4574 SP5
+---------------------
+StarTrak No: 19885266-01 CQ No: PROD00129014
+DSA now handles the situation where a group update triggers many memberOf entry updates and the group update times out.
+The memberOf updates are now rolled back prior to returning an adminLimitExceeded exception to the client.
+
+StarTrak No: 19881884-01 CQ No: PROD00128916
+Addressed an issue where an unnecessary warning was issued when an LDAP application closed an SSL connection.
+
+StarTrak No: 19874411-01 CQ No: PROD00129156
+Addressed an issue where generating a failure message in OpenSSL caused the router DSA to stop.
+
+StarTrak No: 19863657-02 CQ No: PROD00128569
+Addressed an issue where a search against an attribute which has been reverse indexed caused the DSA to stop.
+
+StarTrak No: 19863657 CQ No: PROD00128367
+Addressed an assertion failure in ldapmain.c
+
+StarTrak No: 19846151 CQ No: PROD00128009
+Addressed an issue in DXdumpdb where it would fail to find the ObjectClass table in some circumstances when running Windows.
+
+StarTrak No: 19778792-01 CQ No: PROD00126648
+Corrected a threading issue that could occur when a MW connection was freed.
+
+StarTrak No: 19778233-01 CQ No: PROD00128361
+DSAs will no longer set the trace level to none when no tracing has been configured via DXmanager.
+
+StarTrak No: 19771493 CQ No: PROD00126463
+Addressed an issue where a userPassword had multiple values during replication.
+
+StarTrak No: 19768134 CQ No: PROD00126462
+DXloaddb will now reject entries with multiple passwords unless the enable-nonstandard-behaviour flag is set.
+
+StarTrak No: 19767677 CQ No: PROD00126465
+The rollover dates of log files are now correctly switched at midnight local time rather than 0:00 GMT.
+
+StarTrak No: 19758684 CQ No: PROD00126276
+Corrected a threading issue that could occur when a connection was freed.
+
+StarTrak No: 19752308-01 CQ No: PROD00127519
+Addressed an installation issue on Windows 2003 SP2 and Windows 2008 where the maximum PATH environment variable length was calculated incorrectly.
+
+StarTrak No: 19725495 CQ No: PROD00125115
+Addressed an issue where DXsyntax omitted detailed diagnostic information.
+
+StarTrak No: 19709671-01 CQ No: PROD00125369
+DXtools now processes entries dumped from Active Directory correctly.
+
+StarTrak No: 19690056 CQ No: PROD00124446
+The DSA will no longer halt during a view search when the filter is set to 'from-client' in the first phase and the view entry is searched without a filter being specified.
+
+StarTrak No: 19681938-01 CQ No: PROD00124542
+Addressed an issue where a router could hang because of a bug in the schema parsing code.
+
+StarTrak No: 19673405-01 CQ No: PROD00124062
+Addressed an issue where DXloaddb incorrectly allowed adding whitespace only entries for Telephone Number and Facsimile Telephone Number syntaxes causing MW-DISP problems. 
+
+StarTrak No: 19665898 CQ No: PROD00123861
+dxCacheSize is now returned correctly via SNMP.
+
+StarTrak No: 19663325-03 CQ No: PROD00127422
+It is now possible to track data store usage via following SNMP counters:
+- dxCacheEntries
+- dxCacheFilesize
+- dxCacheUsedBytes
+- dxCacheReclaimable
+
+StarTrak No: 19641908 CQ No: PROD00123194
+Addressed assertion commslib.c(839) issued during DSA shutdown.
+
+StarTrak No: 19635169-02 CQ No: PROD00125681
+The view eis option now lets you add a prefix or suffix to search results. 
+For example, for the current phase to return the value of description with a AD. prefix use:
+    eis = "AD.[$description]"
+
+StarTrak No: 19630393 CQ No: PROD00122975
+CA Directory does not return an empty user data string on an unbind anymore. This makes it compatible with the Siemens Directory.
+
+StarTrak No: 19628523-01 CQ No: PROD00123133
+An issue has been addressed when using the memberOf population feature and following our recommendation to set the memberOf attribute as 'no-user-modification' in the schema
+(to maintain referential integrity).
+
+StarTrak No: 19596860-02, 19585212-01 CQ No: PROD00123435, PROD00121720
+CA Directory now supports SHA-2 for hashing operations, as per US NIST FIPS 180-3 (Oct 2008) Secure Hash Standard (SHS) requirements
+ - http://csrc.nist.gov/publications/PubsFIPS.html.
+
+StarTrak No: 19575666-01 CQ No: PROD00122976
+Replication now works as expected if attributes contain spaces.
+
+StarTrak No: 19519891-02 CQ No: PROD00127628
+Improved performance for modifies of entries which contain a large number of entries (i.e. groups).
+
+StarTrak No: 19424321-01 CQ No: PROD00118921
+Addressed an issue when requesting dxEntryCount be returned by a simple page search.
+
+StarTrak No: 19416404-01 CQ No: PROD00117827
+Addressed an issue where an incorrect "old-style item '<name>' defined, can only be set by XML configuration (DXmanager)" syntax error was issued.
+
+StarTrak No: 19401931-01 CQ No: PROD00124583
+The 'pozLocation' attribute in iTechPoz.dxc schema is now of type CaseIgnoreString to allow for searches to be case insensitive.
+
+StarTrak No: 19381102 CQ No: PROD00119953
+Addressed a memory issue which may have caused a fatal error.
+
+StarTrak No: 19274236-02 CQ No: PROD00118258
+Addressed an assertion error in commslib.c(2589).
+
+StarTrak No: 15609236/2 CQ No: PROD00107537
+It is now possible to prevent adding an entry which has more than one unrelated structural object classes as specified in Section 8.3.2 of X.501 and Section 2.4.2 of RFC4512.
+To enforce this add "set check-structural-oc = true;" to your settings.
+
+CQ No: PROD00129779
+CA Directory r12.0 SP5 no longer supports AIX 5.2.
+It supports AIX 5.3 and later.
+
+CQ No: PROD00127269
+DXcertgen supports now certificates with SHA-2 signatures.
+
+CQ No: PROD00126568
+Addressed an issue with MW queues draining slowly in SP4.
+
+CQ No: PROD00126377
+Addressed an SSL issue where a DSA went into a CPU-bound loop after the router connection was interrupted. 
+
+CQ No: PROD00125757
+Addressed an issue where a search against an attribute which has been reverse indexed caused the DSA to stop (See also 19863657).
+
+CQ No: PROD00124495
+CA Directory is now certified on SLES 11.1 32/64-bit.
+
+CQ No: PROD00124494
+CA Directory is now certified on Windows 7 64-bit.
+
+CQ No: PROD00122951
+Re-introduced support for HSM.
+
+CQ No: PROD00117500
+Addressed an issue where it was not possible to add an entry with an attribute of Guide Syntax via LDAP.
+
+CQ No: PROD00109216
+It is no longer possible to create a MW group containing only LDAP DSAs.
+
+CQ No: PROD00108954
+CA Directory now handles concurrency between searches and updates better.
+
+In Build No. 4457 SP4
+---------------------
+StarTrak No: 19558524 CQ No: PROD00121033
+It is no longer possible to perform a wild card search on an attribute with integer syntax.
+The DSA will return an "unwilling-to-perform" error rather than returning an incorrect result and issuing an assertion at caBT.c.
+
+StarTrak No: 19521001 CQ No: PROD00120918
+Addressed a problem with DXloaddb where it loaded entries with an invalid time syntax.
+
+StarTrak No: 19502461 CQ No: PROD00120184
+Addressed an issue where DXmodify updating memberOf entries caused the DSA to crash.
+This only occurred when performing a modify where large numbers of memberOf attribute values were modified.
+
+StarTrak No: 19491197 CQ No: PROD00120443
+DXserver determines that every entry has a name when it starts.
+
+StarTrak No: 19483855 CQ No: PROD00120533
+The initial and final search filter of attributes with distinguishedName syntax works now as expected for LDAP and X.500 searches.
+
+StarTrak No: 19476175 CQ No: PROD00119527
+Horizontal partitioning no longer forces the same number of buckets when partitioning multiple sets of data.
+
+StarTrak No: 19461002 CQ No: PROD00120056
+Addressed an issue where setting valid configuration items via DXconsole were refused if the DSA was deployed with DXmanager.
+
+StarTrak No: 19440280 CQ No: PROD00120648
+"get stack;" console command lists configured exclude-addresses.
+
+StarTrak No: 19440280 CQ No: PROD00118527
+CA Directory is now able to block rogue clients by IP address with following new command:
+     set exclude-addresses = [ ipv4 | ipv6 ] <address> [, ...];
+For more information see the documentation.
+
+StarTrak No: 19431934 CQ No: PROD00120655
+Improved the robustness of DISP replication to secondary shadows.
+
+StarTrak No: 19373679 CQ No: PROD00117822
+Addressed a referential integrity issue where deleting a user entry caused an assertion failure if MW-DISP replication was configured.
+
+StarTrak No: 19320342 CQ No: PROD00116979
+Reduced the memory usage of online dumps for data stores with spare capacity.
+
+StarTrak No: 19288092 CQ No: PROD00118493
+Addressed an issue where a failed modify caused an indexing problem.
+
+StarTrak No: 19268417 CQ No: PROD00116212
+Improved search performance on routers.
+
+StarTrak No: 19253096 CQ No: PROD00116126
+Addressed an issue with views where using a base-object search returned an incorrect result.
+
+StarTrak No: 19214551 CQ No: PROD00114532
+Addressed an issue where DSP (inter-DSA) links timing out on a DSA under extreme load would cause assertion failures/hangs under rare circumstances.
+
+StarTrak No: 19189461 CQ No: PROD00114274
+Addressed a problem where DXloaddb crashed when run in 'dry run' mode and an object class violation error was present.
+
+StarTrak No: 19174308 CQ No: PROD00113838
+The setting 'concurrent-bind-user' now supports multiple distinguished names via a comma separated list.
+
+StarTrak No: 19056909/2 CQ No: PROD00111557
+Views have been enhanced to support a new filter item 'from-client'. When specified in a search phase the filter passed in from the client application will be used.
+
+CQ No: PROD00132979
+Resolved an issue where the distinguished attribute (RDN) could be removed from an entry with a modify (not a modrdn) operation. This would result in DXdumpdb reporting the following errors:
+ No DN attributes found for this entry
+ Unable to retrieve DN
+ Error writing output file
+ Error while writing LDIF file
+
+CQ No: PROD00120952
+Addressed an issue where a failed add entry caused the DSA to crash if there was no name binding defined for the object class and op-error-trap was set.
+
+CQ No: PROD00119291
+CA Directory is now certified on RHEL 5.5 32-bit.
+
+CQ No: PROD00119290
+CA Directory is now certified on RHEL 5.5 64-bit.
+
+CQ No: PROD00119289
+CA Directory is now certified on SLES 10.3 32-bit.
+
+CQ No: PROD00119288
+CA Directory is now certified on SLES 10.3 64-bit.
+
+CQ No: PROD00116583
+Addressed an issue on Solaris 10 64-bit where memory usage was incorrectly reported as 0 in the output of "get cache;".
+
+CQ No: PROD00116298
+CA Directory is now certified on Windows Server 2008 SP2 32/64-bit.
+
+CQ No: PROD00116284
+Addressed an issue where performing a simple paged result search over multiple nodes (distributed) the DSA could return more entries than the specified page size if an intermediate node returned zero entries.
+
+CQ No: PROD00115563
+DXdumpdb now handles dumping a grid file containing renamed entries correctly.
+The warning that entries are missing ObjectClass and data store needs manual repair is no longer issued.
+
+CQ No: PROD00109065
+Addressed a problem where a long search may cause the DSA to appear single threaded. This fix improves the concurrency of search and update operations.
+
+In Build No. 4355 - SP3 CR01
+----------------------------
+StarTrak No: 19424321 CQ No: PROD00118919
+Addressed an issue where a dxEntryCount search in conjunction with the simple paged results LDAP control returned more than the expected entry.
+
+StarTrak No: 19424272 CQ No: PROD00118350
+Addressed an issue where an r8.1 upgrade containing a DSA referencing the MDB failed.
+
+StarTrak No: 19048788, 19424321 CQ No:  PROD00115244, PROD00118351
+Addressed an issue where a search at the scope of the router, containing the simple paged results LDAP control, may have caused the router to halt unexpectedly when the subordinate DSAs were prefix mapped (native-prefix specified).
+
+StarTrak No: 19241147 CQ No: PROD00117114, PROD00115619
+The 64-bit directory package now correctly installs on Windows 2008 64-bit.
+
+In Build No. 4352
+-----------------
+StarTrak No: 19288092 CQ No: PROD00115926, PROD00115914
+Addressed an issue where a search which included an "OR" filter could return all entries in the DIT rather than the requested entries.
+This may occur if a larger number of objects had previously been deleted (<15000).
+
+StarTrak No: 19285118 CQ No: PROD00115902
+DXgrid doesn't perform an automatic online dump anymore if the command contains a syntax error such as a missing keyword.
+
+StarTrak No: 19269071 CQ No: PROD00115348
+Addressed an issue with multiple rename operations on a single entry in a selective DISP environment.
+
+StarTrak No: 19261769 CQ No: PROD00115407
+An ldapsearch on a Router DSA does now return support for the "Simple Paged Results Control" (supportedControl: 1.2.840.113556.1.4.319).
+
+StarTrak No: 19209356 CQ No: PROD00115289
+Addressed an issue on Windows 64 Bit where CA Directory Router DSA stopped responding due to an assertion error.
+
+CQ No: PROD00115354
+Addressed an issue where a search operation is performed immediately after a failed update of a single-valued attribute.
+
+In Build No. 4346 SP3 GA
+------------------------
+StarTrak No: 19252447 CQ No: PROD00115172
+An issue has been addressed on 64-bit Linux where CA Directory would incorrectly
+return an attribute of integer syntax with a negative value.
+
+StarTrak No: 19176599 CQ No: PROD00114034
+An entry where the RDN is designated as a unique attribute (set unique-attr=<rdn>;)
+is now correctly deleted on the 'master' and the corresponding peer DSAs.
+
+StarTrak No: 19162974 CQ No: PROD00113785
+Addressed an issue where DXloaddb merged two similar entries in an LDIF into one entry.
+DXloaddb now returns an error advising that a duplicate DN has been found
+and includes the line number of the second detected duplicate.
+
+StarTrak No: 19131062 CQ No: PROD00114328
+Addressed an issue where the UNIX silent install prompted the user to setup DXadmind
+when DXADMIND parameters were not written to the response file.
+
+StarTrak No: 19131062 CQ No: PROD00113003
+You can now install CA Directory silently without DXadmind.
+
+StarTrak No: 19129819 CQ No: PROD00112840
+CA Directory no longer applies locking to access control in order to improve performance.
+As a consequence, you can no longer define access control rules dynamically using the console.
+
+StarTrak No: 19063333 CQ No: PROD00111608
+A Red Hat CA Directory upgrade now retains custom specific start-up/shutdown sequences.
+This is achieved by adding the correct "# chkconfig" script directive to the /etc/init.d/dxserver
+script for interpretation by the chkconfig/insserv commands.
+
+StarTrak No: 19036204-01 CQ No: PROD00110895
+An issue with online backups has been fixed where the backup was taken while there were
+modifications taking place concurrently which required previously unused free space.
+
+StarTrak No: 18955603 CQ No: PROD00110467
+CA Directory no longer changes the ownership of /opt to 'dsa' if directly installed under /opt.
+
+StarTrak No: 18934027-02 CQ No: PROD00110185
+CA Directory now supports WebLogic's implementation of Dynamic Groups, that is,
+exact match searches against the entryDN attribute. This is achieved by:
+When an entryDN is detected when processing a filter, the base-object of the search to the entry in the filter item is changed,
+the search scope is changed to a to base-object, and the filter item is replaced with a true filter item, that is (objectClass=*).
+
+StarTrak No: 17878036-02 CQ No:  PROD00108776
+DXpassword has been expanded to produce obfuscated passwords using "-P CADIR".
+These passwords can be used in configuration files for dsa-password and ldap-dsa-password to shield them from users with access to the box running dxserver.
+
+StarTrak No: 18634084 CQ No: PROD00109265
+CA Directory now supports the memberOf functionality implemented on Active Directory.
+
+StarTrak No: 17780871-01 CQ No: PROD00108777
+DXsoak now supports simple authentication binds.
+
+StarTrak No: 17484218 CQ No: PROD00108685
+On Windows 32-bit, a memory usage alert is issued if the cache usage exceeds 1 GB.
+
+StarTrak No: 17296611 CQ No: PROD00107910
+The Dxgrid console command 'get cache;' now reports the "Total number of entries".
+
+CQ No: PROD00115277
+The default schema x500.dxc now defines name bindings for the residentialPerson objectclass.
+This will allow provisioning of generic LDAP user accounts with objectclass residentialPerson,
+without having to explicitly specify the superior objectclass person.
+
+CQ No: PROD00115168
+Addressed an issue with chained search requests containing the simple paged results LDAP control.
+Access controls were being applied to the parent DSA distinguished name rather than the user performing the search.
+
+CQ No: PROD00114953
+An r12.0 SP3 memberOf issue with adding a uniqueMember to a group has been fixed.
+
+CQ No: PROD00114954
+An r12.0 SP3 memberOf issue when attempting to remove a group entry that does not have any members has been fixed.
+
+CQ No: PROD00114307
+It is no longer a requirement to define the environment variable "EXTSHM=ON" before starting a DSA on AIX 32bit.
+
+CQ No: PROD00114299
+Added a queue in front of the data store. It is enabled with
+    set dxgrid-queue = true;
+
+CQ No: PROD00110886
+CA Directory is now certified on Windows Server 2008 R2 64-bit.
+
+CQ No: PROD00110491
+DXadmind no longer refuses to start on Windows if a Network Interface Adaptor exists but is not operational.
+
+CQ No: PROD00110803
+DXextenddb can now extend a data store by more then 4GB in one run.
+
+CQ No: PROD00111560
+An integration issue between SiteMinder and a router DSA has been resolved.
+
+CQ No: PROD00111988
+Addressed an issue causing CA Directory to halt when incorrectly setting 'ssl-auth' on a DXlink DSA.
+
+In Build No. 4104
+-----------------
+StarTrak No: 19174430 CQ No: PROD00114086
+Fixed an issue where a DXmanager created DSA terminated OpenSSL prematurely resulting in a halt of the DSA
+when attempting to encrypt data traffic.
+
+StarTrak No: 19174430 CQ No: PROD00113841, PROD00113663
+CA Directory now correctly sets the SNMP trap originator address.
+
+In Build No. 4103
+-----------------
+StarTrak No: 19177913 CQ No: PROD00113721
+Addressed an issue where an upgrade to r12.0.4099 adversely impacted the performance with the "set dxgrid-write-behind=100" setting.
+
+In Build No. 4102
+-----------------
+StarTrak No: 19155459 CQ No: PROD00113378
+Addressed an issue where a DSA was not able to handle the concurrent-bind-user settings on a non-dxlink DSA.
+
+In Build No. 4099 - SP2 CR1
+---------------------------
+StarTrak No: 19067016, 18958069 CQ No: PROD00111558, PROD00110097
+A large data store issue where DXloaddb reported 'Cannot write to datastore: Bad address' has been fixed.
+
+StarTrak No: 18990765 CQ No: PROD00110712
+Addressed issue with a DXconsole session stopping the DSA when a high level of tracing is enabled.
+
+StarTrak No: 18972187, 18999149	CQ No: PROD00110399
+All DXtools now work with data stores created by DXmanager.
+
+StarTrak No: 18967255	CQ No: PROD00109965
+SLES 10.2 32/64-bit has been certified as a supported platform for DXserver and DXwebserver.
+
+StarTrak No: 18953286 CQ No: PROD00111564, PROD00110022
+Addressed issue when a DXgrid DB is above 2GB in size and the DB file has a large percentage of padding(free space), an online dump would only dump 679MB to the .zd$ temporary file.
+
+StarTrak No: 18942603	CQ No: PROD00109781
+CAPKI gets now installed correctly if dxsetup.exe is run from a path longer than 128 bytes.
+
+StarTrak No: 18920562	CQ No: PROD00109631
+RHEL Server 5.4 32/64-bit has been certified as a supported platform for DXserver and DXwebserver.
+
+CQ No: PROD00111658
+Addressed issue where a modify operation which changes a distinguished value would crash the DSA.
+
+CQ No: PROD00111145
+Addressed issue upgrading CA Directory on Windows when ssld configuration path contained multiple slashes.
+
+CQ No: PROD00111051
+Addressed issue when upgrading CA Directory 32-bit Windows when install on a machine with x64
+architecture.
+
+CQ No: PROD00109974
+SSLD configuration will now be migrated correctly from r8.1 to r12 SP2 on upgrade when certificate paths (root CA and personality) contain DXHOME or backslashes.
+
+CQ No: PROD00109967
+DXloaddb now handles large file names correctly.
+
+CQ No: PROD00109275
+Inter r12.0 SP2 Windows 64-Bit upgrades work now as expected from build 12.4085 onwards.
+
+In Build No. 4076 - SP2
+-----------------------
+StarTrak No: 18843121  LabTrack No: 14523
+Removed the spurious warnings generated when performing an online dump.
+
+StarTrak No: 18817459  LabTrack No: 14514
+DXmanager now does not log extra debug information by default in the
+dxwebserver(Tomcat) logs.
+
+StarTrak No: 18780200  LabTrack No: 14531
+Fixed the syntax for countryName in x500.dxc.
+
+StarTrak No: 18743479  LabTrack No: 14487
+Fixed a problem with root level namespaces in DXmanager.
+
+StarTrak No: 18709108  LabTrack No: 14476
+The Linux CA Directory start-up script /etc/init.d/dxserver now sets defaults
+for chkconfig. CA Directory will now be one of the last services to be started.
+
+If the defaults are overridden to change the startup/shutdown order, these
+values will be retained for all future upgrades.
+
+StarTrak No: 18682121  LabTrack No: 14502
+Flushing the DB file will no longer stall the DSA.
+
+StarTrak No: 18682121  LabTrack No: 14474
+The value of <n> in the trace message:
+"Thread <n> ran continuously in the last minute"
+now matches the thread ID in the logging.
+
+StarTrak No: 18656387,18734455  LabTrack No: 13998
+The assertion HEAD/src/dsa/user/rBlock.c243 has been addressed.
+
+StarTrak No: 18564731  LabTrack No: 14433
+After starting, DXgrid will wait for the start of the next dump period before
+dumping. Previously, if period dump was enabled, DXgrid would dump immediately
+on starting.
+
+StarTrak No: 18456805  LabTrack No: 14401
+The shutdown time for very large datastores has been reduced.
+The shutdown message has been changed to:
+<dsaName> has not stopped within 30 seconds
+
+This may be because the DSA being stopped has queued multi-write requests.
+Please ensure multi-write peer DSAs are running to allow queues to drain.
+
+To force DXserver to stop, issue 'dxserver forcestop <server>'.
+Note: This will cause information in the queue/s to be lost and a manual
+resynchronization may be required.
+
+StarTrak No: 18339067  LabTrack No: 14328
+Removed Assertion failure when starting a DSA where a load had loaded two
+createTimestamps in an entry.
+
+LabTrack No: 14527
+The "get cache;" command now displays the current value of "dxgrid-write-behind" if it has been set.
+
+LabTrack No: 14477
+DXinfo now allows for the collection of a subset of the DSA daily logs. The new
+parameter "-d" can be used to specify the candidate daily logs. Please note that
+all non daily logs (trace/alarm, etc) will still be captured. This change
+impacts the collection of daily logs only.
+
+-d      indicates a specific date <value> in yyyymmdd format to
+        determine which logs are to be collected,
+
+        alternatively, the <value> can be a regular expression
+        enclosed by double quotes (for example: "2009121[0-9]")
+
+Examples:
+
+To collect the daily logs from the 15th December 2009
+   dxinfo -d 20091215
+
+To collect the daily logs from the 10th to 19th December 2009
+   dxinfo -d "2009121[0-9]"
+
+To collect the daily logs from the month of December 2009
+   dxinfo -d 200912
+
+LabTrack No: 13888
+DXgrid's address preference has changed from IPv4 to IPv6.
+For more information see 'set dsa Command - address' in the reference manual.
+
+LabTrack No: 13221
+DXloaddb does no longer load multiple values into a single-valued attribute.
+
+
+In Build No. 2441 - CR 7
+------------------------
+StarTrak No: 18917002  CQ No: PROD00109368
+It is not possible anymore to add an attribute which doesn't provide a value.
+The error code returned in this case is 19 "LDAP constraint violation".
+
+StarTrak No: 18672294  LabTrack No: 14456
+Fixed a problem where modifications that incidentally deleted and readded
+distinguished values were rejected.
+
+In Build No. 2436 - CR 6
+------------------------
+StarTrak No: 18630287  LabTrack No: 14435
+Improves performance of asynchronous peer (multi-write group hub) recovery when
+multi-write-group-credit are enabled.
+
+StarTrak No: 18613132  LabTrack No: 14431
+DirectoryString values received by DXgrid via LDAP updates now are given the
+type UTF8string. Formerly they were given the type printableString, but this
+resulted in interoperability problems. This is an X.500 issue and not an LDAP
+issue - LDAP clients are expected to be unaffected.
+
+StarTrak No: 18587240,18493277/3  LabTrack No: 14416
+Addressed dxcertgen issue importing 3rd party root CAs into trusted.pem on
+Windows.
+
+StarTrak No: 18586535,18580366  LabTrack No: 14417
+If a new DSA with an empty datastore is updated using MWDISP by an existing peer
+DSA then the new DSA will no longer send any data back to the existing peer as
+part of the data synchronization.
+
+Note: It is best practice to copy the data from the existing DSA to the new DSA
+before bringing the new DSA online.
+
+StarTrak No: 18548219  LabTrack No: 14414
+The Siemens DirX Directory Server rejects a message ID of 0. To allow
+interoperability with this Directory via DXlink our bind message ID is now 1
+instead of 0. This behaviour is enabled with the link flag:
+
+  link-flags = .. siemens, ..
+
+StarTrak No: 18517739  LabTrack No: 14393
+Improved performance where navigation occurs through an unindexed attribute that
+has many identical values.
+
+StarTrak No: 18478437  LabTrack No: 14410
+The maximum size of the transaction file is reduced to 100 MB preventing
+possible corruption of the transaction file.
+
+StarTrak No: 18474995-01  LabTrack No: 14392
+Delete and rename operations sent from a multi-write peer will now be replicated
+correctly via DISP to a non multi-write DSA.
+
+StarTrak No: 18416508  LabTrack No: 14409
+The new command
+
+  set cache-search-bias = <multiplier>;
+
+where multiplier is a number between 1 and 1000, allows search processing to
+favour the indexes.
+
+Two properties of LDAP searches are the filter and the base object. The filter
+can be mapped to an operation on an index [IND], while the base-object selects
+subordinate objects [SUB], unless the base-object is really the root of entries
+held by the DSA. When performing the search, DXgrid must choose which of [IND]
+and [SUB] to use to find candidate entries. If [IND] is used, each candidate
+entry will have to be checked against the base-object. In the case of compound
+filters, parts of the filter may also have to be checked. If [SUB] is used, the
+filter will have to be applied to each entry found. To choose between [IND] and
+[SUB], DXgrid estimates the number of entries that would have to be processed
+for each and chooses the method where the number of entries is least.
+
+The above multiplier is applied to the count returned by [SUB]. This has the
+effect of biasing the process towards [IND].
+
+If using this command to tune search performance, be aware that it applies to
+all searches, so any tuning will have to consider the full range of searches
+expected.
+
+StarTrak No: 18416508  LabTrack No: 14408
+Large DISP searches no longer block console access.
+
+StarTrak No: 18416508  LabTrack No: 14407
+The performance of object class comparisons for searches has been improved. This
+helps to prevent replication delays for DISP replication agreement that is
+configured to replicate a subtree and specifying a very complex search filter
+and the data set is very large.
+
+StarTrak No: 18223844  LabTrack No: 14388
+Increased the maximum number of associations from 1024 to 4096 under Linux. This
+will prevent the error message "Too many open files" when many clients connect.
+
+LabTrack No: 14384
+Fixed the problem of a DSA crash when attempting to connect to the DXconsole
+with invalid credentials if 'dxconsole-users' is set.
+
+LabTrack No: 14383
+Allow localhost connections to DXadmind if running on the same host as
+DXmanager. This gets around problems with some network configurations where the
+current host is mapped to localhost in the /etc/hosts file.
+
+LabTrack No: 14243
+The new 'dsa-flags' item 'multi-write-group-hub' allows an administrator to mark
+one or more DSAs from a multi-write-group as a hub.
+
+LabTrack No: 14184
+RHEL 5.3 64-bit has been certified as a supported platform for DXserver and
+DXwebserver.
+
+LabTrack No: 14183
+RHEL 5.3 32-bit has been certified as a supported platform for DXserver and
+DXwebserver.
+
+LabTrack No: 14104
+JRE 1.6.0_15 is now certified for use with JXweb and DXmanager.
+
+LabTrack No: 13698
+DXdumpdb now correctly parses grid locations containing backslashes ("\") under
+Windows.
+
+In Build No. 2417 - Service Release 5
+-------------------------------------
+StarTrak No: 18475663  LabTrack No: 14381
+A DXextenddb defect with overwriting data on Unix is now fixed.
+
+StarTrak No: 18446672  LabTrack No: 14380
+Removed an extra null byte from the StartTLS extended response OID. This may
+have caused the StartTLS response to be rejected by clients.
+
+StarTrak No: 18420820  LabTrack No: 14366
+The password policy can now be used in conjunction with the
+'trust-dsa-triggered-operations' trust flag of DSAs configured in DXmanager.
+
+StarTrak No: 18412328  LabTrack No: 14344
+Fixed the problem with the handling of the case of UTF-8 strings in
+caseExactString syntax attributes.
+
+StarTrak No: 18395706  LabTrack No: 14350
+When searching a standalone null prefix DSA, a base object search request where
+the base object does not exist will no longer cause the DSA to fail.
+
+Example search:
+Base Object Search of entry "cn=SecurityBridge" with a search filter of
+"cn=SecurityBridge".
+
+StarTrak No: 18386913  LabTrack No: 14364
+Outgoing DSP binds on Windows now take 10 msec, down from 1 second.
+
+StarTrak No: 18366143  LabTrack No: 14327
+SSLD start can experience delays of up to 60 seconds when starting in FIPS 140-2
+mode depending on machine/network configuration.
+
+The SSLD start has now been modified to not give control back to the user until
+the start-up has completed and SSLD is ready to service requests. This fix
+prevents a DSA to exit "No Service While Recovering" mode prematurely.
+
+StarTrak No: 18366120  LabTrack No: 14330
+SSLD configuration parameters are now written to the logfile on Windows 64-bit
+computers.
+
+StarTrak No: 18356525  LabTrack No: 14362
+Allow multiple structural objectClasses in an entry by setting the
+enable-nonstandard-behaviour flag:
+
+  set enable-nonstandard-behaviour = true;
+
+StarTrak No: 18291934,18476639  LabTrack No: 14373
+'dump dxgrid-db' configuration command is now supported during an upgrade.
+
+StarTrak No: 18291934  LabTrack No: 14354
+Allow multiple passwords in the userPassword attribute by setting the
+enable-nonstandard-behaviour flag:
+
+  set enable-nonstandard-behaviour = true;
+
+This enables:
+- add entry requests to add multiple password values
+- modify requests to add values to an existing userPassword attribute
+- modify requests to replace all values of an existing userPassword attribute
+- modify requests to delete all values of an existing userPassword attribute.
+
+StarTrak No: 18209604  LabTrack No: 14343
+DXrename "-n" option now works as expected.
+
+StarTrak No: 18087199  LabTrack No: 14311
+A DSA with password policy enabled no longer produces an assertion failure when
+clients disconnect during a bind.
+
+StarTrak No: 17959187   LabTrack No: 14045
+Improved DXwebsetup JRE discovery when the Java binary is a symbolic link.
+
+StarTrak No: 17862056/18458614  LabTrack No: 14345
+DSA start performance for large number of alias entries has been improved.
+
+StarTrak No: 17238773  LabTrack No: 13452
+CA-OpenSSL will now uninstall cleanly when removing CA Directory from machines
+running HP-UX.
+
+LabTrack No: 14365
+The "SSLD -fips_ciphers" command now correctly displays ciphers as TLSv1.
+
+LabTrack No: 14355
+On 64-bit Windows, DXmanager (32-bit) and DXserver (64-bit) are now treated as
+independent installations.
+
+LabTrack No: 14315
+Increased the speed of deploying the configuration in DXmanager when some hosts
+are not reachable.
+
+LabTrack No: 14112
+On Unix and Linux, the home directory is no longer removed if retaining the DSA
+user account during an uninstall.
+
+LabTrack No: 13937
+Upgraded OpenSSL from 0.9.8 to 0.9.8h which:
+- addresses vulnerabilities
+- addresses an HP-UX uninstall problem
+- runs with the latest FIPS 140-2 compliant crypto library.
+
+In Build No. 2381 - Service Release 4
+-------------------------------------
+StarTrak No: 18218220  LabTrack No: 14185
+DXmanager now redirects to the correct SSL port if non-default ports are used.
+
+StarTrak No: 18196177  LabTrack No: 14174
+Removed assertion when a router performs a search from a superior entry.
+
+StarTrak No: 18142081  LabTrack No: 14129
+Remove operations are now correctly logged when MW-DISP is enabled.
+
+StarTrak No: 18128280  LabTrack No: 14114
+Removed the upgrade error message that used to occur when 'dxgrid-tx-location'
+or 'dxgrid-backup-location' were enabled.
+
+StarTrak No: 18122219  LabTrack No: 14107
+UNIX and Windows both now display a "<dsaname> is not running" message when a
+"dxserver init <dsaname>" is performed while the supplied DSA is in a stopped
+state.
+
+StarTrak No: 18099778  LabTrack No: 14146
+MW-DISP binds are now rejected with a critical alert if they originate from a
+DSA that isn't a configured MW-DISP peer. This indicates a configuration problem
+that needs to be resolved before MW-DISP will function correctly.
+
+StarTrak No: 18092938  LabTrack No: 14095
+The order of attributes in a multi-valued RDN is now deterministic.
+
+StarTrak No: 18077096  LabTrack No: 14301
+The file entrust.dxc has been updated as part of the Entrust certification
+process.
+
+StarTrak No: 18063419  LabTrack No: 14111
+The new phase option 'collapse-target', when enabled, will return the view
+result under the first entry returned by the phase it is set against. Note: this
+feature requires the 'collapse-result-under-entry' view option.
+
+StarTrak No: 18028287  LabTrack No: 14069
+As per the X.509 standard, the x500.dxc schema file has been updated to mark the
+pkiUser and pkiCA object classes as auxiliary. These items were incorrectly
+defaulting to structural.
+
+StarTrak No: 17959259  LabTrack No: 14040
+MW-DISP has been rewritten so that DSAs receive updates from other DSAs before
+going online.
+
+StarTrak No: 17862056  LabTrack No: 14221
+An assertion in caAlias.c has been fixed.
+
+StarTrak No: 17862056  LabTrack No: 14006
+A DXloaddb defect with loading aliases (rdn error XI) is now fixed.
+
+StarTrak No: 17780835  LabTrack No: 14037
+DXdumpdb now dumps in alphabetical order. Memory usage has remained the same,
+however the time to dump the data has increased.
+For example a test DB with 23M entries took 68% more time to dump as it did with
+SR3.
+
+StarTrak No: 17631691  LabTrack No: 14066
+Handling of aborted inter-DSA (DSP) connections has been improved.
+
+StarTrak No: 17484113   LabTrack No: 13779
+It is now possible to have a trace file bigger then 2GB.
+
+StarTrak No: 17418165/2  LabTrack No: 13999
+Linux 32Bit and 64Bit packages are now combined into a single hybrid package.
+
+LabTrack No: 14308
+A potential DSA hang while using DISP has been corrected.
+
+LabTrack No: 14306
+Fixed documentation upgrading when installing DXserver over the top of an
+existing DXmanager installation on UNIX.
+
+LabTrack No: 14305
+Documentation is now installed during a DXmanager only install on the Linux
+platform.
+
+LabTrack No: 14299
+In DXmanager if the HTTP session times out (default 30 minutes -- configurable)
+while monitoring the backbone the browser is now redirected to the login page
+rather than being left with a snapshot of the backbone that does not get
+updated.
+
+LabTrack No: 14265
+DXmanager now installs under DXHOME if a custom location has been specified
+during a 64-bit install of DXserver on the Windows platform.
+
+LabTrack No: 14238
+Added the new setting 'rdn-order'.
+
+LabTrack No: 14213
+Persistent search now works in DXgrid.
+
+LabTrack No: 14202
+DXdisp now operates on a .dx file.
+
+LabTrack No: 14191
+Added an option to define external Nexor DSAs and add them to the backbone in
+DXmanager.
+
+LabTrack No: 14182
+The DXserver no longer supports mixed mode replication.
+
+LabTrack No: 14165
+When returning name forms via LDAP, the $ separator now has a space each side.
+
+LabTrack No: 14164
+MW-DISP has been changed to allow greater flexibility at the expense of possibly
+larger updates when DSAs are restarted.
+
+LabTrack No: 14163
+Grid file usage messages are reactivated when file is emptied.
+
+LabTrack No: 14151
+Fixed up DXserver binary permissions mode issue on Redhat 5 onwards.
+
+LabTrack No: 14145
+Milliseconds in timestamps are now compressed correctly.
+
+LabTrack No: 14137
+Correct permissions are now set for DXserver, DXloaddb and DXdumpdb binaries on
+hybrid(32/64-bit) UNIX platforms.
+
+LabTrack No: 14094
+64-bit DXgrid uses (slightly) less memory when indexing values.
+
+LabTrack No: 14071
+Addressed hang issue on start-up when parsing view definition with an invalid
+syntax.
+
+LabTrack No: 14068
+Global samples script now supports Democorp and UNSPSC created via DXmanager.
+This requires the sample DSA names to be passed in as a parameter. Check out the
+script usage for more information.
+
+LabTrack No: 14065
+DXdumpdb will honour the dxgrid-backup-location config setting if set and if the
+user has specified that they are dumping from a backup (i.e. they have used the
+'-z' flag for DXdumpdb).
+
+LabTrack No: 14064
+Improved clarity of trace log when running more than 5 user-threads (to a
+maximum of 20) in a high volume environment.
+
+LabTrack No: 14060
+A syntax error is now generated if the dxgrid-backup-location is not enclosed in
+quotes.
+
+LabTrack No: 14058
+Nesting of conditional view phases is now supported.
+
+LabTrack No: 14053
+Made storing & retrieval of a DLSubmitPermission attribute containing the
+member_of_group item via LDAP consistent.
+
+LabTrack No: 14043
+Null values are automatically converted to space for syntaxes which don't
+support NULLs (i.e. DirectoryString).
+
+LabTrack No: 13990
+The assertion when renaming an entry where the new superior doesn't exist has
+been removed.
+
+LabTrack No: 13969
+The DSA will no longer start when a DXgrid data file is configured without 'set
+lookup-cache = true;'.
+
+LabTrack No: 13868
+The 32-bit DXserver on Solaris and Linux now supports log files larger than 2GB.
+
+In Build No. 2312 - Service Release 3
+-------------------------------------
+StarTrak No: 17997165  LabTrack No: 14056
+Fixed the issue where DXgrid allowed modifications to deleted entries if
+multi-write-disp-recovery was set and active peers were present.
+
+StarTrak No: 17911385  LabTrack No: 14010
+If an RDN has more than one component, these components are always
+returned in the same order for all entries and all times.
+
+StarTrak No: 17896142  LabTrack No: 14028
+DXdumpdb now supports two options:
+  -x Exclude listed attributes
+  -i Include listed attributes
+Note attributes forming part of a DN should not be excluded.
+
+StarTrak No: 17896132  LabTrack No: 14016
+Connections to hosts which aren't on the network will fail after
+15 seconds instead of the 60 seconds previously.
+
+StarTrak No: 17886409  LabTrack No: 14004
+A MW-DISP problem with renaming an entry back to its original name has been
+fixed.
+
+StarTrak No: 17870114   LabTrack No: 14009
+A search returning dxEntryCount now returns the correct value for a
+base-object-only scoped search with partial indexing and more than 25 items
+indexed.
+
+StarTrak No: 17858709,17869577  LabTrack No: 14002
+DXserver now supports replacing of caseIgnoreString attribute values
+that differ only by case.
+
+StarTrak No: 17847040  LabTrack No: 13996
+Output of "dxserver start all" is now sequential.
+
+StarTrak No: 17835069,17835052  LabTrack No: 13978
+Addressed MW-DISP delete issues.
+
+StarTrak No: 17807650  LabTrack No: 13970
+Addressed issue when performing a reverse server side sort request
+in conjunction with a simple page result search of size 1.
+
+StarTrak No: 17716489  LabTrack No: 14047
+Fixed issue where installer was proceeding after the backup of config and data
+failed.
+
+StarTrak No: 17705091   LabTrack No: 13946
+DXdumpdb is now significantly faster and memory usage is reduced.
+
+StarTrak No: 17241370  LabTrack No: 13671
+The new command 'set trap-on-update-verbose = true|false;' is a more
+verbose mode of the 'trap-on-update' command:
+a) This includes 4 extra update types MW-ADD, MW-REM, MW-MOD, MW-REN
+to indicate updates received via multi-write.
+b) It contains the names of the attribute types being added for
+ADD/MW-ADD requests.
+c) It contains the names of attribute types and whether they are
+being added or removed for MOD/MW-MOD requests.
+
+StarTrak No: 15866113,15802376  LabTrack No: 11490
+Windows 64 bit is supported from r12.0 SP1 SR3 onwards.
+
+LabTrack No: 14052
+The ASN.1 compiler was changed to fix a problem with importing a CHOICE type.
+This affects the 'Name' type if imported and tagged, for example, in DLSubmitPermission.
+
+LabTrack No: 14048
+When a multi-write DSA has "no-service-while-recovering" configured and another
+multi-write DSA's queue becomes full while the peer DSA is stopped, the peer will now
+service client requests when it is restarted. Note: The restarted DSA will now serve
+stale data until it has been manually resynchronized.
+
+LabTrack No: 14042
+Fixed the problem where it was possible to produce orphaned values.
+
+LabTrack No: 14023
+The 'set multi-write-credit' has been renamed to 'set multi-write-group-credit' as it only applies to MW groups
+(asynchronous replication).
+
+LabTrack No: 14019
+DXserver status no longer blocks when run while a DSA is starting up on Windows.
+
+LabTrack No: 13989
+The installation log file contains now more detailed information.
+
+LabTrack No: 13976
+The command 'set multi-write-group-credit' will switch replication
+from asynchronous (multi-write-group hubs) to synchronous (wait for
+replication to complete before sending client confirmation) when the
+configured value is exceeded.
+This can be used to control flow when replicating to multi-write hubs
+asynchronously, where client updates occur at a faster rate than they
+can be serviced (replicated).
+This situation can occur if performing bulk front-end updates where
+multi-write groups are configured on latent links.
+
+LabTrack No: 13901
+CA Directory is now supported with RHEL AS/ES 4.7 32 Bit and 64 Bit.
+
+In Build No. 2266 - Service Release 2
+-------------------------------------
+StarTrak No: 17796184  LabTrack No: 13955
+Problem where a modify of a large value appeared not to take effect has been
+addressed.
+
+StarTrak No: 17742475  LabTrack No: 13927
+Fixed a problem with the installer where it was allowing upgrades from previous
+versions which had multiple DSAs per database configured.
+
+StarTrak No: 17728101  LabTrack No: 13916
+DXgrid is now supported with RH AS 3 Update 8 32 Bit.
+
+StarTrak No: 17724527  LabTrack No: 13866
+Added the command "set multi-write-outstanding-ops = <num>;" to increase the
+threshold of outstanding multiwrite operations before multiwrite pauses sending
+while waiting for a response.
+See the techdoc titled: "Can I adjust the number of multi-write operations sent
+across the network?" for further information.
+
+StarTrak No: 17716489  LabTrack No: 13929
+Fixed an issue where the installer would complete and return with an exit code
+of 0 even when the restore failed of one DSA.
+
+StarTrak No: 17688205  LabTrack No: 13882
+DXgrid no longer generates transaction file warnings when the transaction file
+is disabled.
+
+StarTrak No: 17671485  LabTrack No: 13876
+Exact-match whole-subtree searches will no longer return deleted entries.
+
+StarTrak No: 17669788      LabTrack No: 13874
+Upgrades from r12.0 SP1 with a dxmanager created configuration are now allowed.
+
+StarTrak No: 17668895  LabTrack No: 13931
+The installer will now attempt to start Ingres before the upgrade if it is
+stopped so that existing data can be dumped.
+
+StarTrak No: 17661809  LabTrack No: 13923
+Timestamps are now replicated via multiwrite when running MW-DISP and
+"set op-attrs = false;"
+
+StarTrak No: 17661483  LabTrack No: 13872
+If an object class schema definition has the same attribute in both the
+must-contain list and the may-contain list, it will be stored in the
+must-contain list only.
+
+StarTrak No: 17658627  LabTrack No: 13867
+Supplying a single DSA name (-D) to "dxcertgen certs" now functions as expected.
+
+StarTrak No: 17649527  LabTrack No: 13873
+Reboot on Red Hat 5.1 now restarts all required DSA's.
+
+StarTrak No: 17645053  LabTrack No: 13857
+DXdisp now works as documented.
+
+StarTrak No: 17575245/1  LabTrack No: 13864
+Improved the error messages that are generated when the DSA datastore is
+missing.
+
+StarTrak No: 17483331  LabTrack No: 13897
+The one-second delay when DXserver connects to another server has been removed
+on non-Windows ports.
+
+StarTrak No: 17403792  LabTrack No: 13682
+Added additional sanity checking for the response file before installing.
+
+LabTrack No: 13956
+Handling of renames in MW-DISP has been improved by passing a timestamp with the
+rename in the DISP update. Also, delete/rename tombstones don't clutter up the
+grid file as they are cleaned up as soon as possible.
+
+LabTrack No: 13918
+Multiwrite cache queues handling has been optimized.
+
+LabTrack No: 13893
+DSA will no longer abort non-peer connections when it has been servicing data
+and is notified by a peer DSA that it will be resynchronised.
+
+LabTrack No: 13892
+The default datastore size is now 500MB.
+
+LabTrack No: 13885
+DSA's are now marked as "inconsistent" if they were not shutdown cleanly and the
+transaction logging is turned off.
+
+LabTrack No: 13870
+On Windows the installed default DXmanager limits file now contains the correct
+limits settings.
+
+LabTrack No: 13862
+DXdisp has had a number of enhancements:
+* stricter validation
+* more information in the usage and during the execution process
+* operational improvements
+
+LabTrack No: 13861
+Fixed the issue of MW-DISP updates always being replayed on start-up when the
+user is configuring MW-DISP using DXmanager.
+
+LabTrack No: 13852
+Installer now appends the contents of the response file to the end of the
+install log even if you do not specify the full path to the response file in the arguments.
+
+LabTrack No: 13841
+The installer will check for an existing datastore before it restores any DSA's
+during an upgrade.
+
+LabTrack No: 13600
+Windows upgrade now gives user control of dialog instead of causing it to report
+it is not responding.
+
+In Build No. 2226 - Service Release 1
+-------------------------------------
+StarTrak No: 17595793  LabTrack No: 13830
+DXgrid maintains modifiersName, even if op-attrs is FALSE. This has been fixed.
+
+StarTrak No: 17572510  LabTrack No: 13817
+Upgrading from 8.1 to 12.0 SP1 will not remove files under II_SYSTEM if they are
+not Ingres related.
+
+StarTrak No: 17568025  LabTrack No: 13822
+Fixed the issue with modify and keep-order-of-values.
+
+StarTrak No: 17567898  LabTrack No: 12665
+DXgrid enforces the schema setting "single-valued".
+
+StarTrak No: 17559097  LabTrack No: 13805
+Fixed the issue where it was possible to add null values to attributes of syntax
+DirectoryString.
+
+StarTrak No: 17553839   LabTrack No: 13804
+DXcertgen now signs certificates using the FIPS 140-2 compliant SHA-1 hashing
+algorithm. Certificates generated will now operate with SSLD running in either
+FIPS or Non-FIPS mode.
+
+StarTrak No: 17497915,17600512  LabTrack No: 13819
+The installer now checks that dxlistdb is functioning properly before proceeding
+with the install.
+
+StarTrak No: 17493506   LabTrack No: 13796
+Silent uninstalls work now as expected on Solaris.
+
+StarTrak No: 17484315  LabTrack No: 13766
+DXdumpdb now ends gracefully if the disk fills to 100%.
+
+StarTrak No: 17444645  LabTrack No: 13777
+Server side sorting is now much faster.
+
+LabTrack No: 13825
+clear multi-write-queue is no longer restricted to cache-only (obsolete) DSAs
+
+LabTrack No: 13855
+The setting of return-oc-parents now works as with previous versions of CA
+Directory.
+
+LabTrack No: 13854
+No name binding checks are performed when adding an object class to an entry as
+it is no longer possible to change the structural object class.
+
+LabTrack No: 13827
+The default grid size is set to 500MB instead of zero.
+
+LabTrack No: 13820
+We assume values of a particular attribute are regular expressions that may be
+compared with values passed in by extensible-match filters. When an
+extensible-match filter of the appropriate type is received, the value in the
+filter is compared against the templates stored in the entries to achieve an
+inverse match (value against filter, not filter against value).
+
+LabTrack No: 13807
+The DXnewdsa/DXloaddb/DXnewdb now allow creating a DB file larger than 1GB on
+Windows.
+
+LabTrack No: 13800
+Default grid size on upgrades is 500MB.
+
+LabTrack No: 13799
+CA Directory r12.0 SP1 now ships with Tomcat 6.0.18 which addresses tomcat
+vulnerabilities.
+
+LabTrack No: 13798
+/3GB option for MS Windows is now activated on dxserver, dxloaddb and dxdumpdb.
+
+LabTrack No: 13797
+CA Directory r12.0 SP1 is certified on Solaris LDOM.
+
+LabTrack No: 13795
+Addressed SNMP trap issue when a machines local hostname does not resolve to a
+valid address.
+
+LabTrack No: 13788
+DXloaddb will no longer create a DB larger than specified in the config.
+
+LabTrack No: 13787
+The operational attributes creatorsName, createTimestamp, modifiersName and
+modifyTimestamp are not added to the datastore during a dxloaddb when op-attr is
+false. If the name and/or timestamp attributes are present in the ldif file then
+they are ignored.  If the createTimestamp attribute is not present in the ldif
+file then it is not added to the datastore.
+
+LabTrack No: 13786
+CA Directory (32Bit) has been certified on Windows x64.
+
+LabTrack No: 13785
+CA Directory (32Bit) has been certified on Windows with the /3GB switch.
+
+LabTrack No: 13780
+Server side sorting attribute ordering is now preserved when used in conjunction
+with the simple paged results control.
+
+LabTrack No: 13775
+Fixed issue where the cache-index setting in the server files on 8.1 wasn't
+being replaced correctly by the upgrade.
+
+LabTrack No: 13772
+When upgrading from 8.1 deprecated cache-attrs and max-cache-size are
+automatically removed from the configuration.
+
+LabTrack No: 13767
+'ssld start all' now works if an ssld is installed with the same name as a
+file/folder in the current working directory.
+
+LabTrack No: 13763
+The Unix/Linux installers now support the -no_load and -load_data flags which
+split the upgrade into 2 parts.
+
+LabTrack No: 13762
+The Windows installer now supports an upgrade in 2 steps:
+dxsetup NO_LOAD=1 will ONLY restore the configuration during an upgrade
+dxsetup LOAD_DATA=1 will load the data and services after the upgrade
+
+LabTrack No: 13736
+DXdumpdb memory usage has been significantly reduced.
+
+LabTrack No: 13644
+Values of particular attributes may be compressed by setting
+
+  set compress <type> = <attr>, ...;
+
+<type> is one of base64, hex, deflate, deflate1, deflate2. deflate is fastest,
+deflate1 balances speed with compression and deflate2 tries for maximum
+compression.
+
+Note: base64 should only be used when all values of the specified attributes are
+base64 encoded. hex should only be used when all values of the specified
+attributes are hex encoded. If the values of an attribute may encoded
+differently then use deflate.
+
+LabTrack No: 13609
+Dxnewdsa will now by default create a 1000MB file (1GB) and not 1024MB.
+
+LabTrack No: 13543
+CA Directory has been certified on RHEL 4.5.
+
+LabTrack No: 13348
+Corrected dxemptydb usage statement.
+
+LabTrack No: 13146
+New DXextenddb tool. For more information see README.
+
+In Build No. 2174 - GA
+----------------------
+StarTrak: 17427996  LabTrack: 13703, 13265
+DSA console connections now support pure IPV6 connections.
+
+StarTrak: 17428530  LabTrack: 13711
+Fixed issue where the uninstall will fail if the DSA user has the bash shell
+as the default shell.
+
+StarTrak: 17428693  Labtrack: 13718
+DXwebserver will now start in a pure IPv6 environment
+
+StarTrak: 17366438  Labtrack: 13729
+Upgrading EEM (iTechPoz) now strips the domain off the hostname and truncates
+the hostname to a maximum of 15 characters before building the DSA name
+iTechPoz-<hostname>.
+
+StarTrak: 17195937, 16723316  LabTrack: 13656, 13235
+On Unix and Linux you can now use a domain user instead of the default local
+"dsa" user.
+* You must configure the domain user before running the install
+* The domain user must belong to the user group etrdir
+* The home directory must be a writable directory in order for the install to
+configure the profile that defines DXHOME
+
+If the dsa user does not exist when installing, then a local user will be
+created and a new install of CA Directory will take place as before.
+Note - you can also customise the name of the dsa user. To do this define the
+flag -dxuser <dsa-admin-username> on the commandline when launching dxsetup, or set
+$DXUSER = <dsa-admin-username> in the reponsefile.
+
+StarTrak: 177409478   LabTrack: 13693
+Addressed an ASN.1 runtime underflow error in the router when a data DSA sends a
+PDU larger then 300 MB.
+
+StarTrak: 17412911    LabTrack: 13686
+On UNIX, SSLD personality (pem) name matching against the DSA name is now case
+insensitive. If multiple personality files exist with the same name
+(i.e. democorp.pem and Democorp.pem) then only the first personality file
+matched will be used.
+
+LabTrack: 13679
+On Windows, the ssld service is now automatically restarted after an upgrade,
+even if the service name contains a space.
+
+Labtrack: 13638
+If the session times out while using DXmanager, the browser will be sent
+back to the login page after the next server request. If the configuration
+is being edited when the session times-out it will be automatically saved.
+
+LabTrack: 13684
+The dxadmind password can now contain special characters.
+
+Labtrack: 13683
+Fixed the UNIX installer issue where install would halt due to incorrect
+permissions on certain folders and the installer was not able to create some files.
+
+LabTrack: 13667
+The following obsolete commands are no longer valid in theDXserver:
+* open-log
+* close-log
+* flush-log
+
+LabTrack:  13668
+DXserver now supports "get users;" after the command "abort all-users;"
+has been run.
+
+StarTrak: 17330930 	LabTrack: 13675, 13674, 13673
+Addressed intermittent DSA issue when using SSL after upgrades.
+
+StarTrak: 17392202      LabTrack: 13663
+On Unix, the upgrade defines the DXgrid file size as the maximum of
+(2 * ldif-file-size) and 100 MB.
+
+StarTrak: 17366438,17375395   LabTrack: 13660,13651
+On UNIX and Linux, the upgrade no longer accepts a corrupt dsa user
+environment. Instead it exits with an error.
+
+StarTrak: 17366710   LabTrack: 13657
+On Windows, CA Directory no longer changes the value of the environment
+variable %R_SHLIB_LD_LIBRARY_PATH%. This variable was used by applications that
+were shipped with pre-4.0 versions of CA ETPKI.
+
+StarTrak: 17379511   LabTrack: 13654
+All data DSAs now load DXgrid after an upgrade from any versions pre r12.0 SP1.
+
+StarTrak: 16324191   LabTrack: 12467
+DXmanager now asks for password confirmation in the configuration screens.
+
+StarTrak: 17305202   LabTrack: 13620
+Improved performance of dxloaddb when reading LDIF files with a large
+number of continuations (multi-line attribute values).
+
+StarTrak: 17346171   LabTrack: 13629
+On Windows, the data directory is now removed when the product is
+uninstalled and the data directory is empty.
+
+StarTrak 17346159    LabTrack: 13634
+The upgrade process on Unix and Linux now only removes the temporary files
+it created during the upgrade, instead of deleting any pre-existing files
+as well.
+
+StarTrak: 17342573   LabTrack: 13619
+keep-order-of-values=<attribute> now also maintains the order of the
+multi-valued attribute values in a modify operation.
+
+StarTrak: 17265988   LabTrack: 13495, 13615, 13617
+- Fixed problem where large values where not being dumped properly
+- dxloaddb will stop the loading of LDIF data that contains items without
+  a parent.
+- dxloaddb now loads caCertificate items correctly
+
+StarTrak: 17159778   LabTrack: 13607
+Performance has been improved for the sequential deletion of entries
+after they were modified sequentially.
+
+StarTrak: 13852513  LabTrack: 7705
+DXcertgen now uses server .dxi files (and the knowledge they source)
+when determining DSAs for which to generate certificates and certificate
+signing requests.
+
+StarTrak: 17338334  LabTrack: 13613
+The installation using a response file now supports quoted non-space
+paths on the command line, preceding another property. (Windows)
+
+LabTrack: 13563
+DXserver no longer allows multiple values for the password attribute.
+
+LabTrack: 12756
+The Windows package no longer ships with the Windows installer, which is
+already available on all supported Windows platforms.
+
+StarTrak: 17289633  LabTrack: 13571
+Corrected format of the schema file iTechPoz.dxc.
+
+StarTrak: 17265988  LabTrack: 13495
+DXdumpdb now dumps pre-encrypted large "caseExactString" values correctly.
+
+StarTrak: 17301148  LabTrack: 13549
+Running an upgrade with a responsefile now ignores the parameters provided
+in the responsefile and honors the settings already installed. Previously
+dxsetup installed a new instance of Directory under the specified $DXHOME,
+even if Directory was already installed in a different location.
+
+StarTrak: 17260198  LabTrack: 13550
+On Windows, Ingres is no longer stopped during the pre-upgrade verification.
+If Ingres fails to stop during the upgrade, the user will need to stop Ingres
+manually. This overcomes the issue were Ingres is still stopped after Directory
+was migrated to DXgrid, and other applications still require Ingres.
+
+StarTrak: 17281865  LabTrack: 13522
+Addressed simple paged result issue when searching backbones that contain
+top-level DSAs servicing different namespaces.
+
+StarTrak: 17284696  LabTrack: 13515
+Distributed simple paged results now supports DSA backbones of more
+than 127 DSAs.
+
+StarTrak: 17265988  LabTrack: 13495
+Dumping of large values works now as expected in DXdumpdb.
+
+StarTrak: 17159778  LabTrack: 13496
+DXloaddb no longer assigns identical timestamps to all entries loaded.
+
+LabTrack: 13451
+The Uninstaller no longer removes the whole "/" directory if Directory
+was installed in the "/" directory.
+
+StarTrak: 17260064  LabTrack: 13482
+On Windows, upgrading Directory r8.0 that uses the MDB as the EEM user store
+now successfully migrates the EEM data to DXgrid.
+
+StarTrak: 17259798  LabTrack: 13478
+The backup location used during an upgrade can now be configured by using
+BACKUP_LOCATION=<path> on the command line or in the response file.
+<path> must point to an existing folder. If <path> has spaces, it must be
+quoted.
+i.e. BACKUP_LOCATION="<path>"
+
+StarTrak: 17189536, 17259784   LabTrack: 13476
+On Windows dxsetup.exe is now shipped in DXHOME/bin to support silent
+uninstalls.
+Note that Directory is removed only if there are no DXserver services installed.
+
+StarTrak: 17252764  LabTrack: 13474
+On Windows the creation of a response file can now be followed with the install
+of the product.
+
+StarTrak: 17213590  LabTrack: 13415
+ETPKI has been upgraded to r4.0.0-05. This fixes an issue when ssld could not
+list the supported ciphers.
+
+LabTrack: 13396
+DXmanager now uses realm based authentication and authorization. CA
+Embedded Entitlements Manager is no longer a prerequisite for DXmanager.
+
+LabTrack: 9343
+The Directory Management installer now configures https automatically.
+DXmanager is accessed by https://localhost:8443/dxmanager and the server.xml
+settings for DXmanager are now SSLEnabled="true" and sslProtocol="TLS"
+
+StarTrak: 16256015/2  LabTrack: 12494
+The recommended replication method is now MW-DISP. This removes the need for
+large in-memory queues.
+
+StarTrak: 15981847, 15993651    LabTrack: 11683
+Views can now be used to find the groups a user is a member of.
+
+StarTrak: 16874820   LabTrack: 13462
+Online dump has been improved. There is also an option to dump periodically:
+         dump dxgrid-db [ period <start> <period> ];
+<start> is the number of seconds since Sunday 00:00:00 am GMT
+<period> is the number of seconds between dumps.
+
+StarTrak: 17159778   LabTrack: 13327
+Deleting entries in the order they were added is no longer slower than
+deleting them in the opposite order.
+
+StarTrak: 17260742   LabTrack: 13441
+Addressed documentation uninstall issue where documentation was not completely
+removed causing issues with subsequent response file install.
+
+StarTrak: 17209696   LabTrack: 13418
+When authenticating anonymously to Nexor through a DXserver backbone,
+including the new the link-flags 'nexor' in the Nexor knowledge will cause
+the DSA name to not be set in the credentials.
+
+StarTrak: 17189621, 17166359   LabTrack: 13367
+Upgrades from the MDB used by EEM are now supported. The data is dumped from the
+MDB and loaded into the DXgrid datastore. The EEM data is removed from the MDB
+if the previous Directory version was more recent than 8.0.466.
+
+--------------------------------------------------------------------------------
+CA Directory r12.0 SP12 consists of:
+
+.  Directory r12.0 SP12 (this includes the tools)
+.  Directory Management r12.0 SP12
+.  Documentation r12.0 SP12
+
+This release of Directory r12.0 SP12 accumulates all changes to release 
+r8.1, r12, as well as r12 SPx that were distributed previously.
+
+-------------------------
+Known Issues and Notes
+-------------------------
+.  For a complete list of the known issues for this release, details about how the new features and enhancements
+   for this release might affect you, and information about operating system support and systems requirements, see the Release Summary.
+
+--------------------------------------------------------------------------------

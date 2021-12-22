@@ -1,0 +1,43 @@
+# logging and tracing
+source "../logging/default.dxc";
+#
+# schema
+clear schema;
+source "../schema/smsession.dxg";
+#
+# knowledge 
+clear dsas;
+source "../knowledge/ssosession.dxg";
+#
+# operational setting
+source "../settings/settings.dxc";
+#
+# service limits
+source "../limits/ssosession.dxc";
+#
+# access controls
+clear access;
+source "../access/default.dxc";
+#
+# replication agreements (rarely used)
+#source "../replication/";
+#
+# multiwrite DISP recovery 
+set multi-write-disp-recovery = false; 
+# disable transaction logging for performance
+set disable-transaction-log = true;
+set disable-transaction-log-flush = true;
+#
+# grid configuration
+set dxgrid-db-location = "data";
+set dxgrid-db-size = 100;
+#set cache-attrs = all-attributes;
+#set cache-index = all-attributes;
+#set cache-index-all-except = smVariableValue,smsessionblob;
+set cache-index = smSessionId, smExpirationTime, smIdleExpirationTime, smSearchData, smVariableName, smFullVariableName;
+set lookup-cache = true;
+set ignore-name-bindings = true;
+
+# use single queue in front of DSA instead of
+# one queue per thread
+set dxgrid-queue = true;

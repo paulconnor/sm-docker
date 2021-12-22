@@ -1,0 +1,38 @@
+version: 1
+
+dn: o=management-ui
+objectClass: top
+objectClass: organization
+o: management-ui
+
+dn: ou=users,o=management-ui
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=environments,o=management-ui
+objectClass: top
+objectClass: organizationalUnit
+ou: environments
+
+dn: ou=scim-servers,o=management-ui
+objectClass: top
+objectClass: organizationalUnit
+ou: scim-servers
+
+dn: cn=superuser,ou=users,o=management-ui
+objectClass: top
+objectClass: person
+cn: superuser
+sn: superuser
+dxPwdIgnoreSuspended: true
+dxPwdPolicy: Superuser
+userPassword: changeme
+
+dn: cn=admin,ou=users,o=management-ui
+objectClass: top
+objectClass: person
+cn: admin
+sn: admin
+userPassword: C@D1r3ct0ry
+

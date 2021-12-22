@@ -1,0 +1,379 @@
+# Computer Associates DXserver Library File
+# $Id: dxsetuplinux.shlib,v 1.49 2012/10/29 22:45:29 justin Exp $
+
+# If log not set then set to cat to ignore
+if [ -z "$LOG" ]; then
+    LOG="cat"
+fi
+
+OSPWD=/bin/pwd
+export OSPWD
+
+# Number of items returned in an empty directory
+OS_EMPTYDIR_COUNT=4;
+export OS_EMPTYDIR_COUNT
+
+SPATIAL_REQUIRED=",spatial"
+
+cap_net_bind_service_info()
+{
+echo "" | $LOG
+cat <<EOF | $LOG
+-------------------------------------------------------------------
+  For Linux systems there are two methods that allow the DXserver
+  to listen on ports <= 1024.
+  One approach is to change the ownership of a binary (dxserver)
+  to root and set 'setuid' flag for that binary.
+  A safer approach is to assign 'cap_net_bind_service' capability
+  to a binary. This allows access to ports <= 1024 without a need
+  for the binaries to be root.
+-------------------------------------------------------------------
+EOF
+}
+
+###########################################################################
+# set LEGACY_SETUID to y if using old style method to access ports < 1024 #
+###########################################################################
+get_legacy_setuid_response()
+{
+    QUESTION="  Do you want to use 'cap_net_bind_service' Linux capability for DXserver to listen on ports <= 1024? (y/n/i/q)"
+    DEFAULT="y"
+    get_response yniq
+
+    # If the answer is i then run the information subroutine
+    while [ "$RETURN" = "i" ]; do
+        cap_net_bind_service_info
+        QUESTION="  Do you want to use 'cap_net_bind_service' Linux capability for DXserver to listen on ports <= 1024? (y/n/i/q)"
+        DEFAULT="y"
+        get_response yniq
+    done
+
+    if [ "$RETURN" = "n" ]; then
+        LEGACY_SETUID="y"
+    fi
+}
+
+################################################################
+# return available file-system space (in Mb), given a filename #
+################################################################
+fs_space()
+{
+    RETURN=`/bin/df -Pk $1 | awk '$1 != "Filesystem" { print int($4/1024) }'`
+}
+
+##################
+# nice 'df' info #
+##################
+nice_df()
+{
+    echo 
+    /bin/df -Pk | awk '
+$1 == "  Filesystem" {
+         printf("FileSystem                        Used    Free Space\n")
+         printf("----------------------------------------------------\n")
+         next
+}
+
+$1 ~ /\/dev\// {
+    if (int($4) > int(lim))
+    comment=""
+    else
+    comment="[Not enough space]"
+    printf("  %-32.32s  %-6.6s  %4d Mb %s\n", $6,$5,int($4/1024),comment)
+}
+' lim=`expr $1 \* 1024` 
+}
+
+###########################################
+# Start DXserver at system reboot/startup #
+###########################################
+start_at_boot()
+{
+    if [ "$INSTALLDX" = "n" -a "$INSTALLDXWEBSERVER" = "n" -a "$INSTALLDXAGENT" = "n" ]; then
+        return
+    fi
+
+    echo | $LOG
+    echo "================================ REBOOT SCRIPTS ===============================" | $LOG
+    echo | $LOG
+    echo "  Setting system scripts to start $PRODNAME components at system boot" | $LOG
+
+    # Check if Ubuntu as this uses System-V reboot/shutdown scripts
+    BSDREBOOT=n
+    if [ -f /etc/lsb-release ]; then
+        grep -i "Ubuntu" /etc/lsb-release > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            BSDREBOOT=y
+        fi
+    fi
+
+    # if chkconfig has already been set then use that - may have been customized
+    if [ -f /etc/init.d/dxserver ]; then
+	cp -p /etc/init.d/dxserver /etc/init.d/dxserver.old > /dev/null 2>&1
+        CHKCONFIG=`grep chkconfig /etc/init.d/dxserver 2>/dev/null`
+    fi
+    if [ ! -n "$CHKCONFIG" ]; then
+        CHKCONFIG="# chkconfig: 2345 99 01"
+    fi
+
+    rm -f /etc/init.d/dxserver
+    rm -f /etc/init/dxserver.conf
+    # could rm -f /etc/rc.d/rc?.d/*dxserver but this would remove customer changes in this area
+    rm -f /etc/rc.d/rc6.d/K99dxserver
+    rm -f /etc/rc.d/rc6.d/K98dxserver
+    rm -f /etc/rc.d/rc6.d/K89dxserver
+    rm -f /etc/rc.d/rc5.d/S99dxserver
+    rm -f /etc/rc.d/rc4.d/S99dxserver
+    rm -f /etc/rc.d/rc3.d/S99dxserver
+    rm -f /etc/rc.d/rc2.d/K99dxserver
+    rm -f /etc/rc.d/rc2.d/K98dxserver
+    rm -f /etc/rc.d/rc2.d/K89dxserver
+    rm -f /etc/rc.d/rc1.d/K99dxserver
+    rm -f /etc/rc.d/rc1.d/K98dxserver
+    rm -f /etc/rc.d/rc1.d/K89dxserver
+    rm -f /etc/rc.d/rc0.d/K99dxserver
+    rm -f /etc/rc.d/rc0.d/K98dxserver
+    rm -f /etc/rc.d/rc0.d/K89dxserver
+    rm -f /etc/rc6.d/S01dxserver
+    rm -f /etc/rc2.d/S01dxserver
+    rm -f /etc/rc1.d/S01dxserver
+    rm -f /etc/rc0.d/S01dxserver
+
+DXINITRC="$DXHOME/install/dxinitrc.skl"
+if [ ! -f $DXINITRC ]; then
+	DXINITRC="$DXWEBHOME/install/dxinitrc.skl"
+fi
+
+    # copy files to startup scripts in /etc/init.d and /etc/rc?.d/
+    sed -e "s|__DXHOME__|$DXHOME|g" \
+        -e "s|__DXWEBHOME__|$DXWEBHOME|g" \
+        -e "s|__DXUIHOME__|$DXUIHOME|g" \
+        -e "s|__SH__|/bin/sh|g" \
+        $DXINITRC > /tmp/dxinitrc
+
+    sed '/#__LINUX_INIT_INFO__/ a\
+'"$CHKCONFIG"' \
+# description: CA Directory service \
+\
+### BEGIN INIT INFO \
+# Provides: dxserver \
+# Required-Start: $local_fs $network $remote_fs \
+# Required-Stop: $local_fs $network $remote_fs \
+# Default-Start: 2 3 5 \
+# Default-Stop:  0 1 6 \
+# Description: CA Directory \
+### END INIT INFO
+        ' /tmp/dxinitrc > /etc/init.d/dxserver
+
+    chown root:sys /etc/init.d/dxserver
+    chmod u+x /etc/init.d/dxserver
+
+    if [ "$BSDREBOOT" = "y" ]; then
+        #cp $DXHOME/install/dxserver.conf /etc/init/dxserver.conf
+        #chown root:root /etc/init/dxserver.conf
+        #chmod 644 /etc/init/dxserver.conf
+        # Unfortunately, there is a bug on Ubuntu where pre-stop stanza
+        # processing is failing as the UpStart process is killed by the
+        # rc scripts.
+        if [ -d /etc/rc6.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc6.d/S01dxserver; fi
+        if [ -d /etc/rc2.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc2.d/S01dxserver; fi
+        if [ -d /etc/rc1.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc1.d/S01dxserver; fi
+        if [ -d /etc/rc0.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc0.d/S01dxserver; fi
+    elif [ -f /etc/SuSE-release ]; then
+        SUSEVERSION=`grep VERSION /etc/SuSE-release | awk -F= '{print $2}' | awk -F. '{print $1}'` 
+        insserv -r dxserver  # refresh runlevel links
+        insserv dxserver  # configure runlevel links
+    else # Redhat
+        if [ -d /etc/rc.d/rc5.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc.d/rc5.d/S99dxserver; fi
+        if [ -d /etc/rc.d/rc4.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc.d/rc4.d/S99dxserver; fi
+        if [ -d /etc/rc.d/rc3.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc.d/rc3.d/S99dxserver; fi
+
+        if [ -d /etc/rc.d/rc6.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc.d/rc6.d/K98dxserver; fi
+        if [ -d /etc/rc.d/rc2.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc.d/rc2.d/K98dxserver; fi
+        if [ -d /etc/rc.d/rc1.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc.d/rc1.d/K98dxserver; fi
+        if [ -d /etc/rc.d/rc0.d/ ]; then ln -s /etc/init.d/dxserver /etc/rc.d/rc0.d/K98dxserver; fi
+    fi
+
+    # set dxserver to running so that it is shutdown after a fresh install
+    [ -d /var/lock/subsys ] && touch /var/lock/subsys/dxserver
+
+    # to enable the dxserver service to be started on reboot >= SuSe 10
+    if [ -f /etc/SuSE-release ]; then
+        if [ $SUSEVERSION -ge 10 ]; then
+            if [ -x /sbin/chkconfig ]; then
+                /sbin/chkconfig dxserver on
+            fi
+        fi
+    elif [ "$BSDREBOOT" = "n" ]; then # run chkconfig on Redhat (not Ubuntu)
+	if [ -x /sbin/chkconfig ]; then
+		/sbin/chkconfig dxserver on
+	fi
+    fi
+}
+
+get_library_name()
+{
+    LIB_NAME=LD_LIBRARY_PATH
+    export LIB_NAME
+}
+
+dxgetent()
+{
+    # $1 = database: passwd, group
+    # $2 = entry
+    if [ -x /usr/bin/getent ]; then
+        # allow for non-installed getent
+        /usr/bin/getent "$1" "$2"
+        return $?
+    elif [ "$1" = "passwd" ]; then
+        grep "$2" /etc/passwd
+        return $?
+    elif [ "$1" = "group" ]; then
+        grep "$2" /etc/group
+        return $?
+    else
+        return 1
+    fi
+}
+
+dxuseradd()
+{
+    if [ "$1" = "0" ]; then
+        /usr/sbin/useradd -g "$2" -c "$3" -M -d "$4" -s "$5" "$6"
+    else
+        /usr/sbin/useradd -u "$1" -g "$2" -c "$3" -M -d "$4" -s "$5" "$6"
+    fi
+    if [ $? -ne 0 ]; then
+        echo "  DXuseradd failed to add user $6. Please check."
+        return 1
+    fi
+}
+
+dxusermod()
+{
+    /usr/sbin/usermod -d $1 $2
+    if [ $? -ne 0 ]; then
+        echo "  DXusermod failed to modify directory for user $2. Please check."
+        return 1
+    fi
+}
+
+dxusermodgroup()
+{
+    # add DXUSER to DXGROUP
+    if [ "$3" = "primary" ]; then
+        /usr/sbin/usermod -g $1 $2
+    else
+        /usr/sbin/usermod -G $1 $2
+    fi
+
+    if [ $? -ne 0 ]; then
+        echo "  DXusermodgroup failed to modify group for user $2. Please check."
+        return 1
+    fi
+}
+
+dxuserdel()
+{
+    /usr/sbin/userdel $1
+    if [ $? -ne 0 ]; then
+        echo "  DXuserdel failed to delete user $1. Please check."
+        return 1
+    fi
+}
+
+dxgroupadd()
+{
+    if [ "$1" = "0" ]; then
+        /usr/sbin/groupadd $2
+    else
+        /usr/sbin/groupadd -g $1 $2
+    fi
+    if [ $? -ne 0 ]; then
+        echo "  DXgroupadd failed to add group $2. Please check."
+        return 1
+    fi
+}
+
+remove_reboot_scripts()
+{
+    if [ -f /etc/rc.d/init.d/dxserver -o -f /etc/init.d/dxserver ]; then
+        # remove run control scripts for DXserver
+        echo | $LOG
+        echo "Removing system startup/shutdown control scripts..." 
+        rm -f /etc/rc.d/rc?.d/*dxserver*
+        rm -f /etc/rc.d/init.d/*dxserver*
+        rm -f /etc/rc?.d/*dxserver*
+        rm -f /etc/init.d/*dxserver*
+        rm -f /etc/init/dxserver.conf
+    fi
+}
+
+######################################
+# Find out what shell the user wants #
+######################################
+get_user_shell()
+{
+    if [ $DEFANS -eq 1 ]; then
+        RETURN=$2
+    else
+        echo "
+     The $1 account needs to be created and requires a login shell.
+     The following are standard login shells:
+
+     /bin/csh      the C Shell            (May require tcsh RPM to be installed)
+     /bin/tcsh     the Improved C Shell   (May require tcsh RPM to be installed)
+     /bin/sh       the Bourne Shell
+     /bin/bash     the Bourne Again Shell" | $LOG
+
+        QUESTION="  Enter the login shell for the $1 account"
+        DEFAULT=/bin/bash
+        get_response executable
+    fi
+    # 9018: validate shell
+    while [ ! -x $RETURN ]; do
+        echo
+        echo "  $RETURN does not exist. Please enter a valid shell for this machine."
+
+        if [ $DEFANS -eq 1 ]; then
+            checkpoint
+        fi
+        QUESTION="  Enter the login shell for the $1 account"
+        DEFAULT=/bin/bash
+        get_response executable
+    done
+}
+
+#######################################
+# test if machine is 64-bit capable   #
+# returns IS64BIT = 1 (yes) or 0 (no) #
+#######################################
+get_64_bit()
+{
+    IS64BIT=0
+
+    if [ `uname -m` = "ia64" ]; then
+        : # skip
+    else
+        uname -m | grep 64 > /dev/null
+        if [ $? -eq 0 ]; then
+            IS64BIT=1
+        fi
+    fi
+    export IS64BIT
+}
+
+
+#############################
+# check maximum PATH length #
+#############################
+get_path_length()
+{
+    MAXPATHLENGTH=255 # random number
+    if [ -f /usr/include/linux/limits.h ]; then
+        MAXPATHLENGTH=`grep "define PATH_MAX" /usr/include/linux/limits.h | awk '{print $3}'`
+    fi
+    export MAXPATHLENGTH
+}
+
+

@@ -1,0 +1,56 @@
+# ============================================
+#   CA Directory Management UI Response File
+# ============================================
+# This response file is used to provide the default responses to dxsetup
+# for all installations.
+#
+# The current defaults conform to CA installation standards so these should 
+# be taken into account when making modifications.
+#
+# Ensure the variable names being set are not changed and that this file
+# is Bourne Shell compatible.
+#
+
+# ====================
+#   Install Defaults
+# ====================
+
+# Installation user. This user will need to be able to maintain users, restart
+# scripts and kernel parameters (OS specific). It is recommended the default be
+# used.
+INSTUSER=root
+
+# The base directory of the install. All components will be installed under
+# this directory unless explicitly overridden.
+ETDIRHOME="/opt/CA/Directory"
+
+# =====================
+#   DXserver Defaults
+# =====================
+
+DXUID=               # (optional) blank UID defaults to OS-allocated UID 
+DXSHELL="/bin/bash"  # Default DXserver shell
+DXGROUP=etrdir       # Default CA Directory group
+DXGID=               # (optional) blank GID defaults to OS-allocated GID
+
+# ====================
+#   DXagent Defaults
+# ====================
+
+DXAGENTCLIENT=dxaclient
+DXAGENTPORT=9443
+
+# ===================
+#   MgmtUI Defaults
+# ===================
+
+UIWEBPORT=3000
+USEOWNWEBCERT=n
+UIDSAPORTLOCAL=10389
+
+# =======================
+#   Monitoring Defaults
+# =======================
+
+UIDSAMONPORTLOCAL=11389
+
